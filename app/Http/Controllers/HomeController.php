@@ -1,0 +1,53 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\Category;
+use App\Models\Product;
+use Illuminate\View\View;
+
+class HomeController extends Controller
+{
+    /**
+     * Display the marketplace landing page.
+     */
+    public function index(): View
+    {
+        $featured = Product::query()
+            ->published()
+            ->featured()
+            ->with('category')
+            ->latest()
+            ->take(6)
+            ->get();
+
+        $latest = Product::query()
+            ->published()
+            ->with('category')
+            ->latest()
+            ->take(8)
+            ->get();
+
+        $topRated = Product::query()
+            ->published()
+            ->with('category')
+            ->orderByDesc('rating')
+            ->orderByDesc('reviews_count')
+            ->take(4)
+            ->get();
+
+        $categories = Category::query()
+            ->where('is_active', true)
+            ->withCount('publishedProducts')
+            ->orderBy('name')
+            ->get();
+
+        $stats = [
+            'products' => Product::published()->count(),
+            'downloads' => (int) Product::published()->sum('downloads'),
+            'categories' => $categories->count(),
+        ];
+
+        return view('home', compact('featured', 'latest', 'topRated', 'categories', 'stats'));
+    }
+}
