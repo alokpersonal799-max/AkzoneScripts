@@ -15,7 +15,9 @@
     <div class="mb-6 flex items-end justify-between gap-4">
         <div>
             @if ($eyebrow)
-                <span class="section-eyebrow">{{ $eyebrow }}</span>
+                <span class="inline-flex items-center gap-1.5 rounded-full bg-brand-50 px-3 py-1 text-xs font-bold uppercase tracking-wide text-brand-600">
+                    <span class="h-1.5 w-1.5 rounded-full bg-brand-500"></span>{{ $eyebrow }}
+                </span>
             @endif
             <h2 class="mt-2 section-title">{{ $title }}</h2>
             @if ($subtitle)
@@ -24,7 +26,7 @@
         </div>
         <div class="flex items-center gap-2">
             @if ($viewAll)
-                <a href="{{ $viewAll }}" class="hidden text-sm font-semibold text-brand-600 hover:text-brand-700 sm:block">View all &rarr;</a>
+                <a href="{{ $viewAll }}" class="hidden rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-ink-900 transition hover:border-brand-300 hover:text-brand-600 sm:block">View All</a>
             @endif
             <button type="button" @click="scroll(-1)" :disabled="atStart" class="flex h-10 w-10 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-600 transition hover:bg-slate-50 disabled:opacity-40">
                 <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" /></svg>

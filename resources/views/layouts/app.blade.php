@@ -5,6 +5,15 @@
 </head>
 <body class="min-h-screen bg-slate-50 font-sans text-slate-600 antialiased">
 
+    {{-- Top announcement bar --}}
+    <div class="bg-ink-900 text-white">
+        <div class="mx-auto flex max-w-7xl items-center justify-center gap-2 px-4 py-2 text-center text-xs font-medium sm:text-sm">
+            <span class="hidden sm:inline-flex h-1.5 w-1.5 rounded-full bg-brand-400"></span>
+            🎉 Limited time — get up to <span class="font-bold text-brand-300">30% off</span> selected premium products.
+            <a href="{{ route('products.index', ['sort' => 'popular']) }}" class="ml-1 font-semibold text-brand-300 underline-offset-2 hover:underline">Shop deals</a>
+        </div>
+    </div>
+
     {{-- Navbar --}}
     <header x-data="{ open: false, scrolled: false }"
             @scroll.window="scrolled = window.pageYOffset > 8"
@@ -28,6 +37,7 @@
                 <a href="{{ route('home') }}" class="rounded-lg px-3 py-2 text-sm font-medium text-slate-600 transition hover:text-ink-900">Home</a>
                 <a href="{{ route('products.index') }}" class="rounded-lg px-3 py-2 text-sm font-medium text-slate-600 transition hover:text-ink-900">Marketplace</a>
                 <a href="{{ route('home') }}#categories" class="rounded-lg px-3 py-2 text-sm font-medium text-slate-600 transition hover:text-ink-900">Categories</a>
+                <a href="mailto:{{ config('marketplace.support_email') }}" class="rounded-lg px-3 py-2 text-sm font-medium text-slate-600 transition hover:text-ink-900">Become a seller</a>
             </div>
 
             <div class="flex items-center gap-2">
@@ -122,8 +132,8 @@
     {{-- Footer --}}
     <footer class="mt-24 border-t border-slate-200 bg-white">
         <div class="mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:px-8">
-            <div class="grid gap-10 md:grid-cols-4">
-                <div class="md:col-span-2">
+            <div class="grid gap-10 md:grid-cols-12">
+                <div class="md:col-span-4">
                     <a href="{{ route('home') }}" class="flex items-center gap-2">
                         <span class="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-brand-500 to-indigo-500 font-display text-lg font-extrabold text-white">A</span>
                         <span class="font-display text-xl font-extrabold text-ink-900">Akzone<span class="text-brand-600">Scripts</span></span>
@@ -137,35 +147,56 @@
                         @endforeach
                     </div>
                 </div>
-                <div>
-                    <h4 class="text-sm font-bold text-ink-900">Marketplace</h4>
+                <div class="md:col-span-3">
+                    <h4 class="text-sm font-bold text-ink-900">Categories</h4>
                     <ul class="mt-4 space-y-2.5 text-sm text-slate-500">
                         <li><a href="{{ route('products.index') }}" class="hover:text-brand-600">All products</a></li>
                         <li><a href="{{ route('products.index', ['sort' => 'popular']) }}" class="hover:text-brand-600">Best selling</a></li>
                         <li><a href="{{ route('products.index', ['sort' => 'rating']) }}" class="hover:text-brand-600">Top rated</a></li>
+                        <li><a href="{{ route('products.index') }}#categories" class="hover:text-brand-600">Browse all</a></li>
                     </ul>
                 </div>
-                <div>
-                    <h4 class="text-sm font-bold text-ink-900">Account</h4>
+                <div class="md:col-span-3">
+                    <h4 class="text-sm font-bold text-ink-900">Quick Links</h4>
                     <ul class="mt-4 space-y-2.5 text-sm text-slate-500">
                         @auth
                             <li><a href="{{ route('dashboard') }}" class="hover:text-brand-600">Dashboard</a></li>
-                            <li><a href="{{ route('dashboard.purchases') }}" class="hover:text-brand-600">Purchases</a></li>
+                            <li><a href="{{ route('dashboard.purchases') }}" class="hover:text-brand-600">My purchases</a></li>
                         @else
                             <li><a href="{{ route('login') }}" class="hover:text-brand-600">Sign in</a></li>
                             <li><a href="{{ route('register') }}" class="hover:text-brand-600">Create account</a></li>
                         @endauth
+                        <li><a href="{{ route('cart.index') }}" class="hover:text-brand-600">Cart</a></li>
                         <li><a href="mailto:{{ config('marketplace.support_email') }}" class="hover:text-brand-600">Support</a></li>
                     </ul>
                 </div>
+                <div class="md:col-span-2">
+                    <h4 class="text-sm font-bold text-ink-900">Legal</h4>
+                    <ul class="mt-4 space-y-2.5 text-sm text-slate-500">
+                        <li><a href="#" class="hover:text-brand-600">Terms of service</a></li>
+                        <li><a href="#" class="hover:text-brand-600">Privacy policy</a></li>
+                        <li><a href="#" class="hover:text-brand-600">Refund policy</a></li>
+                        <li><a href="#" class="hover:text-brand-600">License</a></li>
+                    </ul>
+                </div>
             </div>
-            <div class="mt-12 flex flex-col items-center justify-between gap-4 border-t border-slate-100 pt-6 sm:flex-row">
-                <p class="text-sm text-slate-400">&copy; {{ date('Y') }} {{ config('marketplace.name') }}. All rights reserved.</p>
-                <div class="flex items-center gap-2 opacity-80">
-                    @foreach (['VISA', 'MC', 'PayPal', 'Stripe'] as $pay)
-                        <span class="rounded-md border border-slate-200 bg-slate-50 px-2.5 py-1 text-[10px] font-bold text-slate-500">{{ $pay }}</span>
+
+            {{-- Secure payments --}}
+            <div class="mt-12 flex flex-col items-center justify-between gap-4 rounded-2xl border border-slate-200 bg-slate-50 px-6 py-4 sm:flex-row">
+                <div class="flex items-center gap-2 text-sm font-semibold text-ink-900">
+                    <svg class="h-5 w-5 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke-width="1.6" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75m-3-7.036A11.959 11.959 0 0 1 3.598 6 11.99 11.99 0 0 0 3 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285Z" /></svg>
+                    Secure payments
+                </div>
+                <div class="flex flex-wrap items-center gap-2">
+                    @foreach (['VISA', 'Mastercard', 'PayPal', 'Stripe', 'Apple Pay'] as $pay)
+                        <span class="rounded-md border border-slate-200 bg-white px-2.5 py-1 text-[10px] font-bold text-slate-500">{{ $pay }}</span>
                     @endforeach
                 </div>
+            </div>
+
+            <div class="mt-8 flex flex-col items-center justify-between gap-4 border-t border-slate-100 pt-6 sm:flex-row">
+                <p class="text-sm text-slate-400">&copy; {{ date('Y') }} {{ config('marketplace.name') }}. All rights reserved.</p>
+                <p class="text-sm text-slate-400">Crafted with care for modern builders.</p>
             </div>
         </div>
     </footer>

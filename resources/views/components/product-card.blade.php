@@ -5,21 +5,28 @@
         <img src="{{ $product->thumbnail_url }}" alt="{{ $product->title }}"
              class="h-full w-full object-cover transition duration-500 group-hover:scale-105" loading="lazy">
         <div class="absolute inset-x-0 top-0 flex items-start justify-between p-3">
-            @if ($product->is_featured)
-                <span class="chip bg-indigo-600/95 text-white shadow-sm backdrop-blur">Featured</span>
-            @else
-                <span></span>
-            @endif
-            @if ($product->is_on_sale)
-                <span class="chip bg-rose-500/95 text-white shadow-sm backdrop-blur">Sale</span>
-            @endif
+            <div class="flex flex-col gap-1.5">
+                @if ($product->is_featured)
+                    <span class="chip bg-indigo-600/95 text-white shadow-sm backdrop-blur">Featured</span>
+                @endif
+                @if ($product->is_on_sale)
+                    <span class="chip bg-rose-500/95 text-white shadow-sm backdrop-blur">Sale</span>
+                @endif
+            </div>
+            <span class="chip bg-white/95 text-ink-900 shadow-sm backdrop-blur">
+                <svg class="h-3.5 w-3.5 text-amber-400" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 0 0 .95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 0 0-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 0 0-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 0 0-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 0 0 .951-.69l1.07-3.292Z" /></svg>
+                {{ number_format($product->rating, 1) }}
+            </span>
         </div>
     </a>
 
     <div class="flex flex-1 flex-col p-4">
         <div class="flex items-center justify-between gap-2">
             <span class="chip bg-brand-50 text-brand-700">{{ $product->category?->name ?? 'Uncategorized' }}</span>
-            <x-star-rating :rating="$product->rating" :count="$product->reviews_count" size="h-3.5 w-3.5" />
+            <span class="inline-flex items-center gap-1 text-xs text-slate-400">
+                <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3" /></svg>
+                {{ number_format($product->downloads) }}
+            </span>
         </div>
 
         <h3 class="mt-3 font-display text-base font-bold leading-snug text-ink-900">
