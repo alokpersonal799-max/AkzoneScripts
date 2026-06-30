@@ -13,6 +13,41 @@
             @csrf
             @method('PUT')
 
+            {{-- Announcement bar (independent of hero mode) --}}
+            <div class="card p-6">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h2 class="font-display text-lg font-bold text-ink-900">Announcement bar</h2>
+                        <p class="mt-1 text-sm text-slate-500">A slim bar shown at the very top of every page.</p>
+                    </div>
+                    <label class="flex cursor-pointer items-center gap-2 text-sm font-semibold text-ink-900">
+                        <input type="checkbox" name="announcement_enabled" value="1" {{ old('announcement_enabled', $announcementEnabled) ? 'checked' : '' }} class="rounded border-slate-300 text-brand-600 focus:ring-brand-500/30">
+                        Enabled
+                    </label>
+                </div>
+
+                <div class="mt-4">
+                    <label for="announcement_text" class="label">Message</label>
+                    <input id="announcement_text" name="announcement_text" type="text" value="{{ old('announcement_text', $announcementText) }}" class="input" placeholder="🎉 Summer sale — up to 40% off this week only!">
+                </div>
+
+                <div class="mt-4 grid gap-5 sm:grid-cols-2">
+                    <div>
+                        <label for="announcement_type" class="label">Priority / style</label>
+                        <select id="announcement_type" name="announcement_type" class="input">
+                            @foreach (['offer' => 'Offer (promotional)', 'info' => 'Info', 'success' => 'Success', 'warning' => 'Warning', 'alert' => 'Alert (high priority)'] as $value => $label)
+                                <option value="{{ $value }}" {{ old('announcement_type', $announcementType) === $value ? 'selected' : '' }}>{{ $label }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div>
+                        <label for="announcement_link" class="label">Link <span class="text-slate-400">(optional)</span></label>
+                        <input id="announcement_link" name="announcement_link" type="url" value="{{ old('announcement_link', $announcementLink) }}" class="input" placeholder="Leave blank → opens the marketplace">
+                    </div>
+                </div>
+                <p class="mt-2 text-xs text-slate-400">If no link is set, the bar links to your products/marketplace page automatically.</p>
+            </div>
+
             {{-- Mode picker --}}
             <div class="card p-6">
                 <label class="label">Promotion mode</label>

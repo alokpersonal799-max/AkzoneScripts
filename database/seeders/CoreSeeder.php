@@ -39,9 +39,11 @@ class CoreSeeder extends Seeder
             'hero_highlight' => ['hero', 'next project'],
             'hero_subtitle' => ['hero', 'Buy and download premium scripts, source code, UI kits and design assets. Instant delivery, lifetime access and updates included.'],
 
-            // Announcement bar
-            'announcement_enabled' => ['general', '1'],
-            'announcement_text' => ['general', 'Limited time — get up to 30% off selected premium products.'],
+            // Announcement bar (managed in Admin → Promotions)
+            'announcement_enabled' => ['promotion', '1'],
+            'announcement_text' => ['promotion', 'Limited time — get up to 30% off selected premium products.'],
+            'announcement_type' => ['promotion', 'offer'],
+            'announcement_link' => ['promotion', ''],
 
             // Footer
             'footer_about' => ['footer', 'Discover a vibrant online hub offering a diverse collection of premium scripts & plugins for seamless digital products.'],

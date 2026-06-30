@@ -122,8 +122,6 @@ class SettingController extends Controller
             'social_facebook' => ['nullable', 'string', 'max:255'],
             'contact_whatsapp' => ['nullable', 'string', 'max:50'],
             'contact_telegram' => ['nullable', 'string', 'max:100'],
-            'announcement_enabled' => ['nullable', 'boolean'],
-            'announcement_text' => ['nullable', 'string', 'max:500'],
             'timezone' => ['nullable', 'string', 'max:64', 'timezone'],
             'logo' => ['nullable', 'image', 'max:2048'],
         ]);
@@ -136,10 +134,9 @@ class SettingController extends Controller
             Setting::put('site_logo', $request->file('logo')->store('branding', 'public'), 'general');
         }
 
-        foreach (['site_name', 'support_email', 'social_twitter', 'social_github', 'social_discord', 'social_facebook', 'contact_whatsapp', 'contact_telegram', 'announcement_text'] as $key) {
+        foreach (['site_name', 'support_email', 'social_twitter', 'social_github', 'social_discord', 'social_facebook', 'contact_whatsapp', 'contact_telegram'] as $key) {
             Setting::put($key, $data[$key] ?? '', 'general');
         }
-        Setting::put('announcement_enabled', $request->boolean('announcement_enabled') ? '1' : '0', 'general');
         if (! empty($data['timezone'])) {
             Setting::put('timezone', $data['timezone'], 'general');
         }

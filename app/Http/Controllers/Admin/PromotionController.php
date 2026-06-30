@@ -29,6 +29,10 @@ class PromotionController extends Controller
             'countdownLabel2' => Setting::get('promo_countdown_label_2', 'Limited time offer'),
             'countdownUntil2' => Setting::get('promo_countdown_until_2', ''),
             'products' => Product::published()->orderBy('title')->get(['id', 'title']),
+            'announcementEnabled' => Setting::get('announcement_enabled', '0') === '1',
+            'announcementText' => Setting::get('announcement_text', ''),
+            'announcementType' => Setting::get('announcement_type', 'offer'),
+            'announcementLink' => Setting::get('announcement_link', ''),
         ]);
     }
 
@@ -50,6 +54,9 @@ class PromotionController extends Controller
             'promo_countdown_product_2' => ['nullable', 'integer', 'exists:products,id', 'required_with:promo_countdown_until_2'],
             'promo_countdown_label_2' => ['nullable', 'string', 'max:60'],
             'promo_countdown_until_2' => ['nullable', 'date', 'after:now', 'required_with:promo_countdown_product_2'],
+            'announcement_text' => ['nullable', 'string', 'max:255'],
+            'announcement_type' => ['nullable', 'in:info,offer,success,warning,alert'],
+            'announcement_link' => ['nullable', 'url', 'max:255'],
         ], [
             'promo_products.max' => 'You can feature at most 4 products.',
             'promo_countdown_until.after' => 'The offer end time must be in the future.',
@@ -71,6 +78,12 @@ class PromotionController extends Controller
         Setting::put('promo_countdown_product_2', (string) ($data['promo_countdown_product_2'] ?? ''), 'promotion');
         Setting::put('promo_countdown_label_2', $data['promo_countdown_label_2'] ?? '', 'promotion');
         Setting::put('promo_countdown_until_2', $data['promo_countdown_until_2'] ?? '', 'promotion');
+
+        // Announcement bar (independent of the hero promo mode).
+        Setting::put('announcement_enabled', $request->boolean('announcement_enabled') ? '1' : '0', 'promotion');
+        Setting::put('announcement_text', $data['announcement_text'] ?? '', 'promotion');
+        Setting::put('announcement_type', $data['announcement_type'] ?? 'offer', 'promotion');
+        Setting::put('announcement_link', $data['announcement_link'] ?? '', 'promotion');
 
         $labels = ['off' => 'turned off', 'products' => 'set to featured products', 'message' => 'set to a custom message', 'countdown' => 'set to a countdown offer'];
 

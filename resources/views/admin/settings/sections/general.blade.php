@@ -44,14 +44,6 @@
             <div><label for="contact_telegram" class="label">Global Telegram username <span class="text-slate-400">(no @)</span></label><input id="contact_telegram" name="contact_telegram" type="text" value="{{ old('contact_telegram', setting('contact_telegram')) }}" class="input" placeholder="yourchannel"></div>
         </div>
 
-        <div class="rounded-xl border border-slate-200 p-4">
-            <label class="flex items-center gap-2 text-sm font-semibold text-ink-900">
-                <input type="checkbox" name="announcement_enabled" value="1" {{ setting('announcement_enabled') === '1' ? 'checked' : '' }} class="rounded border-slate-300 text-brand-600 focus:ring-brand-500/30">
-                Show announcement bar
-            </label>
-            <input name="announcement_text" type="text" value="{{ old('announcement_text', setting('announcement_text')) }}" class="input mt-3" placeholder="Announcement text...">
-        </div>
-
         <button type="submit" class="btn-primary btn-md">Save general settings</button>
     </form>
 </div>

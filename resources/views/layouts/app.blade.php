@@ -5,13 +5,29 @@
 </head>
 <body class="min-h-screen bg-slate-50 font-sans text-slate-600 antialiased">
 
-    {{-- Top announcement bar --}}
-    @if (setting('announcement_enabled', '1') === '1' && setting('announcement_text'))
-        <div class="bg-ink-900 text-white">
-            <div class="mx-auto flex max-w-7xl items-center justify-center gap-2 px-4 py-2 text-center text-xs font-medium sm:text-sm">
-                <span class="hidden h-1.5 w-1.5 rounded-full bg-brand-400 sm:inline-flex"></span>
-                {{ setting('announcement_text') }}
-                <a href="{{ route('products.index', ['sort' => 'popular']) }}" class="ml-1 font-semibold text-brand-300 underline-offset-2 hover:underline">Shop deals</a>
+    {{-- Top announcement bar (managed in Admin → Promotions) --}}
+    @if (setting('announcement_enabled', '0') === '1' && setting('announcement_text'))
+        @php
+            $annType = setting('announcement_type', 'offer');
+            $annLink = setting('announcement_link') ?: route('products.index');
+            $annStyles = [
+                'info'    => ['bar' => 'bg-gradient-to-r from-brand-600 to-indigo-600', 'icon' => 'M11.25 11.25l.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z', 'label' => 'Info', 'cta' => 'Learn more'],
+                'offer'   => ['bar' => 'bg-gradient-to-r from-fuchsia-600 via-brand-600 to-indigo-600', 'icon' => 'M9.813 15.904 9 18.75l-.813-2.846a4.5 4.5 0 0 0-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 0 0 3.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 0 0 3.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 0 0-3.09 3.09Z', 'label' => 'Offer', 'cta' => 'Shop now'],
+                'success' => ['bar' => 'bg-gradient-to-r from-emerald-600 to-teal-600', 'icon' => 'M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z', 'label' => 'Success', 'cta' => 'View'],
+                'warning' => ['bar' => 'bg-gradient-to-r from-amber-500 to-orange-500', 'icon' => 'M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z', 'label' => 'Warning', 'cta' => 'Details'],
+                'alert'   => ['bar' => 'bg-gradient-to-r from-rose-600 to-red-600', 'icon' => 'M14.857 17.082a23.848 23.848 0 0 0 5.454-1.31A8.967 8.967 0 0 1 18 9.75V9A6 6 0 0 0 6 9v.75a8.967 8.967 0 0 1-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 0 1-5.714 0m5.714 0a3 3 0 1 1-5.714 0', 'label' => 'Alert', 'cta' => 'View'],
+            ];
+            $ann = $annStyles[$annType] ?? $annStyles['offer'];
+        @endphp
+        <div class="{{ $ann['bar'] }} text-white">
+            <div class="mx-auto flex max-w-7xl items-center justify-center gap-2.5 px-4 py-2 text-center text-xs font-medium sm:text-sm">
+                <svg class="hidden h-4 w-4 flex-shrink-0 sm:inline-flex" fill="none" viewBox="0 0 24 24" stroke-width="1.7" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="{{ $ann['icon'] }}" /></svg>
+                <span class="hidden rounded-full bg-white/20 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide sm:inline-flex">{{ $ann['label'] }}</span>
+                <span>{{ setting('announcement_text') }}</span>
+                <a href="{{ $annLink }}" class="ml-1 inline-flex items-center gap-1 font-bold text-white underline-offset-2 hover:underline">
+                    {{ $ann['cta'] }}
+                    <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke-width="2.2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" /></svg>
+                </a>
             </div>
         </div>
     @endif
