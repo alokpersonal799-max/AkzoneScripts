@@ -12,11 +12,30 @@ use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DownloadController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\InstallController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\WishlistController;
 use Illuminate\Support\Facades\Route;
+
+/*
+|--------------------------------------------------------------------------
+| Web Installer (locked automatically after setup completes)
+|--------------------------------------------------------------------------
+*/
+
+Route::controller(InstallController::class)->prefix('install')->name('install.')->group(function () {
+    Route::get('/', 'requirements')->name('requirements');
+    Route::get('/permissions', 'permissions')->name('permissions');
+    Route::get('/database', 'database')->name('database');
+    Route::post('/database', 'saveDatabase')->name('database.save');
+    Route::get('/import', 'import')->name('import');
+    Route::post('/import', 'runImport')->name('import.run');
+    Route::get('/account', 'account')->name('account');
+    Route::post('/account', 'saveAccount')->name('account.save');
+    Route::get('/finish', 'finish')->name('finish');
+});
 
 /*
 |--------------------------------------------------------------------------
