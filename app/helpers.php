@@ -10,7 +10,7 @@ if (! function_exists('setting')) {
     function setting(?string $key = null, mixed $default = null): mixed
     {
         if (is_null($key)) {
-            return Setting::all();
+            return Setting::cached();
         }
 
         return Setting::get($key, $default);

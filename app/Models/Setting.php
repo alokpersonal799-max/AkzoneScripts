@@ -17,7 +17,7 @@ class Setting extends Model
      *
      * @return array<string, mixed>
      */
-    public static function all(): array
+    public static function cached(): array
     {
         if (! Schema::hasTable('settings')) {
             return [];
@@ -33,7 +33,7 @@ class Setting extends Model
      */
     public static function get(string $key, mixed $default = null): mixed
     {
-        return static::all()[$key] ?? $default;
+        return static::cached()[$key] ?? $default;
     }
 
     /**

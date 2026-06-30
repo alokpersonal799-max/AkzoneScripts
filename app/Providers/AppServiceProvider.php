@@ -34,7 +34,7 @@ class AppServiceProvider extends ServiceProvider
 
             $view->with([
                 'cartItemCount' => is_array($cart) ? count($cart) : 0,
-                'siteSettings' => \App\Models\Setting::all(),
+                'siteSettings' => \App\Models\Setting::cached(),
                 'activeCurrencies' => Currency::active(),
                 'currentCurrency' => app(CurrencyService::class)->current(),
             ]);

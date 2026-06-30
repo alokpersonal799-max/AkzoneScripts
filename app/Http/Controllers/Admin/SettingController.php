@@ -17,7 +17,7 @@ class SettingController extends Controller
     public function index(): View
     {
         return view('admin.settings.index', [
-            'settings' => Setting::all(),
+            'settings' => Setting::cached(),
         ]);
     }
 
