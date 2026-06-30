@@ -40,7 +40,9 @@ class CategoryController extends Controller
     {
         $data = $this->validateCategory($request);
 
-        Category::create($data);
+        $category = Category::create($data);
+
+        app(\App\Services\TelegramService::class)->notify('category_added', \App\Support\TelegramMessages::categoryAdded($category));
 
         return redirect()->route('admin.categories.index')
             ->with('success', 'Category created.');

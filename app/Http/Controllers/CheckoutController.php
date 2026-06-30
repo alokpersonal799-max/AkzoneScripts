@@ -201,6 +201,14 @@ class CheckoutController extends Controller
 
         \App\Models\AdminNotification::notifyAdmins('order', 'New order placed', $order->order_number.' · '.money($order->total), route('admin.orders.show', $order));
 
+        // Announce each purchased product to connected Telegram bots.
+        $order->loadMissing('items.product');
+        foreach ($order->items as $item) {
+            if ($item->product) {
+                app(\App\Services\TelegramService::class)->notify('purchase', \App\Support\TelegramMessages::purchase($user, $item->product));
+            }
+        }
+
         try {
             Mail::to($order->billing_email)->send(new \App\Mail\OrderReceiptMail($order->load('items')));
         } catch (\Throwable $e) {

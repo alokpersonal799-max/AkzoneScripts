@@ -39,6 +39,8 @@ class ReviewController extends Controller
 
         \App\Models\AdminNotification::notifyAdmins('review', 'New review to approve', $user->name.' on '.$product->title, route('admin.reviews.index', ['filter' => 'pending']));
 
+        app(\App\Services\TelegramService::class)->notify('review', \App\Support\TelegramMessages::review($user, $product, (int) $validated['rating']));
+
         return back()->with('success', 'Thanks for your review! It will appear once an admin approves it.');
     }
 }

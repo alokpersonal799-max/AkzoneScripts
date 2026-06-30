@@ -87,6 +87,11 @@ class PromotionController extends Controller
 
         $labels = ['off' => 'turned off', 'products' => 'set to featured products', 'message' => 'set to a custom message', 'countdown' => 'set to a countdown offer'];
 
+        // Announce the updated promotion to connected Telegram bots.
+        if ($data['promo_mode'] !== 'off') {
+            app(\App\Services\TelegramService::class)->notify('promotion', \App\Support\TelegramMessages::promotionFromSettings());
+        }
+
         return back()->with('success', 'Hero promotion '.$labels[$data['promo_mode']].'.');
     }
 }

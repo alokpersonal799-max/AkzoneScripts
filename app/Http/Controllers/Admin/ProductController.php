@@ -52,6 +52,11 @@ class ProductController extends Controller
 
         $product = Product::create($data);
 
+        // Announce newly published products to connected Telegram bots.
+        if ($product->status === 'published') {
+            app(\App\Services\TelegramService::class)->notify('product_added', \App\Support\TelegramMessages::productAdded($product));
+        }
+
         return redirect()->route('admin.products.index')
             ->with('success', '"'.$product->title.'" has been created.');
     }

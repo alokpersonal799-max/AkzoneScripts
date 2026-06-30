@@ -72,6 +72,14 @@ class OrderController extends Controller
                 $item->product?->incrementQuietly('sales');
             }
 
+            // Announce verified purchases to connected Telegram bots.
+            $buyer = $order->user ?: new \App\Models\User(['name' => $order->billing_name, 'email' => $order->billing_email]);
+            foreach ($order->items as $item) {
+                if ($item->product) {
+                    app(\App\Services\TelegramService::class)->notify('purchase', \App\Support\TelegramMessages::purchase($buyer, $item->product));
+                }
+            }
+
             try {
                 \Illuminate\Support\Facades\Mail::to($order->billing_email)
                     ->send(new \App\Mail\OrderReceiptMail($order));

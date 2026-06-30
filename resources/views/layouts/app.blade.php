@@ -19,8 +19,8 @@
             ];
             $ann = $annStyles[$annType] ?? $annStyles['offer'];
         @endphp
-        <div class="{{ $ann['bar'] }} text-white">
-            <div class="mx-auto flex max-w-7xl items-center justify-center gap-2.5 px-4 py-2 text-center text-xs font-medium sm:text-sm">
+        <div x-data="{ show: false, key: 'akz_ann_{{ substr(md5(setting('announcement_text').$annType.($annLink)), 0, 10) }}', init(){ this.show = localStorage.getItem(this.key) !== '1' } }" x-show="show" x-cloak class="relative {{ $ann['bar'] }} text-white">
+            <div class="mx-auto flex max-w-7xl items-center justify-center gap-2.5 px-10 py-2 text-center text-xs font-medium sm:text-sm">
                 <svg class="hidden h-4 w-4 flex-shrink-0 sm:inline-flex" fill="none" viewBox="0 0 24 24" stroke-width="1.7" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="{{ $ann['icon'] }}" /></svg>
                 <span class="hidden rounded-full bg-white/20 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide sm:inline-flex">{{ $ann['label'] }}</span>
                 <span>{{ setting('announcement_text') }}</span>
@@ -29,6 +29,10 @@
                     <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke-width="2.2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" /></svg>
                 </a>
             </div>
+            <button type="button" @click="show = false; localStorage.setItem(key, '1')" title="Dismiss"
+                    class="absolute right-2 top-1/2 -translate-y-1/2 rounded-full p-1 text-white/70 transition hover:bg-white/20 hover:text-white">
+                <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" /></svg>
+            </button>
         </div>
     @endif
 

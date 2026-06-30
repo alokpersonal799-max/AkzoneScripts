@@ -56,6 +56,8 @@ class DownloadController extends Controller
         // Free products track downloads (not sales).
         $product->incrementQuietly('downloads');
 
+        app(\App\Services\TelegramService::class)->notify('free_download', \App\Support\TelegramMessages::freeDownload($user, $product));
+
         if ($isExternal) {
             return redirect()->away($product->external_url);
         }

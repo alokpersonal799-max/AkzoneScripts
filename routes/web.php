@@ -13,6 +13,7 @@ use App\Http\Controllers\Admin\SettingController as AdminSettingController;
 use App\Http\Controllers\Admin\StorageController as AdminStorageController;
 use App\Http\Controllers\Admin\PromotionController as AdminPromotionController;
 use App\Http\Controllers\Admin\SystemController as AdminSystemController;
+use App\Http\Controllers\Admin\TelegramController as AdminTelegramController;
 use App\Http\Controllers\Admin\TicketController as AdminTicketController;
 use App\Http\Controllers\Admin\ContactController as AdminContactController;
 use App\Http\Controllers\Admin\UserController as AdminUserController;
@@ -260,4 +261,12 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::put('/contacts/settings', [AdminContactController::class, 'updateSettings'])->name('contacts.settings');
     Route::get('/contacts/{contact}', [AdminContactController::class, 'show'])->name('contacts.show');
     Route::delete('/contacts/{contact}', [AdminContactController::class, 'destroy'])->name('contacts.destroy');
+
+    // Telegram bot connection.
+    Route::get('/telegram', [AdminTelegramController::class, 'index'])->name('tg.index');
+    Route::post('/telegram', [AdminTelegramController::class, 'store'])->name('tg.store');
+    Route::put('/telegram/{bot}', [AdminTelegramController::class, 'update'])->name('tg.update');
+    Route::delete('/telegram/{bot}', [AdminTelegramController::class, 'destroy'])->name('tg.destroy');
+    Route::post('/telegram/{bot}/test', [AdminTelegramController::class, 'test'])->name('tg.test');
+    Route::post('/telegram/broadcast', [AdminTelegramController::class, 'broadcast'])->name('tg.broadcast');
 });

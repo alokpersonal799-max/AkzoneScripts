@@ -46,6 +46,8 @@ class RegisteredUserController extends Controller
 
         \App\Models\AdminNotification::notifyAdmins('user', 'New registration', $user->name.' ('.$user->email.')', route('admin.users.show', $user));
 
+        app(\App\Services\TelegramService::class)->notify('registration', \App\Support\TelegramMessages::registration($user));
+
         if ($requireVerify) {
             try {
                 Mail::to($user->email)->send(new VerifyEmailMail($user));
