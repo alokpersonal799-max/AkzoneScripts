@@ -34,6 +34,11 @@ class Product extends Model
         'file_path',
         'file_name',
         'file_size',
+        'file_type',
+        'external_url',
+        'download_limit',
+        'link_expiry_minutes',
+        'download_message',
         'tags',
         'downloads',
         'sales',
@@ -69,6 +74,8 @@ class Product extends Model
             'views' => 'integer',
             'reviews_count' => 'integer',
             'file_size' => 'integer',
+            'download_limit' => 'integer',
+            'link_expiry_minutes' => 'integer',
         ];
     }
 
@@ -245,6 +252,30 @@ class Product extends Model
     public function getViewersNowAttribute(): int
     {
         return ((($this->id * 7) + ((int) now()->format('H') * 3)) % 25) + 5;
+    }
+
+    /**
+     * Whether the product is delivered via an external hosted link.
+     */
+    public function getIsExternalFileAttribute(): bool
+    {
+        return $this->file_type === 'external' && ! empty($this->external_url);
+    }
+
+    /**
+     * Whether there is something for a buyer to download (uploaded file or external link).
+     */
+    public function getHasDownloadableAttribute(): bool
+    {
+        return $this->is_external_file || ! empty($this->file_path);
+    }
+
+    /**
+     * Whether buyers can download an unlimited number of times.
+     */
+    public function getIsUnlimitedDownloadAttribute(): bool
+    {
+        return empty($this->download_limit) || (int) $this->download_limit <= 0;
     }
 
     /**

@@ -24,7 +24,9 @@ class DownloadController extends Controller
         $user = $request->user();
         $disk = Storage::disk('products');
 
-        if (! $product->file_path || ! $disk->exists($product->file_path)) {
+        $isExternal = $product->is_external_file;
+
+        if (! $isExternal && (! $product->file_path || ! $disk->exists($product->file_path))) {
             return back()->with('error', 'This free download is not available yet. Please check back soon.');
         }
 
@@ -54,6 +56,10 @@ class DownloadController extends Controller
         // Free products track downloads (not sales).
         $product->incrementQuietly('downloads');
 
+        if ($isExternal) {
+            return redirect()->away($product->external_url);
+        }
+
         return $disk->download($product->file_path, $product->file_name ?: basename($product->file_path));
     }
 
@@ -64,7 +70,7 @@ class DownloadController extends Controller
      * user and the parent order has been completed. Files live on the private
      * "products" disk and are never publicly reachable.
      */
-    public function download(Request $request, OrderItem $orderItem): StreamedResponse
+    public function download(Request $request, OrderItem $orderItem): StreamedResponse|RedirectResponse
     {
         $orderItem->load(['order', 'product']);
 
@@ -74,9 +80,29 @@ class DownloadController extends Controller
         // The order must be paid/completed.
         abort_unless($orderItem->order->isCompleted(), 403, 'This order has not been completed.');
 
+        // Links generated with an expiry carry a signature that must still be valid.
+        if ($request->has('signature') && ! $request->hasValidSignature()) {
+            return redirect()->route('dashboard.purchases')
+                ->with('error', 'This download link has expired. Open My Purchases to generate a fresh one.');
+        }
+
         $product = $orderItem->product;
 
-        abort_if(! $product || ! $product->file_path, 404, 'The download for this product is not available.');
+        abort_if(! $product || ! $product->has_downloadable, 404, 'The download for this product is not available.');
+
+        // Enforce the per-buyer download limit (0 / null = unlimited).
+        $limit = (int) ($product->download_limit ?? 0);
+        if ($limit > 0 && $orderItem->download_count >= $limit) {
+            return redirect()->route('dashboard.purchases')
+                ->with('error', 'You have reached the download limit for "'.$product->title.'". Contact support if you need access again.');
+        }
+
+        // External products: count the access and redirect to the hosted link.
+        if ($product->is_external_file) {
+            $orderItem->increment('download_count');
+
+            return redirect()->away($product->external_url);
+        }
 
         $disk = Storage::disk('products');
 

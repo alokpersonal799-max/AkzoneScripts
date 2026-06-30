@@ -148,6 +148,11 @@ class ProductController extends Controller
                 "mimes:{$allowed}",
                 "max:{$maxFile}",
             ],
+            'file_type' => ['nullable', 'in:upload,external'],
+            'external_url' => ['nullable', 'url', 'max:2000', 'required_if:file_type,external'],
+            'download_limit' => ['nullable', 'integer', 'min:0', 'max:100000'],
+            'link_expiry_minutes' => ['nullable', 'integer', 'min:0', 'max:525600'],
+            'download_message' => ['nullable', 'string', 'max:1000'],
         ]);
 
         // Normalise the comma separated tag string into an array.
@@ -162,6 +167,16 @@ class ProductController extends Controller
         $validated['is_featured'] = $request->boolean('is_featured');
         $validated['is_purchasable'] = $request->boolean('is_purchasable');
         $validated['use_global_contact'] = $request->boolean('use_global_contact');
+
+        // Default delivery type and normalise the optional limits.
+        $validated['file_type'] = $validated['file_type'] ?? 'upload';
+        $validated['download_limit'] = $validated['download_limit'] ?? null;
+        $validated['link_expiry_minutes'] = $validated['link_expiry_minutes'] ?? null;
+
+        // When delivered externally, the link is the source of truth; clear it for uploads.
+        if ($validated['file_type'] !== 'external') {
+            $validated['external_url'] = null;
+        }
 
         return $validated;
     }
@@ -182,7 +197,7 @@ class ProductController extends Controller
             $data['thumbnail'] = $request->file('thumbnail')->store('products', 'public');
         }
 
-        if ($request->hasFile('product_file')) {
+        if ($request->hasFile('product_file') && ($data['file_type'] ?? 'upload') !== 'external') {
             if ($product && $product->file_path) {
                 Storage::disk('products')->delete($product->file_path);
             }

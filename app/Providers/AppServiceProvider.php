@@ -31,6 +31,9 @@ class AppServiceProvider extends ServiceProvider
         // Apply admin-configured SMTP settings at runtime (if enabled).
         $this->applyMailSettings();
 
+        // Point the storage disks at the admin-selected cloud provider (if any).
+        $this->applyStorageSettings();
+
         // Share data needed by every view (navbar, footer, prices).
         View::composer('*', function ($view): void {
             $cart = session('cart', []);
@@ -79,6 +82,68 @@ class AppServiceProvider extends ServiceProvider
             'mail.mailers.smtp.encryption' => \App\Models\Setting::get('mail_encryption') ?: null,
             'mail.from.address' => \App\Models\Setting::get('mail_from_address') ?: config('mail.from.address'),
             'mail.from.name' => \App\Models\Setting::get('mail_from_name') ?: \App\Models\Setting::get('site_name', config('app.name')),
+        ]);
+    }
+
+    /**
+     * Re-point the "public" (images) and "products" (files) disks at the
+     * admin-selected S3-compatible provider. We override the existing disk
+     * names so all current code (Storage::disk('public'|'products')) works
+     * unchanged. Falls back to local storage if anything is missing.
+     */
+    protected function applyStorageSettings(): void
+    {
+        try {
+            if (! \Illuminate\Support\Facades\Schema::hasTable('settings')) {
+                return;
+            }
+        } catch (\Throwable $e) {
+            return;
+        }
+
+        $provider = \App\Models\Setting::get('storage_provider', 'local');
+
+        if ($provider === 'local' || $provider === '' || $provider === null) {
+            return;
+        }
+
+        $key = \App\Models\Setting::get('storage_s3_key');
+        $secret = \App\Models\Setting::get('storage_s3_secret');
+        $bucket = \App\Models\Setting::get('storage_s3_bucket');
+
+        // Not fully configured, or the S3 SDK isn't installed → stay on local
+        // storage so the site keeps working instead of throwing.
+        if (! $key || ! $secret || ! $bucket || ! class_exists(\Aws\S3\S3Client::class)) {
+            return;
+        }
+
+        $endpoint = \App\Models\Setting::get('storage_s3_endpoint') ?: null;
+        $publicUrl = \App\Models\Setting::get('storage_s3_url') ?: null;
+
+        $base = [
+            'driver' => 's3',
+            'key' => $key,
+            'secret' => $secret,
+            'region' => \App\Models\Setting::get('storage_s3_region') ?: 'us-east-1',
+            'bucket' => $bucket,
+            'endpoint' => $endpoint,
+            'use_path_style_endpoint' => \App\Models\Setting::get('storage_s3_path_style') === '1',
+            'throw' => false,
+            'report' => false,
+        ];
+
+        config([
+            // Public images (thumbnails, gallery, branding) → "images/" prefix, public.
+            'filesystems.disks.public' => array_merge($base, [
+                'root' => 'images',
+                'visibility' => 'public',
+                'url' => $publicUrl,
+            ]),
+            // Private downloadable packages → "files/" prefix, private.
+            'filesystems.disks.products' => array_merge($base, [
+                'root' => 'files',
+                'visibility' => 'private',
+            ]),
         ]);
     }
 }

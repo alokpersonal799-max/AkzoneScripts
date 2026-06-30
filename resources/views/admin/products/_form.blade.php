@@ -35,24 +35,13 @@
         {{-- Files --}}
         <div class="card p-6">
             <h3 class="font-display text-base font-bold text-ink-900">Media &amp; files</h3>
-            <div class="mt-4 grid gap-5 sm:grid-cols-2">
-                <div>
-                    <label for="thumbnail" class="label">Thumbnail image</label>
-                    @if ($product->thumbnail)
-                        <img src="{{ $product->thumbnail_url }}" alt="" class="mb-2 h-24 w-full rounded-lg object-cover">
-                    @endif
-                    <input id="thumbnail" name="thumbnail" type="file" accept="image/*"
-                           class="block w-full text-sm text-slate-500 file:mr-3 file:rounded-lg file:border-0 file:bg-brand-50 file:px-3 file:py-1.5 file:text-sm file:font-semibold file:text-brand-600 hover:file:bg-brand-100">
-                </div>
-                <div>
-                    <label for="product_file" class="label">Product package</label>
-                    @if ($product->file_name)
-                        <p class="mb-2 truncate rounded-lg bg-slate-100 px-3 py-2 text-xs text-slate-600">📦 {{ $product->file_name }} ({{ $product->formatted_file_size }})</p>
-                    @endif
-                    <input id="product_file" name="product_file" type="file"
-                           class="block w-full text-sm text-slate-500 file:mr-3 file:rounded-lg file:border-0 file:bg-brand-50 file:px-3 file:py-1.5 file:text-sm file:font-semibold file:text-brand-600 hover:file:bg-brand-100">
-                    <p class="mt-1 text-xs text-slate-400">Allowed: {{ implode(', ', config('marketplace.allowed_file_types')) }}. Stored privately.</p>
-                </div>
+            <div class="mt-4">
+                <label for="thumbnail" class="label">Thumbnail image</label>
+                @if ($product->thumbnail)
+                    <img src="{{ $product->thumbnail_url }}" alt="" class="mb-2 h-32 w-full max-w-xs rounded-lg object-cover">
+                @endif
+                <input id="thumbnail" name="thumbnail" type="file" accept="image/*"
+                       class="block w-full text-sm text-slate-500 file:mr-3 file:rounded-lg file:border-0 file:bg-brand-50 file:px-3 file:py-1.5 file:text-sm file:font-semibold file:text-brand-600 hover:file:bg-brand-100">
             </div>
 
             {{-- Gallery (max 6) --}}
@@ -76,6 +65,63 @@
             <div class="mt-5">
                 <label for="demo_url" class="label">Live demo URL</label>
                 <input id="demo_url" name="demo_url" type="url" value="{{ old('demo_url', $product->demo_url) }}" placeholder="https://..." class="input">
+            </div>
+        </div>
+
+        {{-- Delivery & downloads --}}
+        <div class="card p-6" x-data="{ fileType: '{{ old('file_type', $product->file_type ?? 'upload') }}' }">
+            <h3 class="font-display text-base font-bold text-ink-900">Delivery &amp; downloads</h3>
+            <p class="mt-1 text-xs text-slate-400">How buyers receive this product after purchase.</p>
+
+            {{-- Delivery type toggle --}}
+            <div class="mt-4 grid grid-cols-2 gap-3">
+                <label class="flex cursor-pointer items-start gap-2 rounded-xl border p-3 text-sm transition"
+                       :class="fileType === 'upload' ? 'border-brand-500 bg-brand-50' : 'border-slate-200 hover:bg-slate-50'">
+                    <input type="radio" name="file_type" value="upload" x-model="fileType" class="mt-0.5 text-brand-600 focus:ring-brand-500/30">
+                    <span><span class="font-semibold text-ink-900">Upload file</span><br><span class="text-xs text-slate-400">Store the package on your storage provider.</span></span>
+                </label>
+                <label class="flex cursor-pointer items-start gap-2 rounded-xl border p-3 text-sm transition"
+                       :class="fileType === 'external' ? 'border-brand-500 bg-brand-50' : 'border-slate-200 hover:bg-slate-50'">
+                    <input type="radio" name="file_type" value="external" x-model="fileType" class="mt-0.5 text-brand-600 focus:ring-brand-500/30">
+                    <span><span class="font-semibold text-ink-900">External link</span><br><span class="text-xs text-slate-400">Paste a link hosted on another platform.</span></span>
+                </label>
+            </div>
+
+            {{-- Upload --}}
+            <div x-show="fileType === 'upload'" x-cloak class="mt-5">
+                <label for="product_file" class="label">Product package</label>
+                @if ($product->file_name)
+                    <p class="mb-2 truncate rounded-lg bg-slate-100 px-3 py-2 text-xs text-slate-600">📦 {{ $product->file_name }} ({{ $product->formatted_file_size }})</p>
+                @endif
+                <input id="product_file" name="product_file" type="file"
+                       class="block w-full text-sm text-slate-500 file:mr-3 file:rounded-lg file:border-0 file:bg-brand-50 file:px-3 file:py-1.5 file:text-sm file:font-semibold file:text-brand-600 hover:file:bg-brand-100">
+                <p class="mt-1 text-xs text-slate-400">Allowed: {{ implode(', ', config('marketplace.allowed_file_types')) }}. Stored privately on the active provider.</p>
+            </div>
+
+            {{-- External --}}
+            <div x-show="fileType === 'external'" x-cloak class="mt-5">
+                <label for="external_url" class="label">External download link</label>
+                <input id="external_url" name="external_url" type="url" value="{{ old('external_url', $product->external_url) }}" placeholder="https://drive.google.com/..." class="input">
+                <p class="mt-1 text-xs text-slate-400">Buyers get a system-generated link that redirects here. The real URL stays hidden.</p>
+            </div>
+
+            {{-- Limits --}}
+            <div class="mt-6 grid gap-5 sm:grid-cols-2">
+                <div>
+                    <label for="download_limit" class="label">Downloads per buyer</label>
+                    <input id="download_limit" name="download_limit" type="number" min="0" value="{{ old('download_limit', $product->download_limit) }}" placeholder="0 = unlimited" class="input">
+                    <p class="mt-1 text-xs text-slate-400">e.g. <strong>1</strong> = one-time download, <strong>0</strong> or blank = unlimited.</p>
+                </div>
+                <div>
+                    <label for="link_expiry_minutes" class="label">Link valid for (minutes)</label>
+                    <input id="link_expiry_minutes" name="link_expiry_minutes" type="number" min="0" value="{{ old('link_expiry_minutes', $product->link_expiry_minutes) }}" placeholder="0 = never expires" class="input">
+                    <p class="mt-1 text-xs text-slate-400">Each generated link expires after this time. <strong>0</strong> or blank = never expires.</p>
+                </div>
+            </div>
+
+            <div class="mt-5">
+                <label for="download_message" class="label">Download message <span class="text-slate-400">(optional)</span></label>
+                <textarea id="download_message" name="download_message" rows="2" class="input" placeholder="Shown to buyers on the download screen, e.g. installation notes or support info.">{{ old('download_message', $product->download_message) }}</textarea>
             </div>
         </div>
     </div>

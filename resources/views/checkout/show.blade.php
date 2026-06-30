@@ -21,10 +21,10 @@
                         <p class="truncate font-semibold text-ink-900">{{ $item->product_title }}</p>
                         <p class="text-sm text-slate-500">{{ base_symbol() }}{{ number_format($item->price, 2) }}</p>
                     </div>
-                    @if ($order->isCompleted() && $item->product && $item->product->file_path)
-                        <a href="{{ route('download', $item) }}" class="btn-primary btn-sm flex-shrink-0">
+                    @if ($order->isCompleted() && $item->product && $item->product->has_downloadable)
+                        <a href="{{ route('download', $item) }}" class="btn-primary btn-sm flex-shrink-0" {{ $item->product->is_external_file ? 'target=_blank rel=noopener' : '' }}>
                             <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3" /></svg>
-                            Download
+                            {{ $item->product->is_external_file ? 'Get link' : 'Download' }}
                         </a>
                     @else
                         <span class="flex-shrink-0 text-sm text-slate-400">Pending</span>

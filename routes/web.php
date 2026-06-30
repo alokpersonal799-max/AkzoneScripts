@@ -10,6 +10,7 @@ use App\Http\Controllers\Admin\ProductController as AdminProductController;
 use App\Http\Controllers\Admin\ReportController as AdminReportController;
 use App\Http\Controllers\Admin\ReviewController as AdminReviewController;
 use App\Http\Controllers\Admin\SettingController as AdminSettingController;
+use App\Http\Controllers\Admin\StorageController as AdminStorageController;
 use App\Http\Controllers\Admin\TicketController as AdminTicketController;
 use App\Http\Controllers\Admin\UserController as AdminUserController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
@@ -233,4 +234,8 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::put('/settings/mail', [AdminSettingController::class, 'updateMail'])->name('settings.mail');
     Route::put('/settings/auth', [AdminSettingController::class, 'updateAuth'])->name('settings.auth');
     Route::put('/settings/integrations', [AdminSettingController::class, 'updateIntegrations'])->name('settings.integrations');
+
+    // Storage provider (where product images & files are stored).
+    Route::get('/storage', [AdminStorageController::class, 'index'])->name('storage.index');
+    Route::put('/storage', [AdminStorageController::class, 'update'])->name('storage.update');
 });
