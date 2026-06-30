@@ -104,6 +104,30 @@
             </div>
         </div>
 
+        <div class="card p-6" x-data="{ global: {{ old('use_global_contact', $product->use_global_contact ?? true) ? 'true' : 'false' }} }">
+            <h3 class="font-display text-base font-bold text-ink-900">Sales &amp; contact</h3>
+            <div class="mt-4 space-y-4">
+                <label class="flex items-start gap-2 text-sm text-slate-600">
+                    <input type="checkbox" name="is_purchasable" value="1" {{ old('is_purchasable', $product->is_purchasable ?? true) ? 'checked' : '' }} class="mt-0.5 rounded border-slate-300 text-brand-600 focus:ring-brand-500/30">
+                    <span><span class="font-semibold text-ink-900">Available for direct sale</span><br><span class="text-xs text-slate-400">If off, Buy Now is hidden and checkout is blocked — buyers contact you via WhatsApp/Telegram instead.</span></span>
+                </label>
+                <label class="flex items-center gap-2 text-sm text-slate-600">
+                    <input type="checkbox" name="use_global_contact" value="1" x-model="global" class="rounded border-slate-300 text-brand-600 focus:ring-brand-500/30">
+                    Use global contact (from System settings)
+                </label>
+                <div x-show="!global" x-cloak class="space-y-4">
+                    <div>
+                        <label for="contact_whatsapp" class="label">Product WhatsApp number</label>
+                        <input id="contact_whatsapp" name="contact_whatsapp" type="text" value="{{ old('contact_whatsapp', $product->contact_whatsapp) }}" class="input" placeholder="14155552671">
+                    </div>
+                    <div>
+                        <label for="contact_telegram" class="label">Product Telegram username</label>
+                        <input id="contact_telegram" name="contact_telegram" type="text" value="{{ old('contact_telegram', $product->contact_telegram) }}" class="input" placeholder="yourusername">
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <div class="card p-6">
             <h3 class="font-display text-base font-bold text-ink-900">Pricing &amp; category</h3>
             <div class="mt-4 space-y-4">

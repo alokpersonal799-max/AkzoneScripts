@@ -21,19 +21,24 @@ class CheckoutController extends Controller
      */
     public function index(): View|RedirectResponse
     {
-        $items = $this->cart->items();
+        $allItems = $this->cart->items();
 
-        if ($items->isEmpty()) {
+        if ($allItems->isEmpty()) {
             return redirect()->route('products.index')
                 ->with('info', 'Your cart is empty. Browse the catalog to find something great.');
         }
 
-        $subtotal = $this->cart->subtotal();
+        // Only directly-purchasable items can be checked out.
+        $items = $allItems->filter(fn ($p) => $p->is_purchasable)->values();
+        $contactOnly = $allItems->reject(fn ($p) => $p->is_purchasable)->values();
+
+        $subtotal = (float) $items->sum(fn ($p) => $p->current_price);
         $coupon = $this->activeCoupon($subtotal);
         $discount = $coupon ? $coupon->discountFor($subtotal) : 0;
 
         return view('checkout.index', [
             'items' => $items,
+            'contactOnly' => $contactOnly,
             'subtotal' => $subtotal,
             'coupon' => $coupon,
             'discount' => $discount,
@@ -94,11 +99,12 @@ class CheckoutController extends Controller
         // Skip products the customer already owns to avoid duplicate purchases.
         $items = $items->reject(fn ($product) => $user->hasPurchased($product->id))->values();
 
-        if ($items->isEmpty()) {
-            $this->cart->clear();
+        // Only directly-purchasable items can be checked out.
+        $items = $items->filter(fn ($product) => $product->is_purchasable)->values();
 
-            return redirect()->route('dashboard.purchases')
-                ->with('info', 'You already own everything that was in your cart.');
+        if ($items->isEmpty()) {
+            return redirect()->route('cart.index')
+                ->with('error', 'The items in your cart are not available for direct checkout. Please contact us via WhatsApp or Telegram to purchase them.');
         }
 
         $subtotal = (float) $items->sum(fn ($product) => $product->current_price);

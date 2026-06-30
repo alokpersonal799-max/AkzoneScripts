@@ -3,10 +3,10 @@
 @section('page-title', 'Site Settings')
 
 @section('admin')
-<div x-data="{ tab: 'general' }" class="space-y-6">
+<div x-data="{ tab: '{{ request('tab', 'general') }}' }" class="space-y-6">
     {{-- Tabs --}}
     <div class="flex flex-wrap gap-2">
-        @foreach (['general' => 'General', 'hero' => 'Hero Section', 'footer' => 'Footer'] as $key => $label)
+        @foreach (['general' => 'General', 'hero' => 'Hero Section', 'footer' => 'Footer', 'currencies' => 'Currencies'] as $key => $label)
             <button @click="tab = '{{ $key }}'"
                     :class="tab === '{{ $key }}' ? 'bg-brand-600 text-white' : 'bg-white text-slate-600 border border-slate-200'"
                     class="rounded-xl px-4 py-2 text-sm font-semibold transition">{{ $label }}</button>
@@ -121,6 +121,11 @@
 
             <button type="submit" class="btn-primary btn-md">Save footer</button>
         </form>
+    </div>
+
+    {{-- Currencies --}}
+    <div x-show="tab === 'currencies'" x-cloak>
+        @include('admin.currencies._manage')
     </div>
 </div>
 @endsection

@@ -18,6 +18,7 @@ class SettingController extends Controller
     {
         return view('admin.settings.index', [
             'settings' => Setting::cached(),
+            'currencies' => \App\Models\Currency::orderByDesc('is_default')->orderBy('code')->get(),
         ]);
     }
 

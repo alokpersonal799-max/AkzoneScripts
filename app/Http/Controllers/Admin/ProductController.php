@@ -37,7 +37,7 @@ class ProductController extends Controller
     public function create(): View
     {
         return view('admin.products.create', [
-            'product' => new Product(['status' => 'draft', 'version' => '1.0.0']),
+            'product' => new Product(['status' => 'draft', 'version' => '1.0.0', 'is_purchasable' => true, 'use_global_contact' => true]),
             'categories' => Category::orderBy('name')->get(),
         ]);
     }
@@ -133,6 +133,10 @@ class ProductController extends Controller
             'version' => ['required', 'string', 'max:50'],
             'status' => ['required', 'in:draft,published,archived'],
             'is_featured' => ['nullable', 'boolean'],
+            'is_purchasable' => ['nullable', 'boolean'],
+            'use_global_contact' => ['nullable', 'boolean'],
+            'contact_whatsapp' => ['nullable', 'string', 'max:50'],
+            'contact_telegram' => ['nullable', 'string', 'max:100'],
             'tags' => ['nullable', 'string', 'max:500'],
             'thumbnail' => ['nullable', 'image', 'max:4096'],
             'gallery' => ['nullable', 'array', 'max:6'],
@@ -156,6 +160,8 @@ class ProductController extends Controller
             : [];
 
         $validated['is_featured'] = $request->boolean('is_featured');
+        $validated['is_purchasable'] = $request->boolean('is_purchasable');
+        $validated['use_global_contact'] = $request->boolean('use_global_contact');
 
         return $validated;
     }

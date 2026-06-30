@@ -45,13 +45,27 @@
             <div class="card p-6">
                 <h2 class="font-display text-lg font-bold text-ink-900">Your order</h2>
                 <ul class="mt-4 space-y-3">
-                    @foreach ($items as $item)
+                    @forelse ($items as $item)
                         <li class="flex items-center justify-between gap-3 text-sm">
                             <span class="truncate text-slate-600">{{ $item->title }}</span>
                             <x-price :amount="$item->current_price" class="flex-shrink-0 font-semibold text-ink-900" />
                         </li>
-                    @endforeach
+                    @empty
+                        <li class="text-sm text-slate-500">No items available for direct checkout.</li>
+                    @endforelse
                 </ul>
+
+                @if ($contactOnly->isNotEmpty())
+                    <div class="mt-4 rounded-xl border border-amber-200 bg-amber-50 p-3 text-xs text-amber-700">
+                        <p class="font-semibold">Contact to purchase</p>
+                        <p class="mt-1">These items aren't available for direct checkout — contact us via WhatsApp/Telegram on their product page:</p>
+                        <ul class="mt-1 list-inside list-disc">
+                            @foreach ($contactOnly as $p)
+                                <li><a href="{{ route('products.show', $p) }}" class="font-medium underline">{{ $p->title }}</a></li>
+                            @endforeach
+                        </ul>
+                    </div>
+                @endif
 
                 {{-- Coupon --}}
                 <div class="mt-4 border-t border-slate-100 pt-4">
@@ -80,8 +94,12 @@
                     <div class="flex justify-between border-t border-slate-100 pt-3 text-base font-bold"><dt class="text-ink-900">Total</dt><dd class="text-brand-600">{{ money($total) }}</dd></div>
                 </dl>
 
-                <button type="submit" form="checkoutForm" class="btn-primary btn-lg mt-6 w-full">Complete purchase</button>
-                <p class="mt-3 text-center text-xs text-slate-400">By completing this purchase you agree to our terms of service.</p>
+                @if ($items->isNotEmpty())
+                    <button type="submit" form="checkoutForm" class="btn-primary btn-lg mt-6 w-full">Complete purchase</button>
+                    <p class="mt-3 text-center text-xs text-slate-400">By completing this purchase you agree to our terms of service.</p>
+                @else
+                    <a href="{{ route('products.index') }}" class="btn-ghost btn-lg mt-6 w-full">Browse more products</a>
+                @endif
             </div>
         </div>
     </div>

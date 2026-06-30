@@ -41,6 +41,10 @@ class Product extends Model
         'reviews_count',
         'status',
         'is_featured',
+        'is_purchasable',
+        'use_global_contact',
+        'contact_whatsapp',
+        'contact_telegram',
     ];
 
     /**
@@ -57,6 +61,8 @@ class Product extends Model
             'gallery' => 'array',
             'tags' => 'array',
             'is_featured' => 'boolean',
+            'is_purchasable' => 'boolean',
+            'use_global_contact' => 'boolean',
             'downloads' => 'integer',
             'views' => 'integer',
             'reviews_count' => 'integer',
@@ -229,5 +235,25 @@ class Product extends Model
         $power = min($power, count($units) - 1);
 
         return round($bytes / (1024 ** $power), 2).' '.$units[$power];
+    }
+
+    /**
+     * The WhatsApp number to use for this product (per-product or global).
+     */
+    public function getEffectiveWhatsappAttribute(): ?string
+    {
+        $value = $this->use_global_contact ? setting('contact_whatsapp') : $this->contact_whatsapp;
+
+        return $value ?: null;
+    }
+
+    /**
+     * The Telegram username/link to use for this product (per-product or global).
+     */
+    public function getEffectiveTelegramAttribute(): ?string
+    {
+        $value = $this->use_global_contact ? setting('contact_telegram') : $this->contact_telegram;
+
+        return $value ?: null;
     }
 }

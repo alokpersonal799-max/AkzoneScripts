@@ -45,6 +45,10 @@ class CartController extends Controller
     {
         abort_unless($product->status === 'published', 404);
 
+        if (! $product->is_purchasable) {
+            return back()->with('error', '"'.$product->title.'" is not available for direct purchase. Please contact us via WhatsApp or Telegram to buy it.');
+        }
+
         $this->cart->add($product);
 
         return redirect()->route('checkout.index');
