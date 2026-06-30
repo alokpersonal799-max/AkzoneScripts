@@ -23,11 +23,11 @@ class EnsureInstalled
         $allowed = $request->is('up'); // Laravel health check endpoint
 
         if (! $installed && ! $onInstaller && ! $allowed) {
-            return redirect()->to('/install');
+            return redirect()->route('install.requirements');
         }
 
         if ($installed && $onInstaller) {
-            return redirect()->to('/');
+            return redirect()->route('home');
         }
 
         return $next($request);
