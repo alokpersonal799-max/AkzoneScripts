@@ -15,13 +15,23 @@ use Throwable;
 class InstallController extends Controller
 {
     /**
-     * PHP extensions the application requires.
+     * PHP extensions the application strictly requires to run.
      *
      * @var array<int, string>
      */
     protected array $requiredExtensions = [
         'bcmath', 'ctype', 'curl', 'fileinfo', 'json', 'mbstring',
-        'openssl', 'pdo', 'pdo_mysql', 'tokenizer', 'xml', 'zip',
+        'openssl', 'pdo', 'pdo_mysql', 'tokenizer', 'xml',
+    ];
+
+    /**
+     * Extensions that are nice to have (e.g. used by Composer) but are not
+     * needed for the application to run, so they never block installation.
+     *
+     * @var array<int, string>
+     */
+    protected array $recommendedExtensions = [
+        'zip',
     ];
 
     /*
@@ -38,6 +48,12 @@ class InstallController extends Controller
             $extensions[$ext] = extension_loaded($ext);
         }
 
+        $recommended = [];
+        foreach ($this->recommendedExtensions as $ext) {
+            $recommended[$ext] = extension_loaded($ext);
+        }
+
+        // Only the PHP version and required extensions can block installation.
         $passed = $phpOk && ! in_array(false, $extensions, true);
 
         return view('install.requirements', [
@@ -45,6 +61,7 @@ class InstallController extends Controller
             'phpVersion' => PHP_VERSION,
             'phpOk' => $phpOk,
             'extensions' => $extensions,
+            'recommended' => $recommended,
             'passed' => $passed,
         ]);
     }

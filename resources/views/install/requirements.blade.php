@@ -18,7 +18,30 @@
                 @include('install.partials.check', ['ok' => $ok])
             </div>
         @endforeach
+
+        {{-- Recommended (non-blocking) --}}
+        @foreach ($recommended as $name => $ok)
+            <div class="flex items-center justify-between rounded-xl border border-white/5 bg-ink-900 px-4 py-3">
+                <span class="text-sm text-slate-200">
+                    {{ $name }} extension
+                    <span class="ml-1 text-xs text-slate-500">(recommended)</span>
+                </span>
+                @if ($ok)
+                    @include('install.partials.check', ['ok' => true])
+                @else
+                    <span class="flex items-center gap-1 rounded-full bg-amber-500/15 px-2.5 py-1 text-xs font-medium text-amber-300">Optional</span>
+                @endif
+            </div>
+        @endforeach
     </div>
+
+    @php $missingRecommended = in_array(false, $recommended, true); @endphp
+    @if ($passed && $missingRecommended)
+        <p class="mt-4 rounded-xl bg-amber-500/10 px-4 py-3 text-xs text-amber-300">
+            A recommended extension is missing, but it's optional — you can safely continue.
+            To enable it on XAMPP, uncomment the matching <code>extension=...</code> line in <code>php.ini</code> and restart Apache.
+        </p>
+    @endif
 
     <div class="mt-8 flex items-center justify-between">
         @if ($passed)
