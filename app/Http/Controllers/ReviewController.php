@@ -37,7 +37,7 @@ class ReviewController extends Controller
             ]
         );
 
-        \App\Models\AdminNotification::push('review', 'New review to approve', $user->name.' on '.$product->title, route('admin.reviews.index', ['filter' => 'pending']));
+        \App\Models\AdminNotification::notifyAdmins('review', 'New review to approve', $user->name.' on '.$product->title, route('admin.reviews.index', ['filter' => 'pending']));
 
         return back()->with('success', 'Thanks for your review! It will appear once an admin approves it.');
     }

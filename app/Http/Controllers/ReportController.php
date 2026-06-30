@@ -27,7 +27,7 @@ class ReportController extends Controller
             'status' => 'pending',
         ]);
 
-        \App\Models\AdminNotification::push('report', 'Product reported', $product->title.' — '.$data['reason'], route('admin.reports.index'));
+        \App\Models\AdminNotification::notifyAdmins('report', 'Product reported', $product->title.' — '.$data['reason'], route('admin.reports.index'));
 
         return back()->with('success', 'Thanks for your report. Our team will review it.');
     }

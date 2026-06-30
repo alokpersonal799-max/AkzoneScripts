@@ -193,13 +193,13 @@ class CheckoutController extends Controller
         session()->forget(self::COUPON_SESSION);
 
         if ($isManual) {
-            \App\Models\AdminNotification::push('order', 'Payment to verify', $order->order_number.' · '.$order->billing_name, route('admin.orders.show', $order));
+            \App\Models\AdminNotification::notifyAdmins('order', 'Payment to verify', $order->order_number.' · '.$order->billing_name, route('admin.orders.show', $order));
 
             return redirect()->route('orders.show', $order)
                 ->with('info', 'Thanks! Your payment is awaiting verification. You will get access once an admin confirms it.');
         }
 
-        \App\Models\AdminNotification::push('order', 'New order placed', $order->order_number.' · '.money($order->total), route('admin.orders.show', $order));
+        \App\Models\AdminNotification::notifyAdmins('order', 'New order placed', $order->order_number.' · '.money($order->total), route('admin.orders.show', $order));
 
         try {
             Mail::to($order->billing_email)->send(new \App\Mail\OrderReceiptMail($order->load('items')));

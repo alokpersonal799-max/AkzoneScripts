@@ -16,8 +16,11 @@ class AdminNotification extends Model
 
     /**
      * Create an admin notification (no-op if the table doesn't exist yet).
+     *
+     * Note: named notifyAdmins() rather than push() because Eloquent's
+     * base Model already defines a non-static push() method.
      */
-    public static function push(string $type, string $title, ?string $body = null, ?string $url = null): void
+    public static function notifyAdmins(string $type, string $title, ?string $body = null, ?string $url = null): void
     {
         if (! Schema::hasTable('admin_notifications')) {
             return;
