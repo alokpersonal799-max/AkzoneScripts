@@ -16,6 +16,7 @@ class CoreSeeder extends Seeder
     {
         $this->seedSettings();
         $this->seedCurrencies();
+        $this->seedPages();
     }
 
     protected function seedSettings(): void
@@ -76,6 +77,36 @@ class CoreSeeder extends Seeder
             'manual_qr' => ['manual', null],
             'manual_bank_details' => ['manual', ''],
             'manual_crypto' => ['manual', '[]'],
+
+            // Homepage section toggles
+            'home_show_categories' => ['home', '1'],
+            'home_show_latest' => ['home', '1'],
+            'home_show_featured' => ['home', '1'],
+            'home_show_bestselling' => ['home', '1'],
+            'home_show_free' => ['home', '1'],
+            'home_show_testimonials' => ['home', '1'],
+
+            // SMTP / email
+            'mail_enabled' => ['mail', '0'],
+            'mail_host' => ['mail', ''],
+            'mail_port' => ['mail', '587'],
+            'mail_username' => ['mail', ''],
+            'mail_password' => ['mail', ''],
+            'mail_encryption' => ['mail', 'tls'],
+            'mail_from_address' => ['mail', ''],
+            'mail_from_name' => ['mail', ''],
+
+            // Auth / verification
+            'require_email_verification' => ['auth', '0'],
+
+            // Captcha (Google reCAPTCHA v2)
+            'captcha_enabled' => ['auth', '0'],
+            'captcha_site_key' => ['auth', ''],
+            'captcha_secret' => ['auth', ''],
+
+            // Tawk.to live chat
+            'tawk_enabled' => ['integrations', '0'],
+            'tawk_embed' => ['integrations', ''],
         ];
 
         foreach ($defaults as $key => [$group, $value]) {
@@ -96,4 +127,22 @@ class CoreSeeder extends Seeder
             Currency::firstOrCreate(['code' => $c['code']], $c + ['is_active' => true]);
         }
     }
+
+    protected function seedPages(): void
+    {
+        $pages = [
+            ['title' => 'About Us', 'content' => "We are a single-vendor digital marketplace offering premium scripts, source code, UI kits and design assets.\n\nEvery product is hand-crafted and verified for quality. Edit this page from the admin panel under System → Pages."],
+            ['title' => 'Terms of Service', 'content' => "By using this website you agree to our terms. All digital products are licensed, not sold.\n\nEdit this page from the admin panel under System → Pages."],
+            ['title' => 'Privacy Policy', 'content' => "We respect your privacy and only collect the information needed to process your orders.\n\nEdit this page from the admin panel under System → Pages."],
+            ['title' => 'Refund Policy', 'content' => "Due to the digital nature of our products, refunds are handled case by case.\n\nEdit this page from the admin panel under System → Pages."],
+        ];
+
+        foreach ($pages as $p) {
+            \App\Models\Page::firstOrCreate(
+                ['slug' => \Illuminate\Support\Str::slug($p['title'])],
+                $p + ['is_published' => true, 'show_in_footer' => true]
+            );
+        }
+    }
+
 }

@@ -5,6 +5,7 @@ use App\Http\Controllers\Admin\CouponController as AdminCouponController;
 use App\Http\Controllers\Admin\CurrencyController as AdminCurrencyController;
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\Admin\OrderController as AdminOrderController;
+use App\Http\Controllers\Admin\PageController as AdminPageController;
 use App\Http\Controllers\Admin\ProductController as AdminProductController;
 use App\Http\Controllers\Admin\ReportController as AdminReportController;
 use App\Http\Controllers\Admin\ReviewController as AdminReviewController;
@@ -12,6 +13,9 @@ use App\Http\Controllers\Admin\SettingController as AdminSettingController;
 use App\Http\Controllers\Admin\TicketController as AdminTicketController;
 use App\Http\Controllers\Admin\UserController as AdminUserController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
+use App\Http\Controllers\Auth\EmailVerificationController;
+use App\Http\Controllers\Auth\NewPasswordController;
+use App\Http\Controllers\Auth\PasswordResetLinkController;
 use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\CheckoutController;
@@ -20,6 +24,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DownloadController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\InstallController;
+use App\Http\Controllers\PageController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ReportController;
@@ -61,6 +66,14 @@ Route::get('/categories/{category}', [ProductController::class, 'category'])->na
 // Switch the active display currency.
 Route::get('/currency/{code}', [CurrencyController::class, 'switch'])->name('currency.switch');
 
+// Public custom pages (About, Terms, Privacy, etc.).
+Route::get('/p/{page}', [PageController::class, 'show'])->name('pages.show');
+
+// Email verification link (signed, works without login).
+Route::get('/email/verify/{id}/{hash}', [EmailVerificationController::class, 'verify'])
+    ->middleware('signed')->name('verification.verify');
+Route::post('/email/resend', [EmailVerificationController::class, 'resend'])->name('verification.resend');
+
 // Shopping cart (session based, available to guests and members).
 Route::controller(CartController::class)->prefix('cart')->name('cart.')->group(function () {
     Route::get('/', 'index')->name('index');
@@ -82,6 +95,12 @@ Route::middleware('guest')->group(function () {
 
     Route::get('/login', [AuthenticatedSessionController::class, 'create'])->name('login');
     Route::post('/login', [AuthenticatedSessionController::class, 'store']);
+
+    // Forgot / reset password.
+    Route::get('/forgot-password', [PasswordResetLinkController::class, 'create'])->name('password.request');
+    Route::post('/forgot-password', [PasswordResetLinkController::class, 'store'])->name('password.email');
+    Route::get('/reset-password/{token}', [NewPasswordController::class, 'create'])->name('password.reset');
+    Route::post('/reset-password', [NewPasswordController::class, 'store'])->name('password.update');
 });
 
 Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])
@@ -157,7 +176,11 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::get('/users/{user}/edit', [AdminUserController::class, 'edit'])->name('users.edit');
     Route::patch('/users/{user}', [AdminUserController::class, 'update'])->name('users.update');
     Route::patch('/users/{user}/ban', [AdminUserController::class, 'toggleBan'])->name('users.ban');
+    Route::patch('/users/{user}/verify', [AdminUserController::class, 'toggleVerify'])->name('users.verify');
     Route::delete('/users/{user}', [AdminUserController::class, 'destroy'])->name('users.destroy');
+
+    // Custom pages.
+    Route::resource('pages', AdminPageController::class)->except('show');
 
     // Coupons.
     Route::get('/coupons/generate', [AdminCouponController::class, 'generate'])->name('coupons.generate');
@@ -201,4 +224,8 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::put('/settings/maintenance', [AdminSettingController::class, 'updateMaintenance'])->name('settings.maintenance');
     Route::put('/settings/payments', [AdminSettingController::class, 'updatePayments'])->name('settings.payments');
     Route::put('/settings/manual', [AdminSettingController::class, 'updateManual'])->name('settings.manual');
+    Route::put('/settings/homepage', [AdminSettingController::class, 'updateHomepage'])->name('settings.homepage');
+    Route::put('/settings/mail', [AdminSettingController::class, 'updateMail'])->name('settings.mail');
+    Route::put('/settings/auth', [AdminSettingController::class, 'updateAuth'])->name('settings.auth');
+    Route::put('/settings/integrations', [AdminSettingController::class, 'updateIntegrations'])->name('settings.integrations');
 });

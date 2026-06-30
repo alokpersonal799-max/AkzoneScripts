@@ -166,12 +166,24 @@
                         <span class="font-display text-xl font-extrabold text-ink-900">Akzone<span class="text-brand-600">Scripts</span></span>
                     </a>
                     <p class="mt-4 max-w-sm text-sm text-slate-500">{{ setting('footer_about', config('marketplace.tagline')) }}</p>
-                    <div class="mt-5 flex gap-2">
-                        @php $footerSocials = ['facebook' => 'f', 'twitter' => 'X', 'github' => 'G', 'discord' => 'D']; @endphp
-                        @foreach ($footerSocials as $social => $letter)
-                            <a href="{{ setting('social_'.$social, '#') }}" class="flex h-9 w-9 items-center justify-center rounded-lg bg-slate-100 text-slate-500 transition hover:bg-brand-600 hover:text-white">
-                                <span class="text-xs font-bold uppercase">{{ $letter }}</span>
-                            </a>
+                    <div class="mt-5 flex flex-wrap gap-2">
+                        <a href="mailto:{{ setting('support_email', config('marketplace.support_email')) }}" title="Email support" class="flex h-9 w-9 items-center justify-center rounded-lg bg-slate-100 text-slate-500 transition hover:bg-brand-600 hover:text-white">
+                            <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="1.7" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75" /></svg>
+                        </a>
+                        @php
+                            $socialIcons = [
+                                'twitter' => 'M22 5.92c-.74.33-1.53.55-2.36.65a4.12 4.12 0 0 0 1.8-2.27c-.79.47-1.67.81-2.6 1a4.1 4.1 0 0 0-7 3.74A11.65 11.65 0 0 1 3.39 4.6a4.1 4.1 0 0 0 1.27 5.47c-.66-.02-1.28-.2-1.82-.5v.05a4.1 4.1 0 0 0 3.29 4.02c-.3.08-.62.13-.95.13-.23 0-.46-.02-.68-.06a4.1 4.1 0 0 0 3.83 2.85A8.23 8.23 0 0 1 2 18.29a11.62 11.62 0 0 0 6.29 1.84c7.55 0 11.68-6.25 11.68-11.67l-.01-.53A8.3 8.3 0 0 0 22 5.92Z',
+                                'github' => 'M12 2a10 10 0 0 0-3.16 19.49c.5.09.68-.22.68-.48l-.01-1.7c-2.78.6-3.37-1.34-3.37-1.34-.46-1.16-1.11-1.47-1.11-1.47-.91-.62.07-.6.07-.6 1 .07 1.53 1.03 1.53 1.03.9 1.53 2.36 1.09 2.94.83.09-.65.35-1.09.63-1.34-2.22-.25-4.55-1.11-4.55-4.94 0-1.09.39-1.98 1.03-2.68-.1-.25-.45-1.27.1-2.65 0 0 .84-.27 2.75 1.02a9.56 9.56 0 0 1 5 0c1.91-1.29 2.75-1.02 2.75-1.02.55 1.38.2 2.4.1 2.65.64.7 1.03 1.59 1.03 2.68 0 3.84-2.34 4.69-4.57 4.94.36.31.68.92.68 1.85l-.01 2.74c0 .27.18.58.69.48A10 10 0 0 0 12 2Z',
+                                'discord' => 'M20 4.4A19.8 19.8 0 0 0 15.1 3l-.25.5a18.3 18.3 0 0 0-5.7 0L8.9 3A19.8 19.8 0 0 0 4 4.4 20.4 20.4 0 0 0 .5 18.2 19.9 19.9 0 0 0 6.6 21l.5-.7c-1-.4-1.9-.9-2.7-1.5l.6-.5c2.4 1.1 5 1.7 7.6 1.7 2.6 0 5.2-.6 7.6-1.7l.6.5c-.8.6-1.7 1.1-2.7 1.5l.5.7a19.9 19.9 0 0 0 6.1-2.8A20.4 20.4 0 0 0 20 4.4ZM8.5 15c-.9 0-1.7-.9-1.7-2s.8-2 1.7-2 1.7.9 1.7 2-.8 2-1.7 2Zm7 0c-.9 0-1.7-.9-1.7-2s.8-2 1.7-2 1.7.9 1.7 2-.8 2-1.7 2Z',
+                                'facebook' => 'M22 12a10 10 0 1 0-11.56 9.88v-6.99H7.9V12h2.54V9.8c0-2.5 1.49-3.89 3.78-3.89 1.09 0 2.24.2 2.24.2v2.46h-1.26c-1.24 0-1.63.77-1.63 1.56V12h2.77l-.44 2.89h-2.33v6.99A10 10 0 0 0 22 12Z',
+                            ];
+                        @endphp
+                        @foreach ($socialIcons as $social => $path)
+                            @if (setting('social_'.$social) && setting('social_'.$social) !== '#')
+                                <a href="{{ setting('social_'.$social) }}" target="_blank" rel="noopener" title="{{ ucfirst($social) }}" class="flex h-9 w-9 items-center justify-center rounded-lg bg-slate-100 text-slate-500 transition hover:bg-brand-600 hover:text-white">
+                                    <svg class="h-4 w-4" fill="currentColor" viewBox="0 0 24 24"><path d="{{ $path }}" /></svg>
+                                </a>
+                            @endif
                         @endforeach
                     </div>
                 </div>
@@ -201,10 +213,12 @@
                 <div class="md:col-span-2">
                     <h4 class="text-sm font-bold text-ink-900">Legal</h4>
                     <ul class="mt-4 space-y-2.5 text-sm text-slate-500">
-                        <li><a href="#" class="hover:text-brand-600">Terms of service</a></li>
-                        <li><a href="#" class="hover:text-brand-600">Privacy policy</a></li>
-                        <li><a href="#" class="hover:text-brand-600">Refund policy</a></li>
-                        <li><a href="#" class="hover:text-brand-600">License</a></li>
+                        @forelse (\App\Models\Page::footerLinks() as $page)
+                            <li><a href="{{ route('pages.show', $page) }}" class="hover:text-brand-600">{{ $page->title }}</a></li>
+                        @empty
+                            <li><a href="#" class="hover:text-brand-600">Terms of service</a></li>
+                            <li><a href="#" class="hover:text-brand-600">Privacy policy</a></li>
+                        @endforelse
                     </ul>
                 </div>
             </div>
@@ -247,5 +261,10 @@
             </div>
         </div>
     </footer>
+
+    {{-- Tawk.to live chat --}}
+    @if (setting('tawk_enabled') === '1' && setting('tawk_embed'))
+        {!! setting('tawk_embed') !!}
+    @endif
 </body>
 </html>

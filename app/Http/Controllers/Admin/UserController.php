@@ -116,6 +116,18 @@ class UserController extends Controller
     }
 
     /**
+     * Manually mark a user's email as verified (or unverify).
+     */
+    public function toggleVerify(User $user): RedirectResponse
+    {
+        $user->forceFill([
+            'email_verified_at' => $user->hasVerifiedEmail() ? null : now(),
+        ])->save();
+
+        return back()->with('success', $user->hasVerifiedEmail() ? 'User marked as verified.' : 'User marked as unverified.');
+    }
+
+    /**
      * Ban or unban a user.
      */
     public function toggleBan(Request $request, User $user): RedirectResponse

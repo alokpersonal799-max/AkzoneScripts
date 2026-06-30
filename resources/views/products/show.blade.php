@@ -188,7 +188,7 @@
                         </form>
                         <form method="POST" action="{{ route('cart.add', $product) }}">
                             @csrf
-                            <button type="submit" class="btn-lg w-full bg-brand-600 text-white hover:bg-brand-700">
+                            <button type="submit" class="btn btn-lg w-full bg-brand-600 text-white hover:bg-brand-700">
                                 <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 0 0-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 0 0-16.536-1.84M7.5 14.25 5.106 5.272" /></svg>
                                 Add to Cart
                             </button>
@@ -221,7 +221,7 @@
                         @endunless
                     @endif
 
-                    <div class="flex gap-3">
+                    <div class="flex gap-3" x-data="{ noPreview: false }">
                         @auth
                             <form method="POST" action="{{ route('wishlist.toggle', $product) }}" class="flex-1">
                                 @csrf
@@ -233,7 +233,27 @@
                         @endauth
                         @if ($product->demo_url)
                             <a href="{{ $product->demo_url }}" target="_blank" rel="noopener" class="btn-ghost btn-md flex-1">Live Preview</a>
+                        @else
+                            <button type="button" @click="noPreview = true" class="btn-ghost btn-md flex-1">Live Preview</button>
                         @endif
+
+                        {{-- Preview unavailable modal --}}
+                        <div x-show="noPreview" x-cloak @keydown.escape.window="noPreview = false" class="fixed inset-0 z-[60] flex items-center justify-center p-4">
+                            <div @click="noPreview = false" class="absolute inset-0 bg-slate-900/40"></div>
+                            <div class="relative w-full max-w-md rounded-2xl border border-slate-200 bg-white p-6 text-center shadow-2xl">
+                                <span class="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-amber-50 text-amber-500">
+                                    <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z" /></svg>
+                                </span>
+                                <h3 class="mt-4 font-display text-lg font-bold text-ink-900">Preview unavailable</h3>
+                                <p class="mt-2 text-sm text-slate-500">Sorry, the platform where this preview was hosted is currently shut down. You can contact us to request a live preview.</p>
+                                <div class="mt-5 flex justify-center gap-2">
+                                    @if ($waLink)
+                                        <a href="{{ $waLink }}" target="_blank" rel="noopener" class="btn btn-sm bg-emerald-500 text-white hover:bg-emerald-600">Request via WhatsApp</a>
+                                    @endif
+                                    <button type="button" @click="noPreview = false" class="btn-ghost btn-sm">Close</button>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
 

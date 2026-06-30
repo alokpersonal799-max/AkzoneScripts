@@ -46,6 +46,12 @@
 
                 <div class="mt-4 flex flex-wrap gap-2 border-t border-slate-100 pt-4">
                     <a href="{{ route('admin.users.edit', $user) }}" class="btn-ghost btn-sm">Edit details</a>
+                    <form method="POST" action="{{ route('admin.users.verify', $user) }}">
+                        @csrf @method('PATCH')
+                        <button type="submit" class="rounded-xl border px-4 py-2 text-sm font-semibold transition {{ $user->hasVerifiedEmail() ? 'border-slate-200 text-slate-600 hover:bg-slate-50' : 'border-emerald-200 text-emerald-600 hover:bg-emerald-50' }}">
+                            {{ $user->hasVerifiedEmail() ? 'Unverify email' : 'Mark verified' }}
+                        </button>
+                    </form>
                     @if ($user->id !== auth()->id())
                         <form method="POST" action="{{ route('admin.users.ban', $user) }}">
                             @csrf @method('PATCH')

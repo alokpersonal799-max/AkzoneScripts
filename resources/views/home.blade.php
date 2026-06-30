@@ -116,7 +116,7 @@
         <div class="pt-6">@include('partials.flash')</div>
 
         {{-- Categories --}}
-        @if ($categories->isNotEmpty())
+        @if ($categories->isNotEmpty() && setting('home_show_categories', '1') !== '0')
             <section id="categories" class="reveal py-12">
                 <div class="mb-6 flex items-end justify-between">
                     <div>
@@ -142,7 +142,7 @@
         @endif
 
         {{-- Latest (white) --}}
-        @if ($latest->isNotEmpty())
+        @if ($latest->isNotEmpty() && setting('home_show_latest', '1') !== '0')
             <div class="py-8">
                 <x-product-carousel :products="$latest" eyebrow="Latest" title="Check out latest items"
                     subtitle="Fresh uploads added to the marketplace." :view-all="route('products.index')" />
@@ -151,7 +151,7 @@
     </div>
 
     {{-- Featured (slate band) --}}
-    @if ($featured->isNotEmpty())
+    @if ($featured->isNotEmpty() && setting('home_show_featured', '1') !== '0')
         <section class="reveal bg-slate-100/70 py-14">
             <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                 <x-product-carousel :products="$featured" eyebrow="Featured" title="The world-leading marketplace"
@@ -161,7 +161,7 @@
     @endif
 
     {{-- Best selling (green band) --}}
-    @if ($bestSelling->isNotEmpty())
+    @if ($bestSelling->isNotEmpty() && setting('home_show_bestselling', '1') !== '0')
         <section class="reveal bg-emerald-50/60 py-14">
             <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                 <x-product-carousel :products="$bestSelling" eyebrow="Popular" title="Weekly best selling items"
@@ -171,7 +171,7 @@
     @endif
 
     {{-- Free items band (pastel gradient) --}}
-    @if ($freeItems->isNotEmpty())
+    @if ($freeItems->isNotEmpty() && setting('home_show_free', '1') !== '0')
         <section class="reveal bg-gradient-to-br from-brand-600 to-indigo-600 py-14">
             <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8"
                  x-data="{ scroll(dir){ $refs.t.scrollBy({left: dir*$refs.t.clientWidth*0.85, behavior:'smooth'}) } }">
@@ -197,6 +197,7 @@
     @endif
 
     <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        @if (setting('home_show_testimonials', '1') !== '0')
         {{-- Testimonials --}}
         <section class="reveal py-16"
                  x-data="{ scroll(dir){ $refs.tt.scrollBy({left: dir*$refs.tt.clientWidth*0.9, behavior:'smooth'}) } }">
@@ -275,6 +276,7 @@
                 @endforelse
             </div>
         </section>
+        @endif
 
         {{-- CTA --}}
         <section class="reveal pb-16">

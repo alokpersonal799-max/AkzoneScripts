@@ -29,6 +29,8 @@
                    class="input" placeholder="••••••••">
         </div>
 
+        @include('partials.captcha')
+
         <button type="submit" class="btn-primary btn-lg w-full">Create account</button>
     </form>
 

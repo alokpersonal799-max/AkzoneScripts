@@ -12,7 +12,10 @@
         </div>
 
         <div>
-            <label for="password" class="label">Password</label>
+            <div class="flex items-center justify-between">
+                <label for="password" class="label">Password</label>
+                <a href="{{ route('password.request') }}" class="text-xs font-semibold text-brand-600 hover:text-brand-700">Forgot password?</a>
+            </div>
             <input id="password" name="password" type="password" required autocomplete="current-password"
                    class="input" placeholder="••••••••">
         </div>
@@ -22,8 +25,18 @@
             Remember me
         </label>
 
+        @include('partials.captcha')
+
         <button type="submit" class="btn-primary btn-lg w-full">Sign in</button>
     </form>
+
+    @if (setting('require_email_verification') === '1')
+        <form method="POST" action="{{ route('verification.resend') }}" class="mt-4 flex items-center gap-2">
+            @csrf
+            <input name="email" type="email" placeholder="Resend verification to email" class="input text-sm">
+            <button type="submit" class="btn-ghost btn-sm flex-shrink-0">Resend</button>
+        </form>
+    @endif
 
     <p class="mt-8 text-center text-sm text-slate-500">
         Don't have an account?

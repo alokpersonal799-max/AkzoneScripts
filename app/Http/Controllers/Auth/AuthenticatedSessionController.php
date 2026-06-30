@@ -29,6 +29,12 @@ class AuthenticatedSessionController extends Controller
             'password' => ['required', 'string'],
         ]);
 
+        if (! \App\Support\Captcha::verify($request->input('g-recaptcha-response'))) {
+            throw ValidationException::withMessages([
+                'email' => 'Captcha verification failed. Please try again.',
+            ]);
+        }
+
         $remember = $request->boolean('remember');
 
         if (! Auth::attempt($credentials, $remember)) {
@@ -45,6 +51,17 @@ class AuthenticatedSessionController extends Controller
 
             throw ValidationException::withMessages([
                 'email' => __('This account has been suspended. Please contact support.'),
+            ]);
+        }
+
+        // Require a verified email when the setting is enabled.
+        if (setting('require_email_verification') === '1' && ! Auth::user()->hasVerifiedEmail()) {
+            Auth::logout();
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
+
+            throw ValidationException::withMessages([
+                'email' => 'Please verify your email address before signing in. Check your inbox or use the resend option below.',
             ]);
         }
 
