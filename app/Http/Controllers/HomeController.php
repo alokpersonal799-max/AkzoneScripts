@@ -79,6 +79,63 @@ class HomeController extends Controller
             })->sum('downloads'),
         ];
 
-        return view('home', compact('featured', 'latest', 'topRated', 'bestSelling', 'freeItems', 'categories', 'testimonials', 'stats'));
+        $promotion = $this->resolvePromotion();
+
+        return view('home', compact('featured', 'latest', 'topRated', 'bestSelling', 'freeItems', 'categories', 'testimonials', 'stats', 'promotion'));
+    }
+
+    /**
+     * Build the active hero promotion (managed from the admin Promotions page).
+     *
+     * Modes: off | products | message | countdown.
+     *
+     * @return array<string, mixed>
+     */
+    protected function resolvePromotion(): array
+    {
+        $mode = setting('promo_mode', 'off');
+
+        if ($mode === 'products') {
+            $ids = json_decode((string) setting('promo_products', '[]'), true) ?: [];
+            if (! empty($ids)) {
+                $products = Product::published()->with('category')->whereIn('id', $ids)->take(4)->get()
+                    ->sortBy(fn ($p) => array_search($p->id, $ids))->values();
+                if ($products->isNotEmpty()) {
+                    return [
+                        'mode' => 'products',
+                        'heading' => setting('promo_heading', 'Featured picks'),
+                        'products' => $products,
+                    ];
+                }
+            }
+        }
+
+        if ($mode === 'message') {
+            $message = setting('promo_message');
+            if ($message) {
+                return [
+                    'mode' => 'message',
+                    'heading' => setting('promo_heading', ''),
+                    'message' => $message,
+                    'url' => setting('promo_message_url', ''),
+                ];
+            }
+        }
+
+        if ($mode === 'countdown') {
+            $pid = setting('promo_countdown_product');
+            $until = setting('promo_countdown_until');
+            $product = $pid ? Product::published()->with('category')->find($pid) : null;
+            if ($product && $until && \Illuminate\Support\Carbon::parse($until)->isFuture()) {
+                return [
+                    'mode' => 'countdown',
+                    'label' => setting('promo_countdown_label', 'Limited time offer'),
+                    'product' => $product,
+                    'until' => \Illuminate\Support\Carbon::parse($until)->toIso8601String(),
+                ];
+            }
+        }
+
+        return ['mode' => 'off'];
     }
 }

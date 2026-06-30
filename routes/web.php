@@ -11,6 +11,7 @@ use App\Http\Controllers\Admin\ReportController as AdminReportController;
 use App\Http\Controllers\Admin\ReviewController as AdminReviewController;
 use App\Http\Controllers\Admin\SettingController as AdminSettingController;
 use App\Http\Controllers\Admin\StorageController as AdminStorageController;
+use App\Http\Controllers\Admin\PromotionController as AdminPromotionController;
 use App\Http\Controllers\Admin\SystemController as AdminSystemController;
 use App\Http\Controllers\Admin\TicketController as AdminTicketController;
 use App\Http\Controllers\Admin\UserController as AdminUserController;
@@ -243,4 +244,8 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     // System information & cache tools.
     Route::get('/system', [AdminSystemController::class, 'index'])->name('system.index');
     Route::post('/system/clear-cache', [AdminSystemController::class, 'clearCache'])->name('system.cache.clear');
+
+    // Hero promotion manager.
+    Route::get('/promotions', [AdminPromotionController::class, 'index'])->name('promotions.index');
+    Route::put('/promotions', [AdminPromotionController::class, 'update'])->name('promotions.update');
 });

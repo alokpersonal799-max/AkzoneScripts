@@ -23,6 +23,30 @@ class DemoSeeder extends Seeder
         $this->seedDemoSettings();
         $categories = $this->seedCategories();
         $this->seedProducts($categories);
+        $this->seedPromotion();
+    }
+
+    /**
+     * Seed a ready-to-view hero promotion (featured products mode) so the
+     * homepage shows the promotion band immediately for testing.
+     */
+    protected function seedPromotion(): void
+    {
+        $ids = Product::query()->where('status', 'published')->orderByDesc('is_featured')->take(4)->pluck('id')->all();
+
+        \App\Models\Setting::put('promo_mode', 'products', 'promotion');
+        \App\Models\Setting::put('promo_heading', 'Featured picks', 'promotion');
+        \App\Models\Setting::put('promo_products', json_encode($ids), 'promotion');
+
+        // Pre-fill (but don't activate) a sample countdown + message so admins
+        // can switch modes and immediately see something working.
+        $countdownId = $ids[0] ?? null;
+        if ($countdownId) {
+            \App\Models\Setting::put('promo_countdown_product', (string) $countdownId, 'promotion');
+        }
+        \App\Models\Setting::put('promo_countdown_label', 'Flash deal — ends soon', 'promotion');
+        \App\Models\Setting::put('promo_countdown_until', now()->addDays(3)->format('Y-m-d H:i:s'), 'promotion');
+        \App\Models\Setting::put('promo_message', '🎉 Launch week — use code AKZONE10 for 10% off your first order!', 'promotion');
     }
 
     /**
