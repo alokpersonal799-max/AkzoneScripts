@@ -115,30 +115,62 @@
         </div>
     </div>
 
-    {{-- Recent registrations --}}
-    <div class="card mt-6 overflow-hidden">
-        <div class="flex items-center justify-between border-b border-slate-100 p-5">
-            <h2 class="font-display text-lg font-bold text-ink-900">Recent registrations</h2>
-            <a href="{{ route('admin.users.index') }}" class="text-sm font-semibold text-brand-600 hover:text-brand-700">View all</a>
-        </div>
-        <div class="divide-y divide-slate-100">
-            @forelse ($recentUsers as $user)
-                <a href="{{ route('admin.users.show', $user) }}" class="flex items-center justify-between p-4 transition hover:bg-slate-50">
-                    <div class="flex items-center gap-3">
-                        <span class="flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-brand-500 to-indigo-500 text-sm font-bold text-white">{{ strtoupper(substr($user->name, 0, 1)) }}</span>
-                        <div>
-                            <p class="text-sm font-semibold text-ink-900">{{ $user->name }}</p>
-                            <p class="text-xs text-slate-400">{{ $user->email }}</p>
+    {{-- Recent registrations + Recently active --}}
+    <div class="mt-6 grid gap-6 lg:grid-cols-2">
+        <div class="card overflow-hidden">
+            <div class="flex items-center justify-between border-b border-slate-100 p-5">
+                <h2 class="font-display text-lg font-bold text-ink-900">Recent registrations</h2>
+                <a href="{{ route('admin.users.index') }}" class="text-sm font-semibold text-brand-600 hover:text-brand-700">View all</a>
+            </div>
+            <div class="divide-y divide-slate-100">
+                @forelse ($recentUsers as $user)
+                    <a href="{{ route('admin.users.show', $user) }}" class="flex items-center justify-between p-4 transition hover:bg-slate-50">
+                        <div class="flex items-center gap-3">
+                            <span class="flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-brand-500 to-indigo-500 text-sm font-bold text-white">{{ strtoupper(substr($user->name, 0, 1)) }}</span>
+                            <div>
+                                <p class="text-sm font-semibold text-ink-900">{{ $user->name }}</p>
+                                <p class="text-xs text-slate-400">{{ $user->email }}</p>
+                            </div>
                         </div>
-                    </div>
-                    <div class="text-right">
-                        <p class="text-xs text-slate-400">{{ $user->created_at->diffForHumans() }}</p>
-                        @if (! $user->hasVerifiedEmail())<span class="chip mt-1 bg-amber-50 text-amber-700 ring-1 ring-amber-200">Unverified</span>@endif
-                    </div>
-                </a>
-            @empty
-                <p class="p-5 text-sm text-slate-500">No customers yet.</p>
-            @endforelse
+                        <div class="text-right">
+                            <p class="text-xs text-slate-400">{{ $user->created_at->diffForHumans() }}</p>
+                            @if (! $user->hasVerifiedEmail())<span class="chip mt-1 bg-amber-50 text-amber-700 ring-1 ring-amber-200">Unverified</span>@endif
+                        </div>
+                    </a>
+                @empty
+                    <p class="p-5 text-sm text-slate-500">No customers yet.</p>
+                @endforelse
+            </div>
+        </div>
+
+        <div class="card overflow-hidden">
+            <div class="flex items-center justify-between border-b border-slate-100 p-5">
+                <h2 class="font-display text-lg font-bold text-ink-900">Recently active</h2>
+                <span class="text-xs text-slate-400">Latest sign-ins</span>
+            </div>
+            <div class="divide-y divide-slate-100">
+                @forelse ($recentLogins as $user)
+                    <a href="{{ route('admin.users.show', $user) }}" class="flex items-center justify-between p-4 transition hover:bg-slate-50">
+                        <div class="flex items-center gap-3">
+                            <span class="relative flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-emerald-500 to-teal-500 text-sm font-bold text-white">
+                                {{ strtoupper(substr($user->name, 0, 1)) }}
+                            </span>
+                            <div>
+                                <p class="text-sm font-semibold text-ink-900">{{ $user->name }}
+                                    @if ($user->isAdmin())<span class="chip ml-1 bg-brand-50 text-brand-700 ring-1 ring-brand-200">Admin</span>@endif
+                                </p>
+                                <p class="text-xs text-slate-400">{{ $user->email }}</p>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <p class="text-xs font-semibold text-emerald-600">{{ $user->last_login_at?->diffForHumans() }}</p>
+                            @if ($user->last_login_ip)<p class="text-[11px] text-slate-400">{{ $user->last_login_ip }}</p>@endif
+                        </div>
+                    </a>
+                @empty
+                    <p class="p-5 text-sm text-slate-500">No sign-ins recorded yet.</p>
+                @endforelse
+            </div>
         </div>
     </div>
 

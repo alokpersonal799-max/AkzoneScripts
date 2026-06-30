@@ -26,6 +26,8 @@ class User extends Authenticatable
         'is_banned',
         'avatar',
         'bio',
+        'last_login_at',
+        'last_login_ip',
     ];
 
     /**
@@ -49,6 +51,7 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
             'is_banned' => 'boolean',
+            'last_login_at' => 'datetime',
         ];
     }
 

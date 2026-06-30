@@ -27,6 +27,7 @@
                 <dl class="mt-6 grid grid-cols-2 gap-4 border-t border-slate-100 pt-6 text-left text-sm">
                     <div><dt class="text-slate-400">Orders</dt><dd class="font-bold text-ink-900">{{ $user->orders_count }}</dd></div>
                     <div><dt class="text-slate-400">Joined</dt><dd class="font-bold text-ink-900">{{ $user->created_at->format('M Y') }}</dd></div>
+                    <div class="col-span-2"><dt class="text-slate-400">Last login</dt><dd class="font-bold text-ink-900">{{ $user->last_login_at ? $user->last_login_at->diffForHumans().' · '.$user->last_login_at->format('M j, Y g:i A') : 'Never' }}</dd></div>
                 </dl>
             </div>
 

@@ -42,6 +42,11 @@ class DashboardController extends Controller
 
         $recentUsers = User::where('role', 'user')->latest()->take(6)->get();
 
+        // Recently active users (most recent sign-ins) for the activity panel.
+        $recentLogins = \Illuminate\Support\Facades\Schema::hasColumn('users', 'last_login_at')
+            ? User::whereNotNull('last_login_at')->orderByDesc('last_login_at')->take(6)->get()
+            : collect();
+
         // Revenue for the last 14 days.
         $salesByDay = collect(range(13, 0))->map(function (int $daysAgo): array {
             $date = Carbon::today()->subDays($daysAgo);
@@ -75,6 +80,7 @@ class DashboardController extends Controller
             'topCategories',
             'recentOrders',
             'recentUsers',
+            'recentLogins',
             'topProducts',
             'lowStockOrDraft'
         ));

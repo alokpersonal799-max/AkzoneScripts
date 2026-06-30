@@ -67,6 +67,14 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerate();
 
+        // Record the most recent sign-in for the admin activity panel.
+        if (\Illuminate\Support\Facades\Schema::hasColumn('users', 'last_login_at')) {
+            Auth::user()->forceFill([
+                'last_login_at' => now(),
+                'last_login_ip' => $request->ip(),
+            ])->saveQuietly();
+        }
+
         // Admins go straight to the admin dashboard, everyone else to theirs.
         $redirect = Auth::user()->isAdmin()
             ? route('admin.dashboard')

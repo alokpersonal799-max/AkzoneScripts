@@ -54,6 +54,8 @@ class DemoSeeder extends Seeder
                 'password' => \Illuminate\Support\Facades\Hash::make('password'),
                 'role' => 'admin',
                 'email_verified_at' => now(),
+                'last_login_at' => now()->subMinutes(8),
+                'last_login_ip' => '127.0.0.1',
             ]
         );
 
@@ -64,6 +66,8 @@ class DemoSeeder extends Seeder
                 'password' => \Illuminate\Support\Facades\Hash::make('password'),
                 'role' => 'user',
                 'email_verified_at' => now(),
+                'last_login_at' => now()->subHours(3),
+                'last_login_ip' => '127.0.0.1',
             ]
         );
     }
