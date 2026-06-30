@@ -22,6 +22,17 @@
             <div><label for="support_email" class="label">Support email</label><input id="support_email" name="support_email" type="email" value="{{ old('support_email', setting('support_email')) }}" required class="input"></div>
         </div>
 
+        <div>
+            <label for="timezone" class="label">Timezone</label>
+            @php $currentTz = old('timezone', setting('timezone', config('app.timezone', 'UTC'))); @endphp
+            <select id="timezone" name="timezone" class="input">
+                @foreach (timezone_identifiers_list() as $tz)
+                    <option value="{{ $tz }}" {{ $currentTz === $tz ? 'selected' : '' }}>{{ $tz }}</option>
+                @endforeach
+            </select>
+            <p class="mt-1 text-xs text-slate-400">Controls dates &amp; times shown across the store and admin (e.g. orders, reports).</p>
+        </div>
+
         <div class="grid gap-5 sm:grid-cols-2">
             @foreach (['social_twitter' => 'Twitter URL', 'social_github' => 'GitHub URL', 'social_discord' => 'Discord URL', 'social_facebook' => 'Facebook URL'] as $key => $label)
                 <div><label for="{{ $key }}" class="label">{{ $label }}</label><input id="{{ $key }}" name="{{ $key }}" type="text" value="{{ old($key, setting($key)) }}" class="input"></div>

@@ -124,6 +124,7 @@ class SettingController extends Controller
             'contact_telegram' => ['nullable', 'string', 'max:100'],
             'announcement_enabled' => ['nullable', 'boolean'],
             'announcement_text' => ['nullable', 'string', 'max:500'],
+            'timezone' => ['nullable', 'string', 'max:64', 'timezone'],
             'logo' => ['nullable', 'image', 'max:2048'],
         ]);
 
@@ -139,6 +140,9 @@ class SettingController extends Controller
             Setting::put($key, $data[$key] ?? '', 'general');
         }
         Setting::put('announcement_enabled', $request->boolean('announcement_enabled') ? '1' : '0', 'general');
+        if (! empty($data['timezone'])) {
+            Setting::put('timezone', $data['timezone'], 'general');
+        }
 
         return back()->with('success', 'General settings saved.');
     }

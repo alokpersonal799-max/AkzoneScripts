@@ -34,6 +34,9 @@ class AppServiceProvider extends ServiceProvider
         // Point the storage disks at the admin-selected cloud provider (if any).
         $this->applyStorageSettings();
 
+        // Apply the admin-selected timezone.
+        $this->applyTimezone();
+
         // Share data needed by every view (navbar, footer, prices).
         View::composer('*', function ($view): void {
             $cart = session('cart', []);
@@ -83,6 +86,27 @@ class AppServiceProvider extends ServiceProvider
             'mail.from.address' => \App\Models\Setting::get('mail_from_address') ?: config('mail.from.address'),
             'mail.from.name' => \App\Models\Setting::get('mail_from_name') ?: \App\Models\Setting::get('site_name', config('app.name')),
         ]);
+    }
+
+    /**
+     * Apply the admin-configured timezone (falls back to the .env value).
+     */
+    protected function applyTimezone(): void
+    {
+        try {
+            if (! \Illuminate\Support\Facades\Schema::hasTable('settings')) {
+                return;
+            }
+        } catch (\Throwable $e) {
+            return;
+        }
+
+        $tz = \App\Models\Setting::get('timezone');
+
+        if ($tz && in_array($tz, timezone_identifiers_list(), true)) {
+            config(['app.timezone' => $tz]);
+            date_default_timezone_set($tz);
+        }
     }
 
     /**

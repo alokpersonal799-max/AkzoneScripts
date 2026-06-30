@@ -14,6 +14,8 @@ return [
 
     'name' => env('APP_NAME', 'AkzoneScripts'),
 
+    'version' => '1.0.0',
+
     'tagline' => 'Premium scripts, code & design assets for modern builders.',
 
     'currency' => env('MARKETPLACE_CURRENCY', 'USD'),
