@@ -18,8 +18,36 @@ class DemoSeeder extends Seeder
 {
     public function run(): void
     {
+        $this->seedDemoUsers();
         $categories = $this->seedCategories();
         $this->seedProducts($categories);
+    }
+
+    /**
+     * Create ready-to-use demo accounts for testing both panels.
+     * Change or remove these before going live in production.
+     */
+    protected function seedDemoUsers(): void
+    {
+        \App\Models\User::updateOrCreate(
+            ['email' => 'admin@akzone.com'],
+            [
+                'name' => 'Demo Admin',
+                'password' => \Illuminate\Support\Facades\Hash::make('password'),
+                'role' => 'admin',
+                'email_verified_at' => now(),
+            ]
+        );
+
+        \App\Models\User::updateOrCreate(
+            ['email' => 'user@akzone.com'],
+            [
+                'name' => 'Demo Customer',
+                'password' => \Illuminate\Support\Facades\Hash::make('password'),
+                'role' => 'user',
+                'email_verified_at' => now(),
+            ]
+        );
     }
 
     /**

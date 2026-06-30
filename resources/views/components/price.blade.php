@@ -6,7 +6,7 @@
 @endphp
 
 @if ($value <= 0)
-    <span {{ $attributes->merge(['class' => 'font-semibold text-emerald-400']) }}>Free</span>
+    <span {{ $attributes->merge(['class' => 'font-semibold text-emerald-600']) }}>Free</span>
 @else
     <span {{ $attributes }}>{{ $symbol }}{{ number_format($value, 2) }}</span>
 @endif

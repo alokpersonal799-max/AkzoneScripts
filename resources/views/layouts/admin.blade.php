@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="scroll-smooth">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 <head>
     @include('partials.head')
 </head>
-<body class="min-h-screen bg-ink-900 font-sans text-slate-300 antialiased" x-data="{ sidebar: false }">
+<body class="min-h-screen bg-slate-50 font-sans text-slate-600 antialiased" x-data="{ sidebar: false }">
 
 @php
     $adminNav = [
@@ -17,24 +17,24 @@
 
 <div class="flex min-h-screen">
     {{-- Sidebar --}}
-    <aside class="fixed inset-y-0 left-0 z-50 w-64 -translate-x-full transform border-r border-white/5 bg-ink-800 transition-transform duration-200 lg:translate-x-0"
+    <aside class="fixed inset-y-0 left-0 z-50 w-64 transform border-r border-slate-200 bg-white transition-transform duration-200 lg:translate-x-0"
            :class="sidebar ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'">
-        <div class="flex h-16 items-center gap-2 border-b border-white/5 px-6">
-            <span class="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-brand-400 to-indigo-500 font-display font-extrabold text-ink-900">A</span>
-            <span class="font-display text-lg font-bold text-white">Admin</span>
+        <div class="flex h-16 items-center gap-2 border-b border-slate-100 px-6">
+            <span class="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-brand-500 to-indigo-500 font-display font-extrabold text-white">A</span>
+            <span class="font-display text-lg font-extrabold text-ink-900">Admin</span>
         </div>
         <nav class="space-y-1 p-4">
             @foreach ($adminNav as $item)
                 @php $active = request()->routeIs($item['match']); @endphp
                 <a href="{{ route($item['route']) }}"
-                   class="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition {{ $active ? 'bg-brand-400/10 text-brand-300' : 'text-slate-300 hover:bg-white/5 hover:text-white' }}">
+                   class="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold transition {{ $active ? 'bg-brand-50 text-brand-700' : 'text-slate-600 hover:bg-slate-50 hover:text-ink-900' }}">
                     <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="{{ $item['icon'] }}" /></svg>
                     {{ $item['label'] }}
                 </a>
             @endforeach
         </nav>
-        <div class="absolute inset-x-0 bottom-0 border-t border-white/5 p-4">
-            <a href="{{ route('home') }}" class="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-slate-300 transition hover:bg-white/5 hover:text-white">
+        <div class="absolute inset-x-0 bottom-0 border-t border-slate-100 p-4">
+            <a href="{{ route('home') }}" class="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold text-slate-600 transition hover:bg-slate-50 hover:text-ink-900">
                 <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m2.25 12 8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" /></svg>
                 View storefront
             </a>
@@ -42,26 +42,26 @@
     </aside>
 
     {{-- Overlay for mobile --}}
-    <div x-show="sidebar" x-cloak @click="sidebar = false" class="fixed inset-0 z-40 bg-black/50 lg:hidden"></div>
+    <div x-show="sidebar" x-cloak @click="sidebar = false" class="fixed inset-0 z-40 bg-slate-900/30 lg:hidden"></div>
 
     {{-- Main --}}
     <div class="flex flex-1 flex-col lg:pl-64">
-        <header class="sticky top-0 z-30 flex h-16 items-center gap-4 border-b border-white/5 bg-ink-900/90 px-4 backdrop-blur sm:px-6">
-            <button @click="sidebar = !sidebar" class="rounded-lg p-2 text-slate-300 hover:bg-white/5 lg:hidden">
+        <header class="sticky top-0 z-30 flex h-16 items-center gap-4 border-b border-slate-200 bg-white/90 px-4 backdrop-blur sm:px-6">
+            <button @click="sidebar = !sidebar" class="rounded-lg p-2 text-slate-600 hover:bg-slate-100 lg:hidden">
                 <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" /></svg>
             </button>
-            <h1 class="font-display text-lg font-semibold text-white">@yield('page-title', 'Dashboard')</h1>
+            <h1 class="font-display text-lg font-bold text-ink-900">@yield('page-title', 'Dashboard')</h1>
             <div class="ml-auto flex items-center gap-3">
                 <div x-data="{ menu: false }" class="relative">
-                    <button @click="menu = !menu" class="flex items-center gap-2 rounded-lg border border-white/10 bg-white/5 py-1.5 pl-1.5 pr-3 text-sm font-medium text-white">
-                        <span class="flex h-7 w-7 items-center justify-center rounded-md bg-gradient-to-br from-brand-400 to-indigo-500 text-xs font-bold text-ink-900">{{ strtoupper(substr(auth()->user()->name, 0, 1)) }}</span>
+                    <button @click="menu = !menu" class="flex items-center gap-2 rounded-xl border border-slate-200 bg-white py-1.5 pl-1.5 pr-3 text-sm font-semibold text-ink-900 hover:bg-slate-50">
+                        <span class="flex h-7 w-7 items-center justify-center rounded-md bg-gradient-to-br from-brand-500 to-indigo-500 text-xs font-bold text-white">{{ strtoupper(substr(auth()->user()->name, 0, 1)) }}</span>
                         <span class="hidden sm:block">{{ Str::limit(auth()->user()->name, 14) }}</span>
                     </button>
-                    <div x-show="menu" x-cloak @click.outside="menu = false" x-transition class="absolute right-0 mt-2 w-44 overflow-hidden rounded-xl border border-white/10 bg-ink-800 py-1 shadow-2xl">
-                        <a href="{{ route('dashboard') }}" class="block px-4 py-2 text-sm text-slate-300 hover:bg-white/5">My account</a>
+                    <div x-show="menu" x-cloak @click.outside="menu = false" x-transition class="absolute right-0 mt-2 w-44 overflow-hidden rounded-2xl border border-slate-200 bg-white py-1.5 shadow-soft">
+                        <a href="{{ route('dashboard') }}" class="block px-4 py-2 text-sm text-slate-600 hover:bg-slate-50">My account</a>
                         <form method="POST" action="{{ route('logout') }}">
                             @csrf
-                            <button type="submit" class="block w-full px-4 py-2 text-left text-sm text-rose-300 hover:bg-white/5">Log out</button>
+                            <button type="submit" class="block w-full px-4 py-2 text-left text-sm text-rose-600 hover:bg-slate-50">Log out</button>
                         </form>
                     </div>
                 </div>

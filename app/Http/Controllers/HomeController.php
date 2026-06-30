@@ -36,6 +36,24 @@ class HomeController extends Controller
             ->take(4)
             ->get();
 
+        $bestSelling = Product::query()
+            ->published()
+            ->with('category')
+            ->orderByDesc('downloads')
+            ->take(8)
+            ->get();
+
+        $freeItems = Product::query()
+            ->published()
+            ->with('category')
+            ->where(function ($q) {
+                $q->where('price', '<=', 0)
+                    ->orWhere('sale_price', '<=', 0);
+            })
+            ->latest()
+            ->take(8)
+            ->get();
+
         $categories = Category::query()
             ->where('is_active', true)
             ->withCount('publishedProducts')
@@ -48,6 +66,6 @@ class HomeController extends Controller
             'categories' => $categories->count(),
         ];
 
-        return view('home', compact('featured', 'latest', 'topRated', 'categories', 'stats'));
+        return view('home', compact('featured', 'latest', 'topRated', 'bestSelling', 'freeItems', 'categories', 'stats'));
     }
 }

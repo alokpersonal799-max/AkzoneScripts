@@ -2,17 +2,17 @@
 
 @php
     $map = [
-        'completed' => 'bg-emerald-500/15 text-emerald-300',
-        'published' => 'bg-emerald-500/15 text-emerald-300',
-        'pending'   => 'bg-amber-500/15 text-amber-300',
-        'draft'     => 'bg-slate-500/15 text-slate-300',
-        'failed'    => 'bg-rose-500/15 text-rose-300',
-        'refunded'  => 'bg-rose-500/15 text-rose-300',
-        'archived'  => 'bg-slate-500/15 text-slate-400',
-        'admin'     => 'bg-indigo-500/15 text-indigo-300',
-        'user'      => 'bg-slate-500/15 text-slate-300',
+        'completed' => 'bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200',
+        'published' => 'bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200',
+        'pending'   => 'bg-amber-50 text-amber-700 ring-1 ring-amber-200',
+        'draft'     => 'bg-slate-100 text-slate-600 ring-1 ring-slate-200',
+        'failed'    => 'bg-rose-50 text-rose-700 ring-1 ring-rose-200',
+        'refunded'  => 'bg-rose-50 text-rose-700 ring-1 ring-rose-200',
+        'archived'  => 'bg-slate-100 text-slate-500 ring-1 ring-slate-200',
+        'admin'     => 'bg-indigo-50 text-indigo-700 ring-1 ring-indigo-200',
+        'user'      => 'bg-slate-100 text-slate-600 ring-1 ring-slate-200',
     ];
-    $classes = $map[$status] ?? 'bg-slate-500/15 text-slate-300';
+    $classes = $map[$status] ?? 'bg-slate-100 text-slate-600 ring-1 ring-slate-200';
 @endphp
 
-<span {{ $attributes->merge(['class' => "mt-1 inline-block rounded-full px-2.5 py-0.5 text-xs font-medium capitalize {$classes}"]) }}>{{ $status }}</span>
+<span {{ $attributes->merge(['class' => "inline-block rounded-full px-2.5 py-0.5 text-xs font-semibold capitalize {$classes}"]) }}>{{ $status }}</span>
