@@ -35,12 +35,26 @@
                 <form method="POST" action="{{ route('admin.users.update', $user) }}" class="mt-4 flex gap-2">
                     @csrf
                     @method('PATCH')
+                    <input type="hidden" name="name" value="{{ $user->name }}">
+                    <input type="hidden" name="email" value="{{ $user->email }}">
                     <select name="role" class="input flex-1">
                         <option value="user" {{ $user->role === 'user' ? 'selected' : '' }}>User</option>
                         <option value="admin" {{ $user->role === 'admin' ? 'selected' : '' }}>Admin</option>
                     </select>
                     <button type="submit" class="btn-primary btn-sm">Save</button>
                 </form>
+
+                <div class="mt-4 flex flex-wrap gap-2 border-t border-slate-100 pt-4">
+                    <a href="{{ route('admin.users.edit', $user) }}" class="btn-ghost btn-sm">Edit details</a>
+                    @if ($user->id !== auth()->id())
+                        <form method="POST" action="{{ route('admin.users.ban', $user) }}">
+                            @csrf @method('PATCH')
+                            <button type="submit" class="rounded-xl border px-4 py-2 text-sm font-semibold transition {{ $user->is_banned ? 'border-emerald-200 text-emerald-600 hover:bg-emerald-50' : 'border-amber-200 text-amber-600 hover:bg-amber-50' }}">
+                                {{ $user->is_banned ? 'Unban user' : 'Ban user' }}
+                            </button>
+                        </form>
+                    @endif
+                </div>
 
                 @if ($user->id !== auth()->id())
                     <form method="POST" action="{{ route('admin.users.destroy', $user) }}" class="mt-3" onsubmit="return confirm('Delete this user account? This cannot be undone.');">

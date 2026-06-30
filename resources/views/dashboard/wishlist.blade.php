@@ -15,7 +15,7 @@
             </x-slot:action>
         </x-empty-state>
     @else
-        <div class="grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
+        <div class="grid grid-cols-2 gap-4 sm:gap-6 xl:grid-cols-3">
             @foreach ($products as $product)
                 <x-product-card :product="$product" />
             @endforeach

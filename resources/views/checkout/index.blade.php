@@ -5,10 +5,11 @@
     <h1 class="font-display text-3xl font-extrabold tracking-tight text-ink-900">Checkout</h1>
     <p class="mt-2 text-slate-500">Complete your purchase to unlock instant downloads.</p>
 
-    <form method="POST" action="{{ route('checkout.store') }}" class="mt-8 grid gap-8 lg:grid-cols-[1fr_360px]">
-        @csrf
+    <div class="mt-8 grid gap-8 lg:grid-cols-[1fr_360px]">
+        {{-- Main checkout form (left) --}}
+        <form id="checkoutForm" method="POST" action="{{ route('checkout.store') }}" class="space-y-6">
+            @csrf
 
-        <div class="space-y-6">
             <div class="card p-6">
                 <h2 class="font-display text-lg font-bold text-ink-900">Billing details</h2>
                 <div class="mt-4 grid gap-4 sm:grid-cols-2">
@@ -37,8 +38,9 @@
                     @endforeach
                 </div>
             </div>
-        </div>
+        </form>
 
+        {{-- Summary (right) — sits outside the form; the button submits via form attribute --}}
         <div class="lg:sticky lg:top-24 lg:self-start">
             <div class="card p-6">
                 <h2 class="font-display text-lg font-bold text-ink-900">Your order</h2>
@@ -50,14 +52,38 @@
                         </li>
                     @endforeach
                 </ul>
+
+                {{-- Coupon --}}
+                <div class="mt-4 border-t border-slate-100 pt-4">
+                    @if ($coupon)
+                        <div class="flex items-center justify-between rounded-xl bg-emerald-50 px-3 py-2 text-sm">
+                            <span class="font-semibold text-emerald-700">🏷️ {{ $coupon->code }} applied</span>
+                            <form method="POST" action="{{ route('checkout.coupon.remove') }}">
+                                @csrf @method('DELETE')
+                                <button type="submit" class="text-xs font-semibold text-rose-600 hover:text-rose-700">Remove</button>
+                            </form>
+                        </div>
+                    @else
+                        <form method="POST" action="{{ route('checkout.coupon.apply') }}" class="flex gap-2">
+                            @csrf
+                            <input name="code" placeholder="Coupon code" class="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm uppercase focus:border-brand-500 focus:outline-none focus:ring-4 focus:ring-brand-500/10">
+                            <button type="submit" class="btn-ghost btn-sm flex-shrink-0">Apply</button>
+                        </form>
+                    @endif
+                </div>
+
                 <dl class="mt-4 space-y-3 border-t border-slate-100 pt-4 text-sm">
-                    <div class="flex justify-between"><dt class="text-slate-500">Subtotal</dt><dd class="text-ink-900">{{ config('marketplace.currency_symbol') }}{{ number_format($subtotal, 2) }}</dd></div>
-                    <div class="flex justify-between border-t border-slate-100 pt-3 text-base font-bold"><dt class="text-ink-900">Total</dt><dd class="text-brand-600">{{ config('marketplace.currency_symbol') }}{{ number_format($subtotal, 2) }}</dd></div>
+                    <div class="flex justify-between"><dt class="text-slate-500">Subtotal</dt><dd class="text-ink-900">{{ money($subtotal) }}</dd></div>
+                    @if ($discount > 0)
+                        <div class="flex justify-between"><dt class="text-slate-500">Discount</dt><dd class="text-emerald-600">- {{ money($discount) }}</dd></div>
+                    @endif
+                    <div class="flex justify-between border-t border-slate-100 pt-3 text-base font-bold"><dt class="text-ink-900">Total</dt><dd class="text-brand-600">{{ money($total) }}</dd></div>
                 </dl>
-                <button type="submit" class="btn-primary btn-lg mt-6 w-full">Complete purchase</button>
+
+                <button type="submit" form="checkoutForm" class="btn-primary btn-lg mt-6 w-full">Complete purchase</button>
                 <p class="mt-3 text-center text-xs text-slate-400">By completing this purchase you agree to our terms of service.</p>
             </div>
         </div>
-    </form>
+    </div>
 </div>
 @endsection

@@ -60,12 +60,19 @@ class HomeController extends Controller
             ->orderBy('name')
             ->get();
 
+        $testimonials = \App\Models\Review::query()
+            ->testimonials()
+            ->with(['user', 'product'])
+            ->latest()
+            ->take(8)
+            ->get();
+
         $stats = [
             'products' => Product::published()->count(),
             'downloads' => (int) Product::published()->sum('downloads'),
             'categories' => $categories->count(),
         ];
 
-        return view('home', compact('featured', 'latest', 'topRated', 'bestSelling', 'freeItems', 'categories', 'stats'));
+        return view('home', compact('featured', 'latest', 'topRated', 'bestSelling', 'freeItems', 'categories', 'testimonials', 'stats'));
     }
 }

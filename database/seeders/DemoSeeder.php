@@ -18,6 +18,7 @@ class DemoSeeder extends Seeder
 {
     public function run(): void
     {
+        $this->call(CoreSeeder::class);
         $this->seedDemoUsers();
         $categories = $this->seedCategories();
         $this->seedProducts($categories);

@@ -17,6 +17,8 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
+        $this->call(CoreSeeder::class);
+
         $admin = User::updateOrCreate(
             ['email' => 'admin@akzonescripts.test'],
             [

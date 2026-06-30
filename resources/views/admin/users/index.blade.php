@@ -3,6 +3,14 @@
 @section('page-title', 'Customers')
 
 @section('admin')
+    <div class="mb-6 flex items-center justify-between">
+        <h2 class="font-display text-lg font-bold text-ink-900">Customers</h2>
+        <a href="{{ route('admin.users.create') }}" class="btn-primary btn-md">
+            <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" /></svg>
+            New user
+        </a>
+    </div>
+
     <form method="GET" action="{{ route('admin.users.index') }}" class="mb-6 flex flex-wrap items-center gap-2">
         <input type="text" name="q" value="{{ $filters['q'] ?? '' }}" placeholder="Search name or email..."
                class="w-full max-w-xs rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 placeholder-slate-400 focus:border-brand-500 focus:outline-none focus:ring-4 focus:ring-brand-500/10">

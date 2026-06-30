@@ -26,16 +26,17 @@ class ReviewController extends Controller
         ]);
 
         // updateOrCreate so a user editing their review does not violate the
-        // unique [product_id, user_id] constraint.
+        // unique [product_id, user_id] constraint. New/edited reviews are
+        // unapproved until an admin verifies them.
         $product->reviews()->updateOrCreate(
             ['user_id' => $user->id],
             [
                 'rating' => $validated['rating'],
                 'comment' => $validated['comment'] ?? null,
-                'is_approved' => true,
+                'is_approved' => false,
             ]
         );
 
-        return back()->with('success', 'Thanks for your review!');
+        return back()->with('success', 'Thanks for your review! It will appear once an admin approves it.');
     }
 }

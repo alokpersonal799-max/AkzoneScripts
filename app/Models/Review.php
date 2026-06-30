@@ -22,6 +22,7 @@ class Review extends Model
         'rating',
         'comment',
         'is_approved',
+        'is_testimonial',
     ];
 
     /**
@@ -34,6 +35,7 @@ class Review extends Model
         return [
             'rating' => 'integer',
             'is_approved' => 'boolean',
+            'is_testimonial' => 'boolean',
         ];
     }
 
@@ -59,6 +61,16 @@ class Review extends Model
 
         static::saved($recalculate);
         static::deleted($recalculate);
+    }
+
+    /**
+     * Approved reviews the admin has marked as testimonials.
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder<Review>  $query
+     */
+    public function scopeTestimonials($query): void
+    {
+        $query->where('is_approved', true)->where('is_testimonial', true);
     }
 
     /**

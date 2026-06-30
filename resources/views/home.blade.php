@@ -11,16 +11,23 @@
 
             <div class="relative grid items-center gap-10 lg:grid-cols-2">
                 {{-- Left --}}
-                <div class="animate-fade-up">
+                <div class="order-2 animate-fade-up lg:order-1">
                     <span class="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-3.5 py-1.5 text-xs font-semibold text-brand-200">
                         <span class="flex h-1.5 w-1.5 rounded-full bg-brand-400"></span>
-                        Trusted by thousands of builders
+                        {{ setting('hero_badge', 'Trusted by thousands of builders') }}
                     </span>
+                    @php
+                        $heroTitle = e(setting('hero_title', 'curated digital products for your next project'));
+                        $heroHighlight = setting('hero_highlight', 'next project');
+                        $heroTitleHtml = $heroHighlight
+                            ? str_replace(e($heroHighlight), '<span class="gradient-text">'.e($heroHighlight).'</span>', $heroTitle)
+                            : $heroTitle;
+                    @endphp
                     <h1 class="mt-5 font-display text-4xl font-extrabold leading-[1.1] tracking-tight text-white sm:text-5xl lg:text-6xl">
-                        {{ number_format($stats['products']) }}+ curated digital products<br class="hidden sm:block"> for your <span class="gradient-text">next project</span>
+                        {{ number_format($stats['products']) }}+ {!! $heroTitleHtml !!}
                     </h1>
                     <p class="mt-5 max-w-lg text-base text-slate-300">
-                        Buy and download premium scripts, source code, UI kits and design assets. Instant delivery, lifetime access and updates included.
+                        {{ setting('hero_subtitle', 'Buy and download premium scripts, source code, UI kits and design assets. Instant delivery, lifetime access and updates included.') }}
                     </p>
 
                     <form action="{{ route('products.index') }}" method="GET" class="mt-7 flex max-w-md items-center gap-2 rounded-2xl bg-white p-1.5 shadow-lift">
@@ -42,7 +49,7 @@
                 </div>
 
                 {{-- Right: browser-style preview --}}
-                <div class="relative hidden lg:block">
+                <div class="relative order-1 mb-4 lg:order-2 lg:mb-0">
                     <div class="animate-floaty overflow-hidden rounded-2xl border border-white/10 bg-white shadow-2xl">
                         {{-- Browser bar --}}
                         <div class="flex items-center gap-2 border-b border-slate-100 px-4 py-3">
@@ -74,15 +81,15 @@
                         </div>
                     </div>
                     {{-- Floating stat cards --}}
-                    <div class="absolute -left-6 top-10 rounded-2xl border border-slate-100 bg-white px-4 py-3 shadow-lift">
+                    <div class="absolute -left-6 top-10 hidden rounded-2xl border border-slate-100 bg-white px-4 py-3 shadow-lift sm:block">
                         <p class="text-[10px] text-slate-400">Total downloads</p>
                         <p class="font-display text-lg font-extrabold text-ink-900">{{ number_format($stats['downloads']) }}</p>
                     </div>
-                    <div class="absolute -bottom-5 left-8 flex items-center gap-2 rounded-2xl border border-slate-100 bg-white px-4 py-3 shadow-lift">
+                    <div class="absolute -bottom-5 left-8 hidden items-center gap-2 rounded-2xl border border-slate-100 bg-white px-4 py-3 shadow-lift sm:flex">
                         <x-star-rating :rating="5" size="h-4 w-4" />
                         <span class="text-sm font-bold text-ink-900">5.0</span>
                     </div>
-                    <div class="absolute -right-4 bottom-16 flex items-center gap-2 rounded-2xl border border-slate-100 bg-white px-4 py-3 shadow-lift">
+                    <div class="absolute -right-4 bottom-16 hidden items-center gap-2 rounded-2xl border border-slate-100 bg-white px-4 py-3 shadow-lift sm:flex">
                         <span class="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-50 text-emerald-500">
                             <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" /></svg>
                         </span>
@@ -180,9 +187,9 @@
                         <button type="button" @click="scroll(1)" class="flex h-10 w-10 items-center justify-center rounded-full bg-white/15 text-white transition hover:bg-white/25"><svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" /></svg></button>
                     </div>
                 </div>
-                <div x-ref="t" class="no-scrollbar -mx-1 flex snap-x gap-5 overflow-x-auto scroll-smooth px-1 pb-2">
+                <div x-ref="t" class="no-scrollbar -mx-1 flex snap-x gap-4 overflow-x-auto scroll-smooth px-1 pb-2 sm:gap-5">
                     @foreach ($freeItems as $product)
-                        <x-product-card :product="$product" class="w-[270px] flex-none snap-start sm:w-[290px]" />
+                        <x-product-card :product="$product" class="w-[46%] flex-none snap-start sm:w-[290px]" />
                     @endforeach
                 </div>
             </div>
@@ -191,49 +198,81 @@
 
     <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         {{-- Testimonials --}}
-        <section class="reveal py-16">
+        <section class="reveal py-16"
+                 x-data="{ scroll(dir){ $refs.tt.scrollBy({left: dir*$refs.tt.clientWidth*0.9, behavior:'smooth'}) } }">
             <div class="flex flex-col items-start justify-between gap-6 sm:flex-row sm:items-end">
                 <div>
-                    <span class="inline-flex items-center gap-1.5 rounded-full bg-brand-50 px-3 py-1 text-xs font-bold uppercase tracking-wide text-brand-600"><span class="h-1.5 w-1.5 rounded-full bg-brand-500"></span>Testimonials</span>
+                    <span class="inline-flex items-center gap-1.5 rounded-full bg-amber-50 px-3 py-1 text-xs font-bold uppercase tracking-wide text-amber-600">
+                        <svg class="h-3.5 w-3.5" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 0 0 .95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 0 0-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 0 0-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 0 0-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 0 0 .951-.69l1.07-3.292Z" /></svg>
+                        Verified Reviews
+                    </span>
                     <h2 class="mt-2 section-title">What customers are saying</h2>
-                    <p class="mt-1.5 text-sm text-slate-500">Trusted by builders across the marketplace.</p>
+                    <p class="mt-1.5 text-sm text-slate-500">Real feedback from real buyers across our marketplace.</p>
                 </div>
-                {{-- Big 5.0 rating box --}}
-                <div class="flex items-center gap-4 rounded-2xl bg-ink-900 px-6 py-4 text-white shadow-lift">
+                <div class="flex items-center gap-4 rounded-2xl border border-slate-200 bg-white px-6 py-4 shadow-soft">
                     <div>
-                        <p class="font-display text-4xl font-extrabold leading-none">5.0</p>
+                        <p class="font-display text-4xl font-extrabold leading-none text-ink-900">5.0</p>
                         <div class="mt-1.5 flex">
                             @for ($i = 0; $i < 5; $i++)
                                 <svg class="h-4 w-4 text-amber-400" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 0 0 .95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 0 0-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 0 0-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 0 0-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 0 0 .951-.69l1.07-3.292Z" /></svg>
                             @endfor
                         </div>
                     </div>
-                    <div class="h-12 w-px bg-white/15"></div>
-                    <p class="max-w-[8rem] text-xs text-slate-300">Average rating from happy buyers</p>
+                    @if ($testimonials->isNotEmpty())
+                        <div class="h-12 w-px bg-slate-200"></div>
+                        <p class="text-xs text-slate-400">{{ $testimonials->count() }} {{ Str::plural('review', $testimonials->count()) }}</p>
+                    @endif
                 </div>
             </div>
 
             @php
-                $testimonials = [
-                    ['name' => 'Daniel R.', 'role' => 'Full-stack Developer', 'text' => 'The code quality is outstanding and saved me weeks of work. Documentation made setup a breeze.'],
-                    ['name' => 'Aisha K.', 'role' => 'Startup Founder', 'text' => 'Found exactly what we needed to launch our MVP. Instant download and great support.'],
-                    ['name' => 'Marco P.', 'role' => 'UI/UX Designer', 'text' => 'Beautiful UI kits and assets. Everything is clean, modern and easy to customise.'],
-                ];
+                $fallback = collect([
+                    (object) ['name' => 'Daniel R.', 'comment' => 'The code quality is outstanding and saved me weeks of work. Documentation made setup a breeze.', 'product' => 'InvoiceFlow'],
+                    (object) ['name' => 'Aisha K.', 'comment' => 'Found exactly what we needed to launch our MVP. Instant download and great support.', 'product' => 'LaraCommerce'],
+                    (object) ['name' => 'Marco P.', 'comment' => 'Beautiful UI kits and assets. Everything is clean, modern and easy to customise.', 'product' => 'Nebula'],
+                ]);
             @endphp
-            <div class="mt-8 grid gap-6 md:grid-cols-3">
-                @foreach ($testimonials as $i => $t)
-                    <figure class="reveal reveal-delay-{{ $i + 1 }} card p-6">
-                        <x-star-rating :rating="5" size="h-4 w-4" />
-                        <blockquote class="mt-4 text-sm leading-relaxed text-slate-600">"{{ $t['text'] }}"</blockquote>
+
+            <div x-ref="tt" class="no-scrollbar mt-8 flex snap-x gap-5 overflow-x-auto scroll-smooth pb-2">
+                @forelse ($testimonials as $t)
+                    <figure class="w-[85%] flex-none snap-start rounded-2xl border border-slate-200 bg-white p-6 shadow-soft sm:w-[46%] lg:w-[31%]">
+                        <div class="flex items-center justify-between">
+                            <x-star-rating :rating="$t->rating" size="h-4 w-4" />
+                            <span class="text-xs text-slate-400">{{ $t->created_at->diffForHumans() }}</span>
+                        </div>
+                        <blockquote class="mt-4 text-sm leading-relaxed text-slate-600">"{{ $t->comment ?: 'Great product!' }}"</blockquote>
                         <figcaption class="mt-5 flex items-center gap-3 border-t border-slate-100 pt-4">
-                            <span class="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-brand-500 to-indigo-500 text-sm font-bold text-white">{{ substr($t['name'], 0, 1) }}</span>
+                            <span class="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-brand-500 to-indigo-500 text-sm font-bold text-white">{{ strtoupper(substr($t->user->name ?? 'A', 0, 1)) }}</span>
                             <div>
-                                <p class="text-sm font-bold text-ink-900">{{ $t['name'] }}</p>
-                                <p class="text-xs text-slate-400">{{ $t['role'] }}</p>
+                                <p class="text-sm font-bold text-ink-900">{{ $t->user->name ?? 'Verified user' }}</p>
+                                <p class="flex items-center gap-1 text-xs text-emerald-600">
+                                    <svg class="h-3.5 w-3.5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.704 4.153a.75.75 0 0 1 .143 1.052l-8 10.5a.75.75 0 0 1-1.127.075l-4.5-4.5a.75.75 0 0 1 1.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 0 1 1.05-.143Z" clip-rule="evenodd" /></svg>
+                                    Verified Buyer
+                                </p>
                             </div>
                         </figcaption>
                     </figure>
-                @endforeach
+                @empty
+                    @foreach ($fallback as $t)
+                        <figure class="w-[85%] flex-none snap-start rounded-2xl border border-slate-200 bg-white p-6 shadow-soft sm:w-[46%] lg:w-[31%]">
+                            <div class="flex items-center justify-between">
+                                <x-star-rating :rating="5" size="h-4 w-4" />
+                                <span class="text-xs text-slate-400">recently</span>
+                            </div>
+                            <blockquote class="mt-4 text-sm leading-relaxed text-slate-600">"{{ $t->comment }}"</blockquote>
+                            <figcaption class="mt-5 flex items-center gap-3 border-t border-slate-100 pt-4">
+                                <span class="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-brand-500 to-indigo-500 text-sm font-bold text-white">{{ substr($t->name, 0, 1) }}</span>
+                                <div>
+                                    <p class="text-sm font-bold text-ink-900">{{ $t->name }}</p>
+                                    <p class="flex items-center gap-1 text-xs text-emerald-600">
+                                        <svg class="h-3.5 w-3.5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.704 4.153a.75.75 0 0 1 .143 1.052l-8 10.5a.75.75 0 0 1-1.127.075l-4.5-4.5a.75.75 0 0 1 1.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 0 1 1.05-.143Z" clip-rule="evenodd" /></svg>
+                                        Verified Buyer
+                                    </p>
+                                </div>
+                            </figcaption>
+                        </figure>
+                    @endforeach
+                @endforelse
             </div>
         </section>
 

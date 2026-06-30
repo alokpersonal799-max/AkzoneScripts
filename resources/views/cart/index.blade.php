@@ -47,9 +47,9 @@
                 <div class="card p-6">
                     <h2 class="font-display text-lg font-bold text-ink-900">Order summary</h2>
                     <dl class="mt-4 space-y-3 text-sm">
-                        <div class="flex justify-between"><dt class="text-slate-500">Items ({{ $items->count() }})</dt><dd class="text-ink-900">{{ config('marketplace.currency_symbol') }}{{ number_format($subtotal, 2) }}</dd></div>
-                        <div class="flex justify-between"><dt class="text-slate-500">Tax</dt><dd class="text-ink-900">{{ config('marketplace.currency_symbol') }}0.00</dd></div>
-                        <div class="flex justify-between border-t border-slate-100 pt-3 text-base font-bold"><dt class="text-ink-900">Total</dt><dd class="text-brand-600">{{ config('marketplace.currency_symbol') }}{{ number_format($subtotal, 2) }}</dd></div>
+                        <div class="flex justify-between"><dt class="text-slate-500">Items ({{ $items->count() }})</dt><dd class="text-ink-900">{{ money($subtotal) }}</dd></div>
+                        <div class="flex justify-between"><dt class="text-slate-500">Tax</dt><dd class="text-ink-900">{{ money(0) }}</dd></div>
+                        <div class="flex justify-between border-t border-slate-100 pt-3 text-base font-bold"><dt class="text-ink-900">Total</dt><dd class="text-brand-600">{{ money($subtotal) }}</dd></div>
                     </dl>
 
                     @auth

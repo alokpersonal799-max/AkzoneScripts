@@ -37,6 +37,17 @@ class AuthenticatedSessionController extends Controller
             ]);
         }
 
+        // Block banned accounts.
+        if (Auth::user()->is_banned) {
+            Auth::logout();
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
+
+            throw ValidationException::withMessages([
+                'email' => __('This account has been suspended. Please contact support.'),
+            ]);
+        }
+
         $request->session()->regenerate();
 
         // Admins go straight to the admin dashboard, everyone else to theirs.

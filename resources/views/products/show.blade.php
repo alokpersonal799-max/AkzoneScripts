@@ -102,7 +102,7 @@
                 <div class="mt-6 flex items-baseline gap-3">
                     <x-price :amount="$product->current_price" class="font-display text-4xl font-extrabold text-ink-900" />
                     @if ($product->is_on_sale)
-                        <span class="text-lg text-slate-400 line-through">{{ config('marketplace.currency_symbol') }}{{ number_format($product->price, 2) }}</span>
+                        <span class="text-lg text-slate-400 line-through">{{ money($product->price) }}</span>
                     @endif
                 </div>
 
@@ -147,6 +147,40 @@
                     <div class="flex justify-between"><dt class="text-slate-500">Downloads</dt><dd class="font-semibold text-ink-900">{{ number_format($product->downloads) }}</dd></div>
                     <div class="flex justify-between"><dt class="text-slate-500">Last updated</dt><dd class="font-semibold text-ink-900">{{ $product->updated_at->format('M j, Y') }}</dd></div>
                 </dl>
+
+                @auth
+                    <div x-data="{ open: false }" class="mt-6 border-t border-slate-100 pt-4 text-center">
+                        <button @click="open = true" class="inline-flex items-center gap-1.5 text-xs font-medium text-slate-400 hover:text-rose-500">
+                            <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3 3v1.5M3 21v-6m0 0 2.77-.693a9 9 0 0 1 6.208.682l.108.054a9 9 0 0 0 6.086.71l3.114-.732a48.524 48.524 0 0 1-.005-10.499l-3.11.732a9 9 0 0 1-6.085-.711l-.108-.054a9 9 0 0 0-6.208-.682L3 4.5M3 15V4.5" /></svg>
+                            Report this product
+                        </button>
+
+                        {{-- Modal --}}
+                        <div x-show="open" x-cloak @keydown.escape.window="open = false" class="fixed inset-0 z-[60] flex items-center justify-center p-4">
+                            <div @click="open = false" class="absolute inset-0 bg-slate-900/40"></div>
+                            <div class="relative w-full max-w-md rounded-2xl border border-slate-200 bg-white p-6 text-left shadow-2xl">
+                                <h3 class="font-display text-lg font-bold text-ink-900">Report product</h3>
+                                <p class="mt-1 text-sm text-slate-500">Let us know what's wrong with this product.</p>
+                                <form method="POST" action="{{ route('reports.store', $product) }}" class="mt-4 space-y-3">
+                                    @csrf
+                                    <select name="reason" required class="input">
+                                        <option value="">Select a reason</option>
+                                        <option>Copyright / stolen content</option>
+                                        <option>Broken or malicious code</option>
+                                        <option>Misleading description</option>
+                                        <option>Spam or scam</option>
+                                        <option>Other</option>
+                                    </select>
+                                    <textarea name="details" rows="3" class="input" placeholder="Add any details (optional)"></textarea>
+                                    <div class="flex justify-end gap-2">
+                                        <button type="button" @click="open = false" class="btn-ghost btn-sm">Cancel</button>
+                                        <button type="submit" class="btn-primary btn-sm">Submit report</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                @endauth
             </div>
         </div>
     </div>
@@ -155,7 +189,7 @@
     @if ($related->isNotEmpty())
         <section class="mt-16">
             <h2 class="section-title">You might also like</h2>
-            <div class="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+            <div class="mt-6 grid grid-cols-2 gap-4 sm:gap-6 lg:grid-cols-4">
                 @foreach ($related as $item)
                     <x-product-card :product="$item" />
                 @endforeach

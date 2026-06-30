@@ -38,7 +38,7 @@
             <div class="flex items-baseline gap-1.5">
                 <x-price :amount="$product->current_price" class="font-display text-lg font-extrabold text-ink-900" />
                 @if ($product->is_on_sale)
-                    <span class="text-sm text-slate-400 line-through">{{ config('marketplace.currency_symbol') }}{{ number_format($product->price, 2) }}</span>
+                    <span class="text-sm text-slate-400 line-through">{{ money($product->price) }}</span>
                 @endif
             </div>
             <form method="POST" action="{{ route('cart.add', $product) }}">

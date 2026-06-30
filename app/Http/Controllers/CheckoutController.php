@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Coupon;
 use App\Models\Order;
 use App\Services\CartService;
 use Illuminate\Http\RedirectResponse;
@@ -11,6 +12,8 @@ use Illuminate\View\View;
 
 class CheckoutController extends Controller
 {
+    public const COUPON_SESSION = 'coupon_code';
+
     public function __construct(protected CartService $cart) {}
 
     /**
@@ -25,18 +28,53 @@ class CheckoutController extends Controller
                 ->with('info', 'Your cart is empty. Browse the catalog to find something great.');
         }
 
+        $subtotal = $this->cart->subtotal();
+        $coupon = $this->activeCoupon($subtotal);
+        $discount = $coupon ? $coupon->discountFor($subtotal) : 0;
+
         return view('checkout.index', [
             'items' => $items,
-            'subtotal' => $this->cart->subtotal(),
+            'subtotal' => $subtotal,
+            'coupon' => $coupon,
+            'discount' => $discount,
+            'total' => max($subtotal - $discount, 0),
         ]);
     }
 
     /**
+     * Apply a coupon code to the current cart.
+     */
+    public function applyCoupon(Request $request): RedirectResponse
+    {
+        $request->validate(['code' => ['required', 'string', 'max:50']]);
+
+        $coupon = Coupon::where('code', strtoupper($request->string('code')->toString()))->first();
+
+        if (! $coupon || ! $coupon->isValid()) {
+            return back()->with('error', 'That coupon code is invalid or expired.');
+        }
+
+        if ($this->cart->subtotal() < (float) $coupon->min_order) {
+            return back()->with('error', 'Your order does not meet the minimum for this coupon.');
+        }
+
+        session([self::COUPON_SESSION => $coupon->code]);
+
+        return back()->with('success', 'Coupon "'.$coupon->code.'" applied.');
+    }
+
+    /**
+     * Remove an applied coupon.
+     */
+    public function removeCoupon(): RedirectResponse
+    {
+        session()->forget(self::COUPON_SESSION);
+
+        return back()->with('success', 'Coupon removed.');
+    }
+
+    /**
      * Process the checkout and create a completed order.
-     *
-     * The bundled flow runs in "manual" payment mode so the full purchase
-     * journey works out of the box. Wire in Stripe/PayPal in services.php to
-     * accept live payments.
      */
     public function store(Request $request): RedirectResponse
     {
@@ -50,8 +88,7 @@ class CheckoutController extends Controller
         $items = $this->cart->items();
 
         if ($items->isEmpty()) {
-            return redirect()->route('products.index')
-                ->with('info', 'Your cart is empty.');
+            return redirect()->route('products.index')->with('info', 'Your cart is empty.');
         }
 
         // Skip products the customer already owns to avoid duplicate purchases.
@@ -64,14 +101,18 @@ class CheckoutController extends Controller
                 ->with('info', 'You already own everything that was in your cart.');
         }
 
-        $order = DB::transaction(function () use ($user, $items, $validated): Order {
-            $subtotal = (float) $items->sum(fn ($product) => $product->current_price);
+        $subtotal = (float) $items->sum(fn ($product) => $product->current_price);
+        $coupon = $this->activeCoupon($subtotal);
+        $discount = $coupon ? $coupon->discountFor($subtotal) : 0;
 
+        $order = DB::transaction(function () use ($user, $items, $validated, $subtotal, $discount, $coupon): Order {
             $order = Order::create([
                 'user_id' => $user->id,
                 'subtotal' => $subtotal,
                 'tax' => 0,
-                'total' => $subtotal,
+                'discount' => $discount,
+                'coupon_code' => $coupon?->code,
+                'total' => max($subtotal - $discount, 0),
                 'status' => 'completed',
                 'payment_method' => $validated['payment_method'],
                 'transaction_id' => strtoupper('TXN-'.uniqid()),
@@ -87,14 +128,18 @@ class CheckoutController extends Controller
                     'price' => $product->current_price,
                 ]);
 
-                // Bump the product's download/sales counter.
                 $product->incrementQuietly('downloads');
+            }
+
+            if ($coupon) {
+                $coupon->increment('used_count');
             }
 
             return $order;
         });
 
         $this->cart->clear();
+        session()->forget(self::COUPON_SESSION);
 
         return redirect()->route('orders.show', $order)
             ->with('success', 'Payment successful! Your digital products are ready to download.');
@@ -110,5 +155,27 @@ class CheckoutController extends Controller
         $order->load('items.product');
 
         return view('checkout.show', compact('order'));
+    }
+
+    /**
+     * Resolve the currently applied, still-valid coupon (if any).
+     */
+    protected function activeCoupon(float $subtotal): ?Coupon
+    {
+        $code = session(self::COUPON_SESSION);
+
+        if (! $code) {
+            return null;
+        }
+
+        $coupon = Coupon::where('code', $code)->first();
+
+        if (! $coupon || ! $coupon->isValid() || $subtotal < (float) $coupon->min_order) {
+            session()->forget(self::COUPON_SESSION);
+
+            return null;
+        }
+
+        return $coupon;
     }
 }

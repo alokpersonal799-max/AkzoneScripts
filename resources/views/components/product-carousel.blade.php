@@ -37,9 +37,9 @@
         </div>
     </div>
 
-    <div x-ref="track" @scroll.debounce.50ms="update()" class="no-scrollbar -mx-1 flex snap-x gap-5 overflow-x-auto scroll-smooth px-1 pb-2">
+    <div x-ref="track" @scroll.debounce.50ms="update()" class="no-scrollbar -mx-1 flex snap-x gap-4 overflow-x-auto scroll-smooth px-1 pb-2 sm:gap-5">
         @foreach ($products as $product)
-            <x-product-card :product="$product" class="w-[270px] flex-none snap-start sm:w-[290px]" />
+            <x-product-card :product="$product" class="w-[46%] flex-none snap-start sm:w-[290px]" />
         @endforeach
     </div>
 </section>

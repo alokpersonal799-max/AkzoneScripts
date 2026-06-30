@@ -167,6 +167,9 @@ class InstallController extends Controller
             // Build the schema.
             Artisan::call('migrate', ['--force' => true]);
 
+            // Always seed core settings + currencies.
+            Artisan::call('db:seed', ['--class' => 'CoreSeeder', '--force' => true]);
+
             // Optionally load sample categories & products.
             if ($request->boolean('demo')) {
                 Artisan::call('db:seed', [
