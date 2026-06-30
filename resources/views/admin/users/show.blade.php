@@ -79,7 +79,7 @@
                             <p class="mt-1 text-xs text-slate-400">{{ $order->items_count }} items · {{ $order->created_at->format('M j, Y') }}</p>
                         </div>
                         <div class="text-right">
-                            <p class="font-bold text-ink-900">{{ config('marketplace.currency_symbol') }}{{ number_format($order->total, 2) }}</p>
+                            <p class="font-bold text-ink-900">{{ base_symbol() }}{{ number_format($order->total, 2) }}</p>
                             <x-status-badge :status="$order->status" class="mt-1" />
                         </div>
                     </a>

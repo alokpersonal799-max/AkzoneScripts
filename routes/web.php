@@ -191,9 +191,14 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::patch('/reviews/{review}/testimonial', [AdminReviewController::class, 'toggleTestimonial'])->name('reviews.testimonial');
     Route::delete('/reviews/{review}', [AdminReviewController::class, 'destroy'])->name('reviews.destroy');
 
-    // Site settings.
+    // Site settings (section-based).
     Route::get('/settings', [AdminSettingController::class, 'index'])->name('settings.index');
+    Route::get('/settings/section/{section}', [AdminSettingController::class, 'show'])->name('settings.show');
     Route::put('/settings/general', [AdminSettingController::class, 'updateGeneral'])->name('settings.general');
     Route::put('/settings/hero', [AdminSettingController::class, 'updateHero'])->name('settings.hero');
     Route::put('/settings/footer', [AdminSettingController::class, 'updateFooter'])->name('settings.footer');
+    Route::put('/settings/seo', [AdminSettingController::class, 'updateSeo'])->name('settings.seo');
+    Route::put('/settings/maintenance', [AdminSettingController::class, 'updateMaintenance'])->name('settings.maintenance');
+    Route::put('/settings/payments', [AdminSettingController::class, 'updatePayments'])->name('settings.payments');
+    Route::put('/settings/manual', [AdminSettingController::class, 'updateManual'])->name('settings.manual');
 });

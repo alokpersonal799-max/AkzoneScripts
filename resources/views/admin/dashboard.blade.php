@@ -3,7 +3,7 @@
 @section('page-title', 'Dashboard')
 
 @section('admin')
-    @php $sym = config('marketplace.currency_symbol'); @endphp
+    @php $sym = base_symbol(); @endphp
 
     {{-- Stats --}}
     <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
@@ -104,7 +104,7 @@
                         <img src="{{ $product->thumbnail_url }}" alt="" class="h-12 w-16 flex-shrink-0 rounded-lg object-cover">
                         <div class="min-w-0 flex-1">
                             <p class="truncate text-sm font-bold text-ink-900">{{ $product->title }}</p>
-                            <p class="text-xs text-slate-400">{{ number_format($product->downloads) }} downloads · {{ number_format($product->views) }} views</p>
+                            <p class="text-xs text-slate-400">{{ number_format($product->sales) }} sold · {{ number_format($product->views) }} views</p>
                         </div>
                         <x-status-badge :status="$product->status" />
                     </div>

@@ -20,8 +20,25 @@ class DemoSeeder extends Seeder
     {
         $this->call(CoreSeeder::class);
         $this->seedDemoUsers();
+        $this->seedDemoSettings();
         $categories = $this->seedCategories();
         $this->seedProducts($categories);
+    }
+
+    /**
+     * Demo contact + manual payment details so the buttons/methods show up.
+     * Replace these with your real details in System settings.
+     */
+    protected function seedDemoSettings(): void
+    {
+        \App\Models\Setting::put('contact_whatsapp', '14155550123', 'general');
+        \App\Models\Setting::put('contact_telegram', 'akzonescripts', 'general');
+        \App\Models\Setting::put('manual_upi_id', 'akzonescripts@upi', 'manual');
+        \App\Models\Setting::put('manual_bank_details', "Account: AkzoneScripts\nA/C No: 0000 1111 2222\nIFSC: AKZN0001234\nBank: Demo Bank", 'manual');
+        \App\Models\Setting::put('manual_crypto', json_encode([
+            ['label' => 'USDT (TRC20)', 'address' => 'TXyZ0000DemoWalletAddress1111'],
+            ['label' => 'Bitcoin', 'address' => 'bc1qdemo0000walletaddress2222'],
+        ]), 'manual');
     }
 
     /**
@@ -87,8 +104,8 @@ class DemoSeeder extends Seeder
             ['cat' => 'javascript', 'title' => 'DropZone Pro — File Uploader', 'tagline' => 'Chunked, resumable file uploads for any backend.', 'price' => 19, 'featured' => false, 'tags' => ['javascript', 'uploads']],
             ['cat' => 'ui-kits-templates', 'title' => 'Nebula — SaaS Landing Template', 'tagline' => 'Modern, animated SaaS landing page in Tailwind CSS.', 'price' => 24, 'sale' => 18, 'featured' => true, 'tags' => ['tailwind', 'landing', 'html']],
             ['cat' => 'ui-kits-templates', 'title' => 'Orbit Admin — Dashboard UI Kit', 'tagline' => '120+ components and 30 pages for admin panels.', 'price' => 45, 'featured' => false, 'tags' => ['ui-kit', 'admin', 'tailwind']],
-            ['cat' => 'mobile-apps', 'title' => 'FoodieGo — Food Delivery App', 'tagline' => 'Full Flutter food delivery app with backend API.', 'price' => 89, 'featured' => true, 'tags' => ['flutter', 'mobile', 'delivery']],
-            ['cat' => 'mobile-apps', 'title' => 'FitTrack — Workout Tracker', 'tagline' => 'React Native fitness tracking app source code.', 'price' => 55, 'featured' => false, 'tags' => ['react-native', 'fitness']],
+            ['cat' => 'mobile-apps', 'title' => 'FoodieGo — Food Delivery App', 'tagline' => 'Full Flutter food delivery app with backend API.', 'price' => 89, 'featured' => true, 'tags' => ['flutter', 'mobile', 'delivery'], 'sellable' => false],
+            ['cat' => 'mobile-apps', 'title' => 'FitTrack — Workout Tracker', 'tagline' => 'React Native fitness tracking app source code.', 'price' => 55, 'featured' => false, 'tags' => ['react-native', 'fitness'], 'sellable' => false],
             ['cat' => 'design-assets', 'title' => 'Lumina Icon Pack — 2,400 Icons', 'tagline' => 'Pixel-perfect line and solid icons in SVG & Figma.', 'price' => 15, 'featured' => false, 'tags' => ['icons', 'svg', 'figma']],
             ['cat' => 'design-assets', 'title' => 'Gradient Mesh Backgrounds Vol. 1', 'tagline' => '60 high-res abstract gradient backgrounds.', 'price' => 9, 'sale' => 5, 'featured' => false, 'tags' => ['backgrounds', 'design']],
         ];
@@ -113,9 +130,12 @@ class DemoSeeder extends Seeder
                     'demo_url' => 'https://example.com/demo',
                     'tags' => $p['tags'],
                     'downloads' => rand(12, 1850),
+                    'sales' => rand(5, 600),
                     'views' => rand(200, 9000),
                     'status' => 'published',
                     'is_featured' => $p['featured'],
+                    'is_purchasable' => $p['sellable'] ?? true,
+                    'use_global_contact' => true,
                 ]
             );
         }

@@ -19,7 +19,7 @@
                 <div class="flex items-center justify-between gap-4 py-4">
                     <div class="min-w-0">
                         <p class="truncate font-semibold text-ink-900">{{ $item->product_title }}</p>
-                        <p class="text-sm text-slate-500">{{ config('marketplace.currency_symbol') }}{{ number_format($item->price, 2) }}</p>
+                        <p class="text-sm text-slate-500">{{ base_symbol() }}{{ number_format($item->price, 2) }}</p>
                     </div>
                     @if ($order->isCompleted() && $item->product && $item->product->file_path)
                         <a href="{{ route('download', $item) }}" class="btn-primary btn-sm flex-shrink-0">
@@ -34,7 +34,7 @@
         </div>
 
         <dl class="mt-4 space-y-2 border-t border-slate-100 pt-4 text-sm">
-            <div class="flex justify-between"><dt class="text-slate-500">Total paid</dt><dd class="font-bold text-ink-900">{{ config('marketplace.currency_symbol') }}{{ number_format($order->total, 2) }}</dd></div>
+            <div class="flex justify-between"><dt class="text-slate-500">Total paid</dt><dd class="font-bold text-ink-900">{{ base_symbol() }}{{ number_format($order->total, 2) }}</dd></div>
             <div class="flex justify-between"><dt class="text-slate-500">Payment method</dt><dd class="capitalize text-ink-900">{{ $order->payment_method }}</dd></div>
         </dl>
     </div>

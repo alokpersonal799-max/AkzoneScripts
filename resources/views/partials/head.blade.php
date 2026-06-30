@@ -2,8 +2,29 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="csrf-token" content="{{ csrf_token() }}">
 
-<title>{{ isset($title) ? $title.' — '.config('marketplace.name') : config('marketplace.name') }}</title>
-<meta name="description" content="{{ config('marketplace.tagline') }}">
+@php
+    $metaTitle = isset($title) ? $title.' — '.setting('site_name', config('marketplace.name')) : (setting('seo_title') ?: setting('site_name', config('marketplace.name')));
+    $metaDesc = setting('seo_description') ?: config('marketplace.tagline');
+    $ogImage = setting('seo_og_image') ? \Illuminate\Support\Facades\Storage::disk('public')->url(setting('seo_og_image')) : null;
+@endphp
+<title>{{ $metaTitle }}</title>
+<meta name="description" content="{{ $metaDesc }}">
+@if (setting('seo_keywords'))<meta name="keywords" content="{{ setting('seo_keywords') }}">@endif
+
+<meta property="og:title" content="{{ $metaTitle }}">
+<meta property="og:description" content="{{ $metaDesc }}">
+<meta property="og:type" content="website">
+@if ($ogImage)<meta property="og:image" content="{{ $ogImage }}"><meta name="twitter:card" content="summary_large_image">@endif
+
+@if (setting('analytics_id'))
+    <script async src="https://www.googletagmanager.com/gtag/js?id={{ setting('analytics_id') }}"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', '{{ setting('analytics_id') }}');
+    </script>
+@endif
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>

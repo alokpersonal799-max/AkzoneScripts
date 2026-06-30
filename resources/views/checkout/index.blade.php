@@ -7,7 +7,8 @@
 
     <div class="mt-8 grid gap-8 lg:grid-cols-[1fr_360px]">
         {{-- Main checkout form (left) --}}
-        <form id="checkoutForm" method="POST" action="{{ route('checkout.store') }}" class="space-y-6">
+        <form id="checkoutForm" method="POST" action="{{ route('checkout.store') }}" enctype="multipart/form-data" class="space-y-6"
+              x-data="{ method: '{{ array_key_first($methods) ?? 'manual' }}' }">
             @csrf
 
             <div class="card p-6">
@@ -24,23 +25,78 @@
                 </div>
             </div>
 
-            <div class="card p-6" x-data="{ method: 'manual' }">
+            <div class="card p-6">
                 <h2 class="font-display text-lg font-bold text-ink-900">Payment method</h2>
-                <p class="mt-1 text-sm text-slate-500">This demo runs in manual mode. Connect Stripe or PayPal keys to accept live payments.</p>
-                <div class="mt-4 space-y-3">
-                    @foreach (['manual' => 'Manual / Test payment', 'stripe' => 'Credit card (Stripe)', 'paypal' => 'PayPal'] as $value => $label)
-                        <label class="flex cursor-pointer items-center gap-3 rounded-xl border px-4 py-3 transition"
-                               :class="method === '{{ $value }}' ? 'border-brand-300 bg-brand-50' : 'border-slate-200 hover:bg-slate-50'">
-                            <input type="radio" name="payment_method" value="{{ $value }}" x-model="method" {{ $value === 'manual' ? 'checked' : '' }}
-                                   class="border-slate-300 text-brand-600 focus:ring-brand-500/30">
-                            <span class="text-sm font-semibold text-ink-900">{{ $label }}</span>
-                        </label>
-                    @endforeach
-                </div>
+
+                @if (empty($methods))
+                    <p class="mt-3 rounded-xl bg-rose-50 px-4 py-3 text-sm text-rose-700">No payment methods are enabled. Please contact support.</p>
+                @else
+                    <div class="mt-4 space-y-3">
+                        @foreach ($methods as $value => $label)
+                            <label class="flex cursor-pointer items-center gap-3 rounded-xl border px-4 py-3 transition"
+                                   :class="method === '{{ $value }}' ? 'border-brand-300 bg-brand-50' : 'border-slate-200 hover:bg-slate-50'">
+                                <input type="radio" name="payment_method" value="{{ $value }}" x-model="method" class="border-slate-300 text-brand-600 focus:ring-brand-500/30">
+                                <span class="text-sm font-semibold text-ink-900">{{ $label }}</span>
+                            </label>
+                        @endforeach
+                    </div>
+
+                    {{-- Manual payment details + proof --}}
+                    @if (isset($methods['manual']))
+                        <div x-show="method === 'manual'" x-cloak class="mt-5 space-y-4 rounded-xl border border-slate-200 bg-slate-50 p-5">
+                            @if ($manual['instructions'])<p class="text-sm text-slate-600">{{ $manual['instructions'] }}</p>@endif
+
+                            <div class="grid gap-4 sm:grid-cols-2">
+                                @if ($manual['upi'])
+                                    <div class="rounded-lg border border-slate-200 bg-white p-3">
+                                        <p class="text-xs font-semibold text-slate-400">UPI ID</p>
+                                        <p class="font-mono text-sm text-ink-900">{{ $manual['upi'] }}</p>
+                                    </div>
+                                @endif
+                                @if ($manual['qr'])
+                                    <div class="rounded-lg border border-slate-200 bg-white p-3">
+                                        <p class="text-xs font-semibold text-slate-400">Scan to pay</p>
+                                        <img src="{{ $manual['qr'] }}" alt="Payment QR" class="mt-1 h-28 w-28 object-contain">
+                                    </div>
+                                @endif
+                            </div>
+
+                            @if ($manual['bank'])
+                                <div class="rounded-lg border border-slate-200 bg-white p-3">
+                                    <p class="text-xs font-semibold text-slate-400">Bank transfer</p>
+                                    <p class="mt-1 whitespace-pre-line text-sm text-ink-900">{{ $manual['bank'] }}</p>
+                                </div>
+                            @endif
+
+                            @if (count($manual['crypto']))
+                                <div class="rounded-lg border border-slate-200 bg-white p-3">
+                                    <p class="text-xs font-semibold text-slate-400">Crypto wallets</p>
+                                    <ul class="mt-1 space-y-1">
+                                        @foreach ($manual['crypto'] as $w)
+                                            <li class="text-sm"><span class="font-semibold text-ink-900">{{ $w['label'] }}:</span> <span class="break-all font-mono text-slate-600">{{ $w['address'] }}</span></li>
+                                        @endforeach
+                                    </ul>
+                                </div>
+                            @endif
+
+                            <div class="grid gap-4 sm:grid-cols-2">
+                                <div>
+                                    <label for="transaction_id" class="label">Transaction ID</label>
+                                    <input id="transaction_id" name="transaction_id" type="text" value="{{ old('transaction_id') }}" class="input" placeholder="Your payment reference">
+                                </div>
+                                <div>
+                                    <label for="payment_proof" class="label">Payment screenshot</label>
+                                    <input id="payment_proof" name="payment_proof" type="file" accept="image/*" class="block w-full text-sm text-slate-500 file:mr-3 file:rounded-lg file:border-0 file:bg-brand-50 file:px-3 file:py-1.5 file:text-sm file:font-semibold file:text-brand-600 hover:file:bg-brand-100">
+                                </div>
+                            </div>
+                            <p class="text-xs text-slate-400">Your order is verified by our team after payment. Downloads unlock once approved.</p>
+                        </div>
+                    @endif
+                @endif
             </div>
         </form>
 
-        {{-- Summary (right) — sits outside the form; the button submits via form attribute --}}
+        {{-- Summary (right) --}}
         <div class="lg:sticky lg:top-24 lg:self-start">
             <div class="card p-6">
                 <h2 class="font-display text-lg font-bold text-ink-900">Your order</h2>
@@ -94,7 +150,7 @@
                     <div class="flex justify-between border-t border-slate-100 pt-3 text-base font-bold"><dt class="text-ink-900">Total</dt><dd class="text-brand-600">{{ money($total) }}</dd></div>
                 </dl>
 
-                @if ($items->isNotEmpty())
+                @if ($items->isNotEmpty() && ! empty($methods))
                     <button type="submit" form="checkoutForm" class="btn-primary btn-lg mt-6 w-full">Complete purchase</button>
                     <p class="mt-3 text-center text-xs text-slate-400">By completing this purchase you agree to our terms of service.</p>
                 @else

@@ -37,7 +37,7 @@
                                 <p class="text-xs text-slate-400">{{ $order->billing_email }}</p>
                             </td>
                             <td class="px-5 py-3 text-slate-600">{{ $order->items_count }}</td>
-                            <td class="px-5 py-3 font-semibold text-ink-900">{{ config('marketplace.currency_symbol') }}{{ number_format($order->total, 2) }}</td>
+                            <td class="px-5 py-3 font-semibold text-ink-900">{{ base_symbol() }}{{ number_format($order->total, 2) }}</td>
                             <td class="px-5 py-3"><x-status-badge :status="$order->status" /></td>
                             <td class="px-5 py-3 text-slate-500">{{ $order->created_at->format('M j, Y') }}</td>
                         </tr>

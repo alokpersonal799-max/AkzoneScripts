@@ -8,6 +8,7 @@ use App\Services\CartService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\View\View;
 
 class CheckoutController extends Controller
@@ -15,6 +16,46 @@ class CheckoutController extends Controller
     public const COUPON_SESSION = 'coupon_code';
 
     public function __construct(protected CartService $cart) {}
+
+    /**
+     * Payment methods enabled in System settings.
+     *
+     * @return array<string, string>
+     */
+    protected function enabledMethods(): array
+    {
+        $methods = [];
+        if (setting('pay_manual_enabled', '1') === '1') {
+            $methods['manual'] = 'Manual / Offline payment';
+        }
+        if (setting('pay_stripe_enabled') === '1') {
+            $methods['stripe'] = 'Credit card (Stripe)';
+        }
+        if (setting('pay_paypal_enabled') === '1') {
+            $methods['paypal'] = 'PayPal';
+        }
+        if (setting('pay_razorpay_enabled') === '1') {
+            $methods['razorpay'] = 'Razorpay';
+        }
+
+        return $methods;
+    }
+
+    /**
+     * Manual payment details configured by the admin.
+     *
+     * @return array<string, mixed>
+     */
+    protected function manualDetails(): array
+    {
+        return [
+            'instructions' => setting('manual_instructions'),
+            'upi' => setting('manual_upi_id'),
+            'qr' => setting('manual_qr') ? \Illuminate\Support\Facades\Storage::disk('public')->url(setting('manual_qr')) : null,
+            'bank' => setting('manual_bank_details'),
+            'crypto' => json_decode(setting('manual_crypto', '[]'), true) ?: [],
+        ];
+    }
 
     /**
      * Show the checkout summary page.
@@ -28,7 +69,6 @@ class CheckoutController extends Controller
                 ->with('info', 'Your cart is empty. Browse the catalog to find something great.');
         }
 
-        // Only directly-purchasable items can be checked out.
         $items = $allItems->filter(fn ($p) => $p->is_purchasable)->values();
         $contactOnly = $allItems->reject(fn ($p) => $p->is_purchasable)->values();
 
@@ -43,12 +83,11 @@ class CheckoutController extends Controller
             'coupon' => $coupon,
             'discount' => $discount,
             'total' => max($subtotal - $discount, 0),
+            'methods' => $this->enabledMethods(),
+            'manual' => $this->manualDetails(),
         ]);
     }
 
-    /**
-     * Apply a coupon code to the current cart.
-     */
     public function applyCoupon(Request $request): RedirectResponse
     {
         $request->validate(['code' => ['required', 'string', 'max:50']]);
@@ -68,9 +107,6 @@ class CheckoutController extends Controller
         return back()->with('success', 'Coupon "'.$coupon->code.'" applied.');
     }
 
-    /**
-     * Remove an applied coupon.
-     */
     public function removeCoupon(): RedirectResponse
     {
         session()->forget(self::COUPON_SESSION);
@@ -79,28 +115,26 @@ class CheckoutController extends Controller
     }
 
     /**
-     * Process the checkout and create a completed order.
+     * Process the checkout. Manual payments create a pending order awaiting
+     * admin verification; enabled gateways complete immediately.
      */
     public function store(Request $request): RedirectResponse
     {
+        $methods = $this->enabledMethods();
+
         $validated = $request->validate([
             'billing_name' => ['required', 'string', 'max:255'],
             'billing_email' => ['required', 'email', 'max:255'],
-            'payment_method' => ['required', 'in:manual,stripe,paypal'],
+            'payment_method' => ['required', 'in:'.implode(',', array_keys($methods))],
+            'transaction_id' => ['required_if:payment_method,manual', 'nullable', 'string', 'max:255'],
+            'payment_proof' => ['required_if:payment_method,manual', 'nullable', 'image', 'max:5120'],
         ]);
 
         $user = $request->user();
-        $items = $this->cart->items();
-
-        if ($items->isEmpty()) {
-            return redirect()->route('products.index')->with('info', 'Your cart is empty.');
-        }
-
-        // Skip products the customer already owns to avoid duplicate purchases.
-        $items = $items->reject(fn ($product) => $user->hasPurchased($product->id))->values();
-
-        // Only directly-purchasable items can be checked out.
-        $items = $items->filter(fn ($product) => $product->is_purchasable)->values();
+        $items = $this->cart->items()
+            ->reject(fn ($product) => $user->hasPurchased($product->id))
+            ->filter(fn ($product) => $product->is_purchasable)
+            ->values();
 
         if ($items->isEmpty()) {
             return redirect()->route('cart.index')
@@ -110,8 +144,15 @@ class CheckoutController extends Controller
         $subtotal = (float) $items->sum(fn ($product) => $product->current_price);
         $coupon = $this->activeCoupon($subtotal);
         $discount = $coupon ? $coupon->discountFor($subtotal) : 0;
+        $isManual = $validated['payment_method'] === 'manual';
 
-        $order = DB::transaction(function () use ($user, $items, $validated, $subtotal, $discount, $coupon): Order {
+        // Store the payment proof screenshot for manual payments.
+        $proofPath = null;
+        if ($isManual && $request->hasFile('payment_proof')) {
+            $proofPath = $request->file('payment_proof')->store('payment-proofs', 'public');
+        }
+
+        $order = DB::transaction(function () use ($user, $items, $validated, $subtotal, $discount, $coupon, $isManual, $proofPath): Order {
             $order = Order::create([
                 'user_id' => $user->id,
                 'subtotal' => $subtotal,
@@ -119,12 +160,13 @@ class CheckoutController extends Controller
                 'discount' => $discount,
                 'coupon_code' => $coupon?->code,
                 'total' => max($subtotal - $discount, 0),
-                'status' => 'completed',
+                'status' => $isManual ? 'pending' : 'completed',
                 'payment_method' => $validated['payment_method'],
-                'transaction_id' => strtoupper('TXN-'.uniqid()),
+                'transaction_id' => $isManual ? $validated['transaction_id'] : strtoupper('TXN-'.uniqid()),
+                'payment_proof' => $proofPath,
                 'billing_name' => $validated['billing_name'],
                 'billing_email' => $validated['billing_email'],
-                'paid_at' => now(),
+                'paid_at' => $isManual ? null : now(),
             ]);
 
             foreach ($items as $product) {
@@ -134,7 +176,10 @@ class CheckoutController extends Controller
                     'price' => $product->current_price,
                 ]);
 
-                $product->incrementQuietly('downloads');
+                // Only count a sale once the payment is confirmed.
+                if (! $isManual) {
+                    $product->incrementQuietly('sales');
+                }
             }
 
             if ($coupon) {
@@ -147,21 +192,21 @@ class CheckoutController extends Controller
         $this->cart->clear();
         session()->forget(self::COUPON_SESSION);
 
-        // Email the buyer their receipt (failures must not break checkout).
-        try {
-            \Illuminate\Support\Facades\Mail::to($order->billing_email)
-                ->send(new \App\Mail\OrderReceiptMail($order->load('items')));
-        } catch (\Throwable $e) {
-            report($e);
+        if (! $isManual) {
+            try {
+                Mail::to($order->billing_email)->send(new \App\Mail\OrderReceiptMail($order->load('items')));
+            } catch (\Throwable $e) {
+                report($e);
+            }
+
+            return redirect()->route('orders.show', $order)
+                ->with('success', 'Payment successful! Your digital products are ready to download.');
         }
 
         return redirect()->route('orders.show', $order)
-            ->with('success', 'Payment successful! Your digital products are ready to download.');
+            ->with('info', 'Thanks! Your payment is awaiting verification. You will get access once an admin confirms it.');
     }
 
-    /**
-     * Show an order confirmation / receipt.
-     */
     public function show(Request $request, Order $order): View
     {
         abort_unless($order->user_id === $request->user()->id, 403);
@@ -171,9 +216,6 @@ class CheckoutController extends Controller
         return view('checkout.show', compact('order'));
     }
 
-    /**
-     * Resolve the currently applied, still-valid coupon (if any).
-     */
     protected function activeCoupon(float $subtotal): ?Coupon
     {
         $code = session(self::COUPON_SESSION);

@@ -53,6 +53,7 @@ class OrderController extends Controller
             'status' => ['required', 'in:pending,completed,failed,refunded'],
         ]);
 
+        $wasCompleted = $order->status === 'completed';
         $order->status = $validated['status'];
 
         // Stamp the paid_at timestamp the first time an order is completed.
@@ -61,6 +62,23 @@ class OrderController extends Controller
         }
 
         $order->save();
+
+        // On first completion (e.g. verifying a manual payment): count the sale
+        // for each product and email the buyer their receipt.
+        if ($validated['status'] === 'completed' && ! $wasCompleted) {
+            $order->loadMissing('items.product');
+
+            foreach ($order->items as $item) {
+                $item->product?->incrementQuietly('sales');
+            }
+
+            try {
+                \Illuminate\Support\Facades\Mail::to($order->billing_email)
+                    ->send(new \App\Mail\OrderReceiptMail($order));
+            } catch (\Throwable $e) {
+                report($e);
+            }
+        }
 
         return back()->with('success', 'Order status updated to '.$validated['status'].'.');
     }

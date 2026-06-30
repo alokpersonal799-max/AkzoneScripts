@@ -82,8 +82,8 @@
                     </div>
                     {{-- Floating stat cards --}}
                     <div class="absolute -left-6 top-10 hidden rounded-2xl border border-slate-100 bg-white px-4 py-3 shadow-lift sm:block">
-                        <p class="text-[10px] text-slate-400">Total downloads</p>
-                        <p class="font-display text-lg font-extrabold text-ink-900">{{ number_format($stats['downloads']) }}</p>
+                        <p class="text-[10px] text-slate-400">Total sold</p>
+                        <p class="font-display text-lg font-extrabold text-ink-900">{{ number_format($stats['sold']) }}</p>
                     </div>
                     <div class="absolute -bottom-5 left-8 hidden items-center gap-2 rounded-2xl border border-slate-100 bg-white px-4 py-3 shadow-lift sm:flex">
                         <x-star-rating :rating="5" size="h-4 w-4" />
@@ -104,7 +104,7 @@
             {{-- Stat strip --}}
             <div class="relative mt-12 grid grid-cols-3 gap-4 border-t border-white/10 pt-8 text-center sm:max-w-lg">
                 <div><p class="font-display text-2xl font-extrabold text-white sm:text-3xl">{{ number_format($stats['products']) }}+</p><p class="text-xs text-slate-400">Products</p></div>
-                <div><p class="font-display text-2xl font-extrabold text-white sm:text-3xl">{{ number_format($stats['downloads']) }}+</p><p class="text-xs text-slate-400">Downloads</p></div>
+                <div><p class="font-display text-2xl font-extrabold text-white sm:text-3xl">{{ number_format($stats['sold']) }}+</p><p class="text-xs text-slate-400">Sold</p></div>
                 <div><p class="font-display text-2xl font-extrabold text-white sm:text-3xl">{{ number_format($stats['categories']) }}</p><p class="text-xs text-slate-400">Categories</p></div>
             </div>
         </div>

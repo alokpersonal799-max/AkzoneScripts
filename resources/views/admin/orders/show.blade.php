@@ -25,13 +25,13 @@
                             <p class="truncate font-semibold text-ink-900">{{ $item->product_title }}</p>
                             <p class="text-xs text-slate-400">{{ $item->download_count }} downloads</p>
                         </div>
-                        <p class="font-semibold text-ink-900">{{ config('marketplace.currency_symbol') }}{{ number_format($item->price, 2) }}</p>
+                        <p class="font-semibold text-ink-900">{{ base_symbol() }}{{ number_format($item->price, 2) }}</p>
                     </div>
                 @endforeach
             </div>
             <div class="border-t border-slate-100 p-5">
-                <div class="flex justify-between text-sm"><span class="text-slate-500">Subtotal</span><span class="text-ink-900">{{ config('marketplace.currency_symbol') }}{{ number_format($order->subtotal, 2) }}</span></div>
-                <div class="mt-2 flex justify-between text-base font-bold"><span class="text-ink-900">Total</span><span class="text-brand-600">{{ config('marketplace.currency_symbol') }}{{ number_format($order->total, 2) }}</span></div>
+                <div class="flex justify-between text-sm"><span class="text-slate-500">Subtotal</span><span class="text-ink-900">{{ base_symbol() }}{{ number_format($order->subtotal, 2) }}</span></div>
+                <div class="mt-2 flex justify-between text-base font-bold"><span class="text-ink-900">Total</span><span class="text-brand-600">{{ base_symbol() }}{{ number_format($order->total, 2) }}</span></div>
             </div>
         </div>
 
@@ -47,6 +47,23 @@
                     <div><dt class="text-slate-400">Placed</dt><dd class="text-ink-900">{{ $order->created_at->format('M j, Y g:i A') }}</dd></div>
                 </dl>
             </div>
+
+            @if ($order->payment_proof)
+                <div class="card p-6">
+                    <h3 class="font-display text-base font-bold text-ink-900">Payment proof</h3>
+                    <p class="mt-1 text-xs text-slate-400">Submitted by the customer for manual payment verification.</p>
+                    <a href="{{ \Illuminate\Support\Facades\Storage::disk('public')->url($order->payment_proof) }}" target="_blank" rel="noopener" class="mt-3 block overflow-hidden rounded-xl border border-slate-200">
+                        <img src="{{ \Illuminate\Support\Facades\Storage::disk('public')->url($order->payment_proof) }}" alt="Payment proof" class="w-full object-contain">
+                    </a>
+                    @if ($order->status === 'pending')
+                        <form method="POST" action="{{ route('admin.orders.update', $order) }}" class="mt-3">
+                            @csrf @method('PATCH')
+                            <input type="hidden" name="status" value="completed">
+                            <button type="submit" class="btn-primary btn-md w-full">✓ Approve &amp; verify payment</button>
+                        </form>
+                    @endif
+                </div>
+            @endif
 
             <div class="card p-6">
                 <h3 class="font-display text-base font-bold text-ink-900">Update status</h3>

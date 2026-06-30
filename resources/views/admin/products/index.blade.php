@@ -29,7 +29,7 @@
                         <th class="px-5 py-3 font-semibold">Product</th>
                         <th class="px-5 py-3 font-semibold">Category</th>
                         <th class="px-5 py-3 font-semibold">Price</th>
-                        <th class="px-5 py-3 font-semibold">Downloads</th>
+                        <th class="px-5 py-3 font-semibold">Sold</th>
                         <th class="px-5 py-3 font-semibold">Status</th>
                         <th class="px-5 py-3 text-right font-semibold">Actions</th>
                     </tr>
@@ -47,8 +47,8 @@
                                 </div>
                             </td>
                             <td class="px-5 py-3 text-slate-600">{{ $product->category?->name ?? '—' }}</td>
-                            <td class="px-5 py-3 font-semibold text-ink-900">{{ config('marketplace.currency_symbol') }}{{ number_format($product->current_price, 2) }}</td>
-                            <td class="px-5 py-3 text-slate-600">{{ number_format($product->downloads) }}</td>
+                            <td class="px-5 py-3 font-semibold text-ink-900">{{ base_symbol() }}{{ number_format($product->current_price, 2) }}</td>
+                            <td class="px-5 py-3 text-slate-600">{{ number_format($product->sales) }}</td>
                             <td class="px-5 py-3"><x-status-badge :status="$product->status" /></td>
                             <td class="px-5 py-3">
                                 <div class="flex items-center justify-end gap-1">

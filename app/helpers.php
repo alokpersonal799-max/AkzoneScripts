@@ -36,3 +36,13 @@ if (! function_exists('currency_symbol')) {
         return app(CurrencyService::class)->symbol();
     }
 }
+
+if (! function_exists('base_symbol')) {
+    /**
+     * The symbol of the store's base (default) currency — used in admin/historical amounts.
+     */
+    function base_symbol(): string
+    {
+        return \App\Models\Currency::default()?->symbol ?? config('marketplace.currency_symbol', '$');
+    }
+}

@@ -39,7 +39,7 @@ class HomeController extends Controller
         $bestSelling = Product::query()
             ->published()
             ->with('category')
-            ->orderByDesc('downloads')
+            ->orderByDesc('sales')
             ->take(8)
             ->get();
 
@@ -69,7 +69,7 @@ class HomeController extends Controller
 
         $stats = [
             'products' => Product::published()->count(),
-            'downloads' => (int) Product::published()->sum('downloads'),
+            'sold' => (int) Product::published()->sum('sales'),
             'categories' => $categories->count(),
         ];
 

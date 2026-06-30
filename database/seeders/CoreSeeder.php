@@ -45,6 +45,37 @@ class CoreSeeder extends Seeder
             // Footer
             'footer_about' => ['footer', 'Discover a vibrant online hub offering a diverse collection of premium scripts & plugins for seamless digital products.'],
             'footer_copyright' => ['footer', '© '.date('Y').' AkzoneScripts. All rights reserved.'],
+
+            // SEO
+            'seo_title' => ['seo', ''],
+            'seo_description' => ['seo', ''],
+            'seo_keywords' => ['seo', ''],
+            'seo_og_image' => ['seo', null],
+            'analytics_id' => ['seo', ''],
+
+            // Maintenance
+            'maintenance_enabled' => ['maintenance', '0'],
+            'maintenance_message' => ['maintenance', 'We are performing scheduled maintenance. Please check back shortly.'],
+
+            // Payment gateways
+            'pay_manual_enabled' => ['payments', '1'],
+            'pay_stripe_enabled' => ['payments', '0'],
+            'stripe_key' => ['payments', ''],
+            'stripe_secret' => ['payments', ''],
+            'pay_paypal_enabled' => ['payments', '0'],
+            'paypal_client_id' => ['payments', ''],
+            'paypal_secret' => ['payments', ''],
+            'paypal_mode' => ['payments', 'sandbox'],
+            'pay_razorpay_enabled' => ['payments', '0'],
+            'razorpay_key' => ['payments', ''],
+            'razorpay_secret' => ['payments', ''],
+
+            // Manual payment methods
+            'manual_instructions' => ['manual', 'Pay using any method below, then enter your transaction ID and upload a payment screenshot. We will verify and unlock your downloads.'],
+            'manual_upi_id' => ['manual', ''],
+            'manual_qr' => ['manual', null],
+            'manual_bank_details' => ['manual', ''],
+            'manual_crypto' => ['manual', '[]'],
         ];
 
         foreach ($defaults as $key => [$group, $value]) {

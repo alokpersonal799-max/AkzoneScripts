@@ -27,6 +27,7 @@ class Order extends Model
         'status',
         'payment_method',
         'transaction_id',
+        'payment_proof',
         'billing_name',
         'billing_email',
         'paid_at',

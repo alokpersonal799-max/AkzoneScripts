@@ -271,7 +271,7 @@
                 <dl class="mt-6 space-y-3 border-t border-slate-100 pt-6 text-sm">
                     <div class="flex justify-between"><dt class="text-slate-500">Version</dt><dd class="font-semibold text-ink-900">{{ $product->version }}</dd></div>
                     <div class="flex justify-between"><dt class="text-slate-500">File size</dt><dd class="font-semibold text-ink-900">{{ $product->formatted_file_size }}</dd></div>
-                    <div class="flex justify-between"><dt class="text-slate-500">Downloads</dt><dd class="font-semibold text-ink-900">{{ number_format($product->downloads) }}</dd></div>
+                    <div class="flex justify-between"><dt class="text-slate-500">Sold</dt><dd class="font-semibold text-ink-900">{{ number_format($product->sales) }}</dd></div>
                     <div class="flex justify-between"><dt class="text-slate-500">Last updated</dt><dd class="font-semibold text-ink-900">{{ $product->updated_at->format('M j, Y') }}</dd></div>
                 </dl>
 

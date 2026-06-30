@@ -30,6 +30,18 @@ class EnsureInstalled
             return redirect()->route('home');
         }
 
+        // Maintenance mode: block non-admins (except auth + admin + install routes).
+        if ($installed && \App\Models\Setting::get('maintenance_enabled') === '1') {
+            $user = $request->user();
+            $bypass = $request->is('admin', 'admin/*', 'login', 'logout', 'install', 'install/*') || $allowed;
+
+            if (! $bypass && (! $user || ! $user->isAdmin())) {
+                return response()->view('maintenance', [
+                    'message' => \App\Models\Setting::get('maintenance_message'),
+                ], 503);
+            }
+        }
+
         return $next($request);
     }
 

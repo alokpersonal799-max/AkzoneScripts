@@ -25,7 +25,7 @@
                     @forelse ($coupons as $coupon)
                         <tr class="transition hover:bg-slate-50">
                             <td class="px-5 py-3"><span class="rounded-lg bg-slate-100 px-2.5 py-1 font-mono text-sm font-bold text-ink-900">{{ $coupon->code }}</span></td>
-                            <td class="px-5 py-3 text-slate-600">{{ $coupon->type === 'percent' ? rtrim(rtrim(number_format($coupon->value, 2), '0'), '.').'%' : currency_symbol().number_format($coupon->value, 2) }}</td>
+                            <td class="px-5 py-3 text-slate-600">{{ $coupon->type === 'percent' ? rtrim(rtrim(number_format($coupon->value, 2), '0'), '.').'%' : base_symbol().number_format($coupon->value, 2) }}</td>
                             <td class="px-5 py-3 text-slate-600">{{ $coupon->used_count }}{{ $coupon->max_uses ? ' / '.$coupon->max_uses : '' }}</td>
                             <td class="px-5 py-3 text-slate-500">{{ $coupon->expires_at ? $coupon->expires_at->format('M j, Y') : 'Never' }}</td>
                             <td class="px-5 py-3"><x-status-badge :status="$coupon->isValid() ? 'published' : 'archived'" /></td>

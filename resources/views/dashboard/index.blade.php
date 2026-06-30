@@ -12,7 +12,7 @@
             $cards = [
                 ['label' => 'Products owned', 'value' => number_format($stats['purchases']), 'icon' => 'M20.25 7.5l-.625 10.632a2.25 2.25 0 0 1-2.247 2.118H6.622a2.25 2.25 0 0 1-2.247-2.118L3.75 7.5', 'tint' => 'bg-brand-50 text-brand-600'],
                 ['label' => 'Total orders', 'value' => number_format($stats['orders']), 'icon' => 'M15.75 10.5V6a3.75 3.75 0 1 0-7.5 0v4.5m11.356-1.993 1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 0 1-1.12-1.243l1.264-12A1.125 1.125 0 0 1 5.513 7.5h12.974c.576 0 1.059.435 1.119 1.007Z', 'tint' => 'bg-indigo-50 text-indigo-600'],
-                ['label' => 'Total spent', 'value' => config('marketplace.currency_symbol').number_format($stats['spent'], 2), 'icon' => 'M12 6v12m-3-2.818.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z', 'tint' => 'bg-emerald-50 text-emerald-600'],
+                ['label' => 'Total spent', 'value' => base_symbol().number_format($stats['spent'], 2), 'icon' => 'M12 6v12m-3-2.818.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z', 'tint' => 'bg-emerald-50 text-emerald-600'],
                 ['label' => 'Wishlist items', 'value' => number_format($stats['wishlist']), 'icon' => 'M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z', 'tint' => 'bg-rose-50 text-rose-600'],
             ];
         @endphp
@@ -72,7 +72,7 @@
                             <p class="mt-1 text-xs text-slate-400">{{ $order->items->count() }} {{ Str::plural('item', $order->items->count()) }} · {{ $order->created_at->format('M j, Y') }}</p>
                         </div>
                         <div class="text-right">
-                            <p class="font-bold text-ink-900">{{ config('marketplace.currency_symbol') }}{{ number_format($order->total, 2) }}</p>
+                            <p class="font-bold text-ink-900">{{ base_symbol() }}{{ number_format($order->total, 2) }}</p>
                             <x-status-badge :status="$order->status" class="mt-1" />
                         </div>
                     </a>
