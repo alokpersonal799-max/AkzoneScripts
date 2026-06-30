@@ -173,12 +173,20 @@
                         <div class="rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-center text-sm font-semibold text-emerald-700">✓ You own this product</div>
                         <a href="{{ route('dashboard.purchases') }}" class="btn-primary btn-lg w-full">Go to downloads</a>
                     @elseif ($product->is_free)
-                        {{-- Free product → direct download, no checkout --}}
-                        <a href="{{ route('products.free', $product) }}" class="btn btn-lg w-full bg-emerald-500 text-white hover:bg-emerald-600">
-                            <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3" /></svg>
-                            Download Now — Free
-                        </a>
-                        <p class="text-center text-xs text-slate-400">This product is free. Click to download instantly @guest (login required)@endguest.</p>
+                        {{-- Free product → direct download (login required), no checkout --}}
+                        @auth
+                            <a href="{{ route('products.free', $product) }}" class="btn btn-lg w-full bg-emerald-500 text-white hover:bg-emerald-600">
+                                <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3" /></svg>
+                                Download Now — Free
+                            </a>
+                            <p class="text-center text-xs text-slate-400">This product is free. Click to download instantly.</p>
+                        @else
+                            <a href="{{ route('login') }}" class="btn btn-lg w-full bg-emerald-500 text-white hover:bg-emerald-600">
+                                <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3" /></svg>
+                                Sign in to download — Free
+                            </a>
+                            <p class="text-center text-xs text-slate-400">This product is free. <a href="{{ route('login') }}" class="font-semibold text-brand-600 hover:underline">Sign in</a> or <a href="{{ route('register') }}" class="font-semibold text-brand-600 hover:underline">create an account</a> to download.</p>
+                        @endauth
                     @elseif ($product->is_purchasable)
                         @if ($waLink)
                             <a href="{{ $waLink }}" target="_blank" rel="noopener" class="btn btn-lg w-full bg-emerald-500 text-white hover:bg-emerald-600">
