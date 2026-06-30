@@ -100,16 +100,17 @@
         <div class="lg:sticky lg:top-24 lg:self-start">
             <div class="card p-6">
                 <h2 class="font-display text-lg font-bold text-ink-900">Your order</h2>
-                <ul class="mt-4 space-y-3">
+                <div class="mt-4 space-y-2">
                     @forelse ($items as $item)
-                        <li class="flex items-center justify-between gap-3 text-sm">
-                            <span class="truncate text-slate-600">{{ $item->title }}</span>
-                            <x-price :amount="$item->current_price" class="flex-shrink-0 font-semibold text-ink-900" />
-                        </li>
+                        <a href="{{ route('products.show', $item) }}" class="flex items-center gap-3 rounded-xl border border-slate-200 p-3 transition hover:border-brand-300 hover:bg-slate-50">
+                            <img src="{{ $item->thumbnail_url }}" alt="" class="h-12 w-14 flex-shrink-0 rounded-lg object-cover">
+                            <span class="min-w-0 flex-1 truncate text-sm font-medium text-ink-900">{{ $item->title }}</span>
+                            <x-price :amount="$item->current_price" class="flex-shrink-0 text-sm font-bold text-ink-900" />
+                        </a>
                     @empty
-                        <li class="text-sm text-slate-500">No items available for direct checkout.</li>
+                        <p class="text-sm text-slate-500">No items available for direct checkout.</p>
                     @endforelse
-                </ul>
+                </div>
 
                 @if ($contactOnly->isNotEmpty())
                     <div class="mt-4 rounded-xl border border-amber-200 bg-amber-50 p-3 text-xs text-amber-700">

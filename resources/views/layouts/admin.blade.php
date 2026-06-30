@@ -52,6 +52,35 @@
             </button>
             <h1 class="font-display text-lg font-bold text-ink-900">@yield('page-title', 'Dashboard')</h1>
             <div class="ml-auto flex items-center gap-3">
+                {{-- Notifications bell --}}
+                <div x-data="{ open: false }" class="relative">
+                    <button @click="open = !open" class="relative flex h-9 w-9 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-600 transition hover:bg-slate-50 hover:text-brand-600">
+                        <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke-width="1.6" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 0 0 5.454-1.31A8.967 8.967 0 0 1 18 9.75V9A6 6 0 0 0 6 9v.75a8.967 8.967 0 0 1-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 0 1-5.714 0m5.714 0a3 3 0 1 1-5.714 0" /></svg>
+                        @if (($adminNotifications ?? collect())->count() > 0)
+                            <span class="absolute -right-1 -top-1 flex h-5 min-w-[1.25rem] items-center justify-center rounded-full bg-rose-500 px-1 text-xs font-bold text-white">{{ $adminNotifications->count() }}</span>
+                        @endif
+                    </button>
+                    <div x-show="open" x-cloak @click.outside="open = false" x-transition class="absolute right-0 mt-2 w-80 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-soft">
+                        <div class="flex items-center justify-between border-b border-slate-100 px-4 py-3">
+                            <span class="text-sm font-bold text-ink-900">Notifications</span>
+                            @if (($adminNotifications ?? collect())->count() > 0)
+                                <form method="POST" action="{{ route('admin.notifications.readAll') }}">@csrf<button class="text-xs font-semibold text-brand-600 hover:underline">Mark all read</button></form>
+                            @endif
+                        </div>
+                        <div class="max-h-80 overflow-y-auto divide-y divide-slate-100">
+                            @forelse ($adminNotifications ?? [] as $n)
+                                <a href="{{ route('admin.notifications.read', $n) }}" class="block px-4 py-3 transition hover:bg-slate-50">
+                                    <p class="text-sm font-semibold text-ink-900">{{ $n->title }}</p>
+                                    @if ($n->body)<p class="mt-0.5 truncate text-xs text-slate-500">{{ $n->body }}</p>@endif
+                                    <p class="mt-0.5 text-[11px] text-slate-400">{{ $n->created_at->diffForHumans() }}</p>
+                                </a>
+                            @empty
+                                <p class="px-4 py-8 text-center text-sm text-slate-400">You're all caught up 🎉</p>
+                            @endforelse
+                        </div>
+                    </div>
+                </div>
+
                 <a href="{{ route('home') }}" target="_blank" rel="noopener" title="View storefront" class="flex h-9 w-9 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-600 transition hover:bg-slate-50 hover:text-brand-600">
                     <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke-width="1.6" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18Zm0 0c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3m-9 9h18" /></svg>
                 </a>

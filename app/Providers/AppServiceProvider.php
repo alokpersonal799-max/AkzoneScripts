@@ -42,6 +42,15 @@ class AppServiceProvider extends ServiceProvider
                 'currentCurrency' => app(CurrencyService::class)->current(),
             ]);
         });
+
+        // Admin notifications for the bell menu.
+        View::composer('layouts.admin', function ($view): void {
+            $unread = collect();
+            if (\Illuminate\Support\Facades\Schema::hasTable('admin_notifications')) {
+                $unread = \App\Models\AdminNotification::whereNull('read_at')->latest()->take(10)->get();
+            }
+            $view->with(['adminNotifications' => $unread]);
+        });
     }
 
     /**

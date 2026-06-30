@@ -9,8 +9,7 @@
         <div class="flex w-full flex-col justify-center px-6 py-12 lg:w-1/2 lg:px-20">
             <div class="mx-auto w-full max-w-md">
                 <a href="{{ route('home') }}" class="flex items-center gap-2">
-                    <span class="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-brand-500 to-indigo-500 font-display text-xl font-extrabold text-white shadow-lift">A</span>
-                    <span class="font-display text-2xl font-extrabold text-ink-900">Akzone<span class="text-brand-600">Scripts</span></span>
+                    @include('partials.brand')
                 </a>
 
                 <div class="mt-10">

@@ -154,7 +154,7 @@
                 <h1 class="mt-4 font-display text-2xl font-extrabold leading-tight text-ink-900">{{ $product->title }}</h1>
                 <p class="mt-2 flex items-center gap-2 text-sm text-slate-500">
                     By <span class="font-semibold text-brand-600">{{ setting('site_name', 'AkzoneScripts') }}</span>
-                    <span class="inline-flex items-center gap-1 text-emerald-600"><span class="h-1.5 w-1.5 rounded-full bg-emerald-500"></span>{{ rand(8, 40) }} people viewing now</span>
+                    <span class="inline-flex items-center gap-1 text-emerald-600"><span class="h-1.5 w-1.5 rounded-full bg-emerald-500"></span>{{ $product->viewers_now }} people viewing now</span>
                 </p>
 
                 <div class="mt-5 flex items-baseline gap-3">
@@ -172,6 +172,13 @@
                     @if ($hasPurchased)
                         <div class="rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-center text-sm font-semibold text-emerald-700">✓ You own this product</div>
                         <a href="{{ route('dashboard.purchases') }}" class="btn-primary btn-lg w-full">Go to downloads</a>
+                    @elseif ($product->is_free)
+                        {{-- Free product → direct download, no checkout --}}
+                        <a href="{{ route('products.free', $product) }}" class="btn btn-lg w-full bg-emerald-500 text-white hover:bg-emerald-600">
+                            <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3" /></svg>
+                            Download Now — Free
+                        </a>
+                        <p class="text-center text-xs text-slate-400">This product is free. Click to download instantly @guest (login required)@endguest.</p>
                     @elseif ($product->is_purchasable)
                         @if ($waLink)
                             <a href="{{ $waLink }}" target="_blank" rel="noopener" class="btn btn-lg w-full bg-emerald-500 text-white hover:bg-emerald-600">
@@ -291,7 +298,7 @@
                 <dl class="mt-6 space-y-3 border-t border-slate-100 pt-6 text-sm">
                     <div class="flex justify-between"><dt class="text-slate-500">Version</dt><dd class="font-semibold text-ink-900">{{ $product->version }}</dd></div>
                     <div class="flex justify-between"><dt class="text-slate-500">File size</dt><dd class="font-semibold text-ink-900">{{ $product->formatted_file_size }}</dd></div>
-                    <div class="flex justify-between"><dt class="text-slate-500">Sold</dt><dd class="font-semibold text-ink-900">{{ number_format($product->sales) }}</dd></div>
+                    <div class="flex justify-between"><dt class="text-slate-500">{{ $product->is_free ? 'Downloads' : 'Sold' }}</dt><dd class="font-semibold text-ink-900">{{ $product->is_free ? number_format($product->downloads) : number_format($product->sales) }}</dd></div>
                     <div class="flex justify-between"><dt class="text-slate-500">Last updated</dt><dd class="font-semibold text-ink-900">{{ $product->updated_at->format('M j, Y') }}</dd></div>
                 </dl>
 

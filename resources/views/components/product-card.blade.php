@@ -25,7 +25,7 @@
             <span class="chip bg-brand-50 text-brand-700">{{ $product->category?->name ?? 'Uncategorized' }}</span>
             <span class="inline-flex items-center gap-1 text-xs text-slate-400">
                 <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 0 0-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 0 0-16.536-1.84M7.5 14.25 5.106 5.272" /></svg>
-                {{ number_format($product->sales) }} sold
+                @if ($product->is_free){{ number_format($product->downloads) }} downloads @else {{ number_format($product->sales) }} sold @endif
             </span>
         </div>
 

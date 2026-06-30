@@ -71,6 +71,12 @@ class HomeController extends Controller
             'products' => Product::published()->count(),
             'sold' => (int) Product::published()->sum('sales'),
             'categories' => $categories->count(),
+            'free' => Product::published()->where(function ($q) {
+                $q->where('price', '<=', 0)->orWhere('sale_price', '<=', 0);
+            })->count(),
+            'downloads' => (int) Product::published()->where(function ($q) {
+                $q->where('price', '<=', 0)->orWhere('sale_price', '<=', 0);
+            })->sum('downloads'),
         ];
 
         return view('home', compact('featured', 'latest', 'topRated', 'bestSelling', 'freeItems', 'categories', 'testimonials', 'stats'));

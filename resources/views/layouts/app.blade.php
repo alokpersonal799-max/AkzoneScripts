@@ -162,8 +162,7 @@
             <div class="grid gap-10 md:grid-cols-12">
                 <div class="md:col-span-4">
                     <a href="{{ route('home') }}" class="flex items-center gap-2">
-                        <span class="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-brand-500 to-indigo-500 font-display text-lg font-extrabold text-white">A</span>
-                        <span class="font-display text-xl font-extrabold text-ink-900">Akzone<span class="text-brand-600">Scripts</span></span>
+                        @include('partials.brand')
                     </a>
                     <p class="mt-4 max-w-sm text-sm text-slate-500">{{ setting('footer_about', config('marketplace.tagline')) }}</p>
                     <div class="mt-5 flex flex-wrap gap-2">

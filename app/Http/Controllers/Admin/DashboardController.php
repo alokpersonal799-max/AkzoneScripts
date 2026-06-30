@@ -23,17 +23,24 @@ class DashboardController extends Controller
         $totalViews = (int) Product::sum('views');
         $completedCount = (clone $completedOrders)->count();
 
+        $freeProductIds = Product::query()->where(function ($q) {
+            $q->where('price', '<=', 0)->orWhere('sale_price', '<=', 0);
+        })->pluck('id');
+
         $stats = [
             'revenue' => (float) (clone $completedOrders)->sum('total'),
             'orders' => $completedCount,
             'products' => Product::count(),
             'published' => Product::where('status', 'published')->count(),
             'customers' => User::where('role', 'user')->count(),
-            'downloads' => (int) Product::sum('downloads'),
+            'sold' => (int) Product::sum('sales'),
+            'downloads' => (int) Product::whereIn('id', $freeProductIds)->sum('downloads'),
+            'free_products' => $freeProductIds->count(),
             'views' => $totalViews,
-            // Rough conversion: completed orders per 100 product views.
             'conversion' => $totalViews > 0 ? round(($completedCount / $totalViews) * 100, 2) : 0,
         ];
+
+        $recentUsers = User::where('role', 'user')->latest()->take(6)->get();
 
         // Revenue for the last 14 days.
         $salesByDay = collect(range(13, 0))->map(function (int $daysAgo): array {
@@ -67,6 +74,7 @@ class DashboardController extends Controller
             'salesByDay',
             'topCategories',
             'recentOrders',
+            'recentUsers',
             'topProducts',
             'lowStockOrDraft'
         ));

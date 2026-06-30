@@ -51,6 +51,8 @@ class TicketController extends Controller
             'message' => $data['message'],
         ], $this->storeAttachment($request)));
 
+        \App\Models\AdminNotification::push('ticket', 'New support ticket', $ticket->subject, route('admin.tickets.show', $ticket));
+
         return redirect()->route('tickets.show', $ticket)
             ->with('success', 'Your ticket has been submitted. We will reply soon.');
     }
@@ -84,6 +86,8 @@ class TicketController extends Controller
         ], $this->storeAttachment($request)));
 
         $ticket->update(['status' => 'customer-reply', 'last_reply_at' => now()]);
+
+        \App\Models\AdminNotification::push('ticket', 'Customer replied to ticket', $ticket->subject, route('admin.tickets.show', $ticket));
 
         return back()->with('success', 'Reply sent.');
     }

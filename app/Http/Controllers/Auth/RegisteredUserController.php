@@ -44,6 +44,8 @@ class RegisteredUserController extends Controller
             'email_verified_at' => $requireVerify ? null : now(),
         ]);
 
+        \App\Models\AdminNotification::push('user', 'New registration', $user->name.' ('.$user->email.')', route('admin.users.show', $user));
+
         if ($requireVerify) {
             try {
                 Mail::to($user->email)->send(new VerifyEmailMail($user));

@@ -240,6 +240,14 @@ class Product extends Model
     }
 
     /**
+     * A stable-but-lively "people viewing now" number (changes hourly per product).
+     */
+    public function getViewersNowAttribute(): int
+    {
+        return ((($this->id * 7) + ((int) now()->format('H') * 3)) % 25) + 5;
+    }
+
+    /**
      * The WhatsApp number to use for this product (per-product or global).
      */
     public function getEffectiveWhatsappAttribute(): ?string

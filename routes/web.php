@@ -132,6 +132,7 @@ Route::middleware('auth')->group(function () {
 
     // Secure download of a purchased product.
     Route::get('/download/{orderItem}', [DownloadController::class, 'download'])->name('download');
+    Route::get('/free-download/{product}', [DownloadController::class, 'free'])->name('products.free');
 
     // Reviews & reports.
     Route::post('/products/{product}/reviews', [ReviewController::class, 'store'])->name('reviews.store');
@@ -160,6 +161,10 @@ Route::middleware('auth')->group(function () {
 
 Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/', [AdminDashboardController::class, 'index'])->name('dashboard');
+
+    // Notifications.
+    Route::get('/notifications/{notification}/read', [\App\Http\Controllers\Admin\NotificationController::class, 'read'])->name('notifications.read');
+    Route::post('/notifications/read-all', [\App\Http\Controllers\Admin\NotificationController::class, 'readAll'])->name('notifications.readAll');
 
     Route::resource('products', AdminProductController::class);
     Route::resource('categories', AdminCategoryController::class)->except('show');

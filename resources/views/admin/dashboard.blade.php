@@ -10,9 +10,9 @@
         @php
             $cards = [
                 ['label' => 'Revenue', 'value' => $sym.number_format($stats['revenue'], 2), 'sub' => $stats['orders'].' completed orders', 'tint' => 'bg-emerald-50 text-emerald-600', 'icon' => 'M12 6v12m-3-2.818.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33'],
-                ['label' => 'Total views', 'value' => number_format($stats['views']), 'sub' => number_format($stats['downloads']).' downloads', 'tint' => 'bg-sky-50 text-sky-600', 'icon' => 'M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178ZM15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z'],
-                ['label' => 'Conversion', 'value' => $stats['conversion'].'%', 'sub' => 'orders per 100 views', 'tint' => 'bg-violet-50 text-violet-600', 'icon' => 'M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 0 1 3 19.875v-6.75ZM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V8.625ZM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V4.125Z'],
-                ['label' => 'Customers', 'value' => number_format($stats['customers']), 'sub' => $stats['published'].' published products', 'tint' => 'bg-brand-50 text-brand-600', 'icon' => 'M15 19.128a9.38 9.38 0 0 0 2.625.372 9.337 9.337 0 0 0 4.121-.952 4.125 4.125 0 0 0-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 0 1 8.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0 1 11.964-3.07M12 6.375a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0Z'],
+                ['label' => 'Total sold', 'value' => number_format($stats['sold']), 'sub' => number_format($stats['downloads']).' free downloads', 'tint' => 'bg-emerald-50 text-emerald-600', 'icon' => 'm3.75 13.5 10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75Z'],
+                ['label' => 'Total views', 'value' => number_format($stats['views']), 'sub' => 'all-time product views', 'tint' => 'bg-sky-50 text-sky-600', 'icon' => 'M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178ZM15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z'],
+                ['label' => 'Customers', 'value' => number_format($stats['customers']), 'sub' => $stats['published'].' published · '.$stats['free_products'].' free', 'tint' => 'bg-brand-50 text-brand-600', 'icon' => 'M15 19.128a9.38 9.38 0 0 0 2.625.372 9.337 9.337 0 0 0 4.121-.952 4.125 4.125 0 0 0-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 0 1 8.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0 1 11.964-3.07M12 6.375a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0Z'],
             ];
         @endphp
         @foreach ($cards as $card)
@@ -112,6 +112,33 @@
                     <p class="p-5 text-sm text-slate-500">No products yet.</p>
                 @endforelse
             </div>
+        </div>
+    </div>
+
+    {{-- Recent registrations --}}
+    <div class="card mt-6 overflow-hidden">
+        <div class="flex items-center justify-between border-b border-slate-100 p-5">
+            <h2 class="font-display text-lg font-bold text-ink-900">Recent registrations</h2>
+            <a href="{{ route('admin.users.index') }}" class="text-sm font-semibold text-brand-600 hover:text-brand-700">View all</a>
+        </div>
+        <div class="divide-y divide-slate-100">
+            @forelse ($recentUsers as $user)
+                <a href="{{ route('admin.users.show', $user) }}" class="flex items-center justify-between p-4 transition hover:bg-slate-50">
+                    <div class="flex items-center gap-3">
+                        <span class="flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-brand-500 to-indigo-500 text-sm font-bold text-white">{{ strtoupper(substr($user->name, 0, 1)) }}</span>
+                        <div>
+                            <p class="text-sm font-semibold text-ink-900">{{ $user->name }}</p>
+                            <p class="text-xs text-slate-400">{{ $user->email }}</p>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <p class="text-xs text-slate-400">{{ $user->created_at->diffForHumans() }}</p>
+                        @if (! $user->hasVerifiedEmail())<span class="chip mt-1 bg-amber-50 text-amber-700 ring-1 ring-amber-200">Unverified</span>@endif
+                    </div>
+                </a>
+            @empty
+                <p class="p-5 text-sm text-slate-500">No customers yet.</p>
+            @endforelse
         </div>
     </div>
 

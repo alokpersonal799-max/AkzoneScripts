@@ -192,19 +192,23 @@ class CheckoutController extends Controller
         $this->cart->clear();
         session()->forget(self::COUPON_SESSION);
 
-        if (! $isManual) {
-            try {
-                Mail::to($order->billing_email)->send(new \App\Mail\OrderReceiptMail($order->load('items')));
-            } catch (\Throwable $e) {
-                report($e);
-            }
+        if ($isManual) {
+            \App\Models\AdminNotification::push('order', 'Payment to verify', $order->order_number.' · '.$order->billing_name, route('admin.orders.show', $order));
 
             return redirect()->route('orders.show', $order)
-                ->with('success', 'Payment successful! Your digital products are ready to download.');
+                ->with('info', 'Thanks! Your payment is awaiting verification. You will get access once an admin confirms it.');
+        }
+
+        \App\Models\AdminNotification::push('order', 'New order placed', $order->order_number.' · '.money($order->total), route('admin.orders.show', $order));
+
+        try {
+            Mail::to($order->billing_email)->send(new \App\Mail\OrderReceiptMail($order->load('items')));
+        } catch (\Throwable $e) {
+            report($e);
         }
 
         return redirect()->route('orders.show', $order)
-            ->with('info', 'Thanks! Your payment is awaiting verification. You will get access once an admin confirms it.');
+            ->with('success', 'Payment successful! Your digital products are ready to download.');
     }
 
     public function show(Request $request, Order $order): View
