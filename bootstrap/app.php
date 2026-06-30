@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Middleware\AutoTelegramPromo;
 use App\Http\Middleware\EnsureInstalled;
 use App\Http\Middleware\EnsureUserIsAdmin;
 use Illuminate\Foundation\Application;
@@ -16,6 +17,7 @@ return Application::configure(basePath: dirname(__DIR__))
         // Gate every web request behind the installer until setup is complete.
         $middleware->web(append: [
             EnsureInstalled::class,
+            AutoTelegramPromo::class,
         ]);
 
         // Register the route middleware alias used to guard admin-only routes.

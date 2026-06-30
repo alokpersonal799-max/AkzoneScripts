@@ -29,6 +29,7 @@ class TelegramBot extends Model
         'purchase' => 'Product purchased',
         'review' => 'New product review',
         'free_download' => 'Free product downloaded',
+        'auto_promo' => 'Auto product promotion',
         'custom' => 'Custom broadcast messages',
     ];
 

@@ -136,6 +136,39 @@
             </form>
         </div>
 
+        {{-- Auto promotion --}}
+        <div class="card p-6">
+            <div class="flex items-start justify-between gap-3">
+                <div>
+                    <h2 class="font-display text-lg font-bold text-ink-900">Auto product promotion</h2>
+                    <p class="mt-1 text-sm text-slate-500">Automatically recommend a random product to your channel on a schedule. Sent to bots subscribed to <b>Auto product promotion</b>.</p>
+                </div>
+            </div>
+            <form method="POST" action="{{ route('admin.tg.autopromo') }}" class="mt-4 space-y-4">
+                @csrf @method('PUT')
+                <label class="flex items-center gap-2 text-sm font-semibold text-ink-900">
+                    <input type="checkbox" name="autotgpromo_enabled" value="1" {{ old('autotgpromo_enabled', $autoEnabled) ? 'checked' : '' }} class="rounded border-slate-300 text-brand-600 focus:ring-brand-500/30">
+                    Enable auto promotion
+                </label>
+                <div class="flex flex-wrap items-end gap-3">
+                    <div>
+                        <label for="autotgpromo_interval" class="label">Send every</label>
+                        <input id="autotgpromo_interval" name="autotgpromo_interval" type="number" min="1" max="1000" value="{{ old('autotgpromo_interval', $autoInterval) }}" class="input w-28">
+                    </div>
+                    <div>
+                        <label for="autotgpromo_unit" class="label">Unit</label>
+                        <select id="autotgpromo_unit" name="autotgpromo_unit" class="input w-36">
+                            @foreach (['minutes' => 'Minutes', 'hours' => 'Hours', 'days' => 'Days'] as $value => $label)
+                                <option value="{{ $value }}" {{ old('autotgpromo_unit', $autoUnit) === $value ? 'selected' : '' }}>{{ $label }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <button type="submit" class="btn-primary btn-md">Save schedule</button>
+                </div>
+                <p class="text-xs text-slate-400">Triggered by site traffic (no cron needed). A random published product is posted once the interval elapses.</p>
+            </form>
+        </div>
+
         {{-- Previews --}}
         <div>
             <h2 class="font-display text-lg font-bold text-ink-900">Message previews</h2>
@@ -165,8 +198,12 @@
                                     <p class="text-sm leading-relaxed text-ink-900">{!! nl2br($msg['text']) !!}</p>
                                     @if (! empty($msg['buttons']))
                                         <div class="mt-3 space-y-1.5">
-                                            @foreach ($msg['buttons'] as $button)
-                                                <div class="rounded-lg bg-sky-50 py-1.5 text-center text-xs font-semibold text-sky-600">{{ $button[0] }}</div>
+                                            @foreach (array_chunk($msg['buttons'], 2) as $row)
+                                                <div class="grid grid-cols-{{ count($row) }} gap-1.5">
+                                                    @foreach ($row as $button)
+                                                        <div class="rounded-lg bg-sky-50 py-1.5 text-center text-xs font-semibold text-sky-600">{{ $button[0] }}</div>
+                                                    @endforeach
+                                                </div>
                                             @endforeach
                                         </div>
                                     @endif

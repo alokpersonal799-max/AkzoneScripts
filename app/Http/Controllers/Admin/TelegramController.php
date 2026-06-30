@@ -24,6 +24,9 @@ class TelegramController extends Controller
             'bots' => TelegramBot::latest()->get(),
             'events' => TelegramBot::EVENTS,
             'previews' => $this->buildPreviews(),
+            'autoEnabled' => setting('autotgpromo_enabled', '0') === '1',
+            'autoInterval' => (int) setting('autotgpromo_interval', 6),
+            'autoUnit' => setting('autotgpromo_unit', 'hours'),
         ]);
     }
 
@@ -92,6 +95,23 @@ class TelegramController extends Controller
     }
 
     /**
+     * Save the time-based auto product promotion settings.
+     */
+    public function autoPromo(Request $request): RedirectResponse
+    {
+        $data = $request->validate([
+            'autotgpromo_interval' => ['nullable', 'integer', 'min:1', 'max:1000'],
+            'autotgpromo_unit' => ['nullable', 'in:minutes,hours,days'],
+        ]);
+
+        \App\Models\Setting::put('autotgpromo_enabled', $request->boolean('autotgpromo_enabled') ? '1' : '0', 'telegram');
+        \App\Models\Setting::put('autotgpromo_interval', (string) ($data['autotgpromo_interval'] ?? 6), 'telegram');
+        \App\Models\Setting::put('autotgpromo_unit', $data['autotgpromo_unit'] ?? 'hours', 'telegram');
+
+        return back()->with('success', 'Auto promotion settings saved.');
+    }
+
+    /**
      * @return array<string, mixed>
      */
     protected function validateBot(Request $request, ?TelegramBot $bot = null): array
@@ -156,6 +176,7 @@ class TelegramController extends Controller
             'purchase' => TelegramMessages::purchase($user, $product),
             'review' => TelegramMessages::review($user, $product, 5),
             'free_download' => TelegramMessages::freeDownload($user, $product),
+            'auto_promo' => TelegramMessages::autoPromo($product),
             'custom' => TelegramMessages::custom('✨ <b>Special weekend sale!</b> Use code <b>SAVE20</b> for 20% off everything this weekend only.'),
         ];
     }

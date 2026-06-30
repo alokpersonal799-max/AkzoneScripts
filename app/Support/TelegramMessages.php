@@ -11,9 +11,16 @@ use Illuminate\Support\Str;
  * Builds the HTML message payloads (text + optional photo + inline buttons)
  * for every Telegram notification type. Used both when sending live updates
  * and when rendering the admin preview, so previews always match reality.
+ *
+ * Telegram supports a small HTML subset: <b> <i> <u> <s> <a> <code>
+ * <blockquote>. We lean on those plus tasteful dividers and emoji for a
+ * polished, consistent look.
  */
 class TelegramMessages
 {
+    /** A slim decorative divider used across messages. */
+    protected const RULE = "➖➖➖➖➖➖➖➖➖➖";
+
     protected static function site(): string
     {
         return e(setting('site_name', config('app.name')));
@@ -24,14 +31,22 @@ class TelegramMessages
         return route('products.index');
     }
 
+    /** A consistent, understated signature line. */
+    protected static function footer(): string
+    {
+        return "\n\n<i>✦ ".self::site()." ✦</i>";
+    }
+
     /**
      * @return array{text: string, photo: ?string, buttons: array<int, array{0: string, 1: string}>}
      */
     public static function registration(User $user): array
     {
-        $text = "🎉 <b>New member joined ".self::site()."!</b>\n\n"
-            ."👤 <b>".e($user->name)."</b> just created an account.\n\n"
-            ."A warm welcome aboard — happy building! 🚀";
+        $text = "🎉 <b>NEW MEMBER JOINED</b> 🎉\n"
+            .self::RULE."\n\n"
+            ."👤 <b>".e($user->name)."</b> just joined the community!\n\n"
+            ."<blockquote>Welcome aboard — we're thrilled to have you. Explore premium scripts, templates &amp; assets, all with instant delivery. 🚀</blockquote>"
+            .self::footer();
 
         return [
             'text' => $text,
@@ -42,13 +57,16 @@ class TelegramMessages
 
     public static function productAdded(Product $product): array
     {
-        $price = $product->price > 0 ? money($product->current_price) : 'Free';
+        $price = $product->price > 0 ? money($product->current_price) : 'FREE';
 
-        $text = "🆕 <b>New product just dropped!</b>\n\n"
-            ."<b>".e($product->title)."</b>\n"
+        $text = "✨ <b>NEW ARRIVAL</b> ✨\n"
+            .self::RULE."\n\n"
+            ."🧩 <b>".e($product->title)."</b>\n"
             .($product->tagline ? '<i>'.e($product->tagline)."</i>\n" : '')
-            ."\n💰 <b>".$price."</b>"
-            .($product->category ? "\n📂 ".e($product->category->name) : '');
+            ."\n💰 Price: <b>".$price."</b>"
+            .($product->category ? "\n📂 Category: <b>".e($product->category->name)."</b>" : '')
+            ."\n\n👇 <b>Grab it now</b>"
+            .self::footer();
 
         $buttons = [['🔎 View product', route('products.show', $product)]];
         if ($product->demo_url) {
@@ -65,9 +83,11 @@ class TelegramMessages
 
     public static function categoryAdded(Category $category): array
     {
-        $text = "📂 <b>New category added!</b>\n\n"
+        $text = "📂 <b>NEW CATEGORY</b>\n"
+            .self::RULE."\n\n"
             .($category->icon ? $category->icon.' ' : '')."<b>".e($category->name)."</b>\n"
-            .($category->description ? '<i>'.e(Str::limit($category->description, 160))."</i>" : '');
+            .($category->description ? "\n<blockquote>".e(Str::limit($category->description, 180))."</blockquote>" : '')
+            .self::footer();
 
         return [
             'text' => $text,
@@ -78,10 +98,12 @@ class TelegramMessages
 
     public static function purchase(User $user, Product $product): array
     {
-        $text = "🛒 <b>New purchase!</b>\n\n"
+        $text = "🛒 <b>NEW PURCHASE</b> 🎊\n"
+            .self::RULE."\n\n"
             ."🙏 Thank you <b>".e($user->name)."</b> for purchasing\n"
-            ."<b>".e($product->title)."</b>!\n\n"
-            ."Enjoy your download and lifetime updates. 💜";
+            ."🧩 <b>".e($product->title)."</b>!\n\n"
+            ."<blockquote>Enjoy your download, lifetime access &amp; updates. 💜</blockquote>"
+            .self::footer();
 
         return [
             'text' => $text,
@@ -92,12 +114,15 @@ class TelegramMessages
 
     public static function review(User $user, Product $product, int $rating): array
     {
-        $stars = str_repeat('⭐', max(1, min(5, $rating)));
+        $rating = max(1, min(5, $rating));
+        $stars = str_repeat('⭐', $rating).str_repeat('☆', 5 - $rating);
 
-        $text = "📝 <b>New review!</b>\n\n"
-            ."<b>".e($user->name)."</b> rated <b>".e($product->title)."</b>\n"
-            .$stars." (".$rating."/5)\n\n"
-            ."Check it out and share your thoughts too!";
+        $text = "📝 <b>NEW REVIEW</b>\n"
+            .self::RULE."\n\n"
+            ."<b>".e($user->name)."</b> reviewed\n"
+            ."🧩 <b>".e($product->title)."</b>\n\n"
+            .$stars."  <b>".$rating.".0</b> / 5"
+            .self::footer();
 
         return [
             'text' => $text,
@@ -108,14 +133,45 @@ class TelegramMessages
 
     public static function freeDownload(User $user, Product $product): array
     {
-        $text = "⬇️ <b>Free download!</b>\n\n"
-            ."<b>".e($user->name)."</b> just grabbed <b>".e($product->title)."</b> for free. 🎁\n\n"
-            ."Loved it? Don't forget to leave a review! ✍️";
+        $text = "⬇️ <b>FREE DOWNLOAD</b> 🎁\n"
+            .self::RULE."\n\n"
+            ."<b>".e($user->name)."</b> just grabbed\n"
+            ."🧩 <b>".e($product->title)."</b> for free!\n\n"
+            ."<blockquote>Loved it? Leave a quick review &amp; help others discover it. ✍️</blockquote>"
+            .self::footer();
 
         return [
             'text' => $text,
             'photo' => null,
             'buttons' => [['⭐ Review & visit', route('products.show', $product)]],
+        ];
+    }
+
+    /**
+     * Time-based "recommended product" auto promotion.
+     */
+    public static function autoPromo(Product $product): array
+    {
+        $price = $product->price > 0 ? money($product->current_price) : 'FREE';
+
+        $text = "🔥 <b>RECOMMENDED FOR YOU</b> 🔥\n"
+            .self::RULE."\n\n"
+            ."🧩 <b>".e($product->title)."</b>\n"
+            .($product->tagline ? '<i>'.e($product->tagline)."</i>\n" : '')
+            ."\n💰 <b>".$price."</b>"
+            .($product->rating > 0 ? "  •  ⭐ <b>".number_format($product->rating, 1)."</b>" : '')
+            ."\n\n<blockquote>Hand-picked just for you — take a look and grab the preview! 👀</blockquote>"
+            .self::footer();
+
+        $buttons = [['🔎 Visit product', route('products.show', $product)]];
+        if ($product->demo_url) {
+            $buttons[] = ['👀 Preview', $product->demo_url];
+        }
+
+        return [
+            'text' => $text,
+            'photo' => $product->thumbnail_url,
+            'buttons' => $buttons,
         ];
     }
 
@@ -127,19 +183,20 @@ class TelegramMessages
         $mode = setting('promo_mode', 'off');
 
         if ($mode === 'message') {
-            $text = "📣 <b>Announcement from ".self::site()."</b>\n\n".e(setting('promo_message', ''));
+            $body = "📣 <b>ANNOUNCEMENT</b>\n".self::RULE."\n\n".e(setting('promo_message', ''));
         } elseif ($mode === 'countdown') {
-            $text = "⏰ <b>Limited-time offer is live!</b>\n\n"
-                .e(setting('promo_countdown_label', 'Limited time offer'))." — hurry before it ends! 🔥";
+            $body = "⏰ <b>LIMITED-TIME OFFER</b>\n".self::RULE."\n\n"
+                ."<b>".e(setting('promo_countdown_label', 'Limited time offer'))."</b>\n"
+                ."<blockquote>Hurry — the clock is ticking! 🔥</blockquote>";
         } elseif ($mode === 'products') {
-            $text = "✨ <b>".e(setting('promo_heading', 'Featured picks'))."</b>\n\n"
-                ."Freshly featured products are now live on ".self::site().". Take a look! 👀";
+            $body = "✨ <b>".e(setting('promo_heading', 'Featured picks'))."</b>\n".self::RULE."\n\n"
+                ."Freshly featured products are now live. Take a look! 👀";
         } else {
-            $text = "✨ <b>Something new on ".self::site()."</b>\n\nVisit the store for the latest updates!";
+            $body = "✨ <b>What's new</b>\n".self::RULE."\n\nVisit the store for the latest updates!";
         }
 
         return [
-            'text' => $text,
+            'text' => $body.self::footer(),
             'photo' => null,
             'buttons' => [['🛍 Visit store', self::storeUrl()]],
         ];

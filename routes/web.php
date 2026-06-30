@@ -265,8 +265,9 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     // Telegram bot connection.
     Route::get('/telegram', [AdminTelegramController::class, 'index'])->name('tg.index');
     Route::post('/telegram', [AdminTelegramController::class, 'store'])->name('tg.store');
+    Route::post('/telegram/broadcast', [AdminTelegramController::class, 'broadcast'])->name('tg.broadcast');
+    Route::put('/telegram/auto-promo', [AdminTelegramController::class, 'autoPromo'])->name('tg.autopromo');
     Route::put('/telegram/{bot}', [AdminTelegramController::class, 'update'])->name('tg.update');
     Route::delete('/telegram/{bot}', [AdminTelegramController::class, 'destroy'])->name('tg.destroy');
     Route::post('/telegram/{bot}/test', [AdminTelegramController::class, 'test'])->name('tg.test');
-    Route::post('/telegram/broadcast', [AdminTelegramController::class, 'broadcast'])->name('tg.broadcast');
 });
