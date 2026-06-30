@@ -206,6 +206,7 @@
                             <li><a href="{{ route('register') }}" class="hover:text-brand-600">Create account</a></li>
                         @endauth
                         <li><a href="{{ route('cart.index') }}" class="hover:text-brand-600">Cart</a></li>
+                        <li><a href="{{ route('contact.show') }}" class="hover:text-brand-600">Contact us</a></li>
                         <li><a href="mailto:{{ config('marketplace.support_email') }}" class="hover:text-brand-600">Support</a></li>
                     </ul>
                 </div>

@@ -14,6 +14,7 @@ use App\Http\Controllers\Admin\StorageController as AdminStorageController;
 use App\Http\Controllers\Admin\PromotionController as AdminPromotionController;
 use App\Http\Controllers\Admin\SystemController as AdminSystemController;
 use App\Http\Controllers\Admin\TicketController as AdminTicketController;
+use App\Http\Controllers\Admin\ContactController as AdminContactController;
 use App\Http\Controllers\Admin\UserController as AdminUserController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Auth\EmailVerificationController;
@@ -22,6 +23,7 @@ use App\Http\Controllers\Auth\PasswordResetLinkController;
 use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\CheckoutController;
+use App\Http\Controllers\ContactController;
 use App\Http\Controllers\CurrencyController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DownloadController;
@@ -71,6 +73,10 @@ Route::get('/currency/{code}', [CurrencyController::class, 'switch'])->name('cur
 
 // Public custom pages (About, Terms, Privacy, etc.).
 Route::get('/p/{page}', [PageController::class, 'show'])->name('pages.show');
+
+// Contact form (open to guests and members).
+Route::get('/contact', [ContactController::class, 'show'])->name('contact.show');
+Route::post('/contact', [ContactController::class, 'store'])->name('contact.store');
 
 // Email verification link (signed, works without login).
 Route::get('/email/verify/{id}/{hash}', [EmailVerificationController::class, 'verify'])
@@ -248,4 +254,10 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     // Hero promotion manager.
     Route::get('/promotions', [AdminPromotionController::class, 'index'])->name('promotions.index');
     Route::put('/promotions', [AdminPromotionController::class, 'update'])->name('promotions.update');
+
+    // Contact messages.
+    Route::get('/contacts', [AdminContactController::class, 'index'])->name('contacts.index');
+    Route::put('/contacts/settings', [AdminContactController::class, 'updateSettings'])->name('contacts.settings');
+    Route::get('/contacts/{contact}', [AdminContactController::class, 'show'])->name('contacts.show');
+    Route::delete('/contacts/{contact}', [AdminContactController::class, 'destroy'])->name('contacts.destroy');
 });
