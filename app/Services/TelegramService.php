@@ -107,9 +107,8 @@ class TelegramService
 
     /**
      * Time-based auto promotion: if enabled and the configured interval has
-     * elapsed, pick a random published product and recommend it to the
-     * subscribed bots. Designed to be called on every web request (cheap when
-     * not due) so it works on hosting without a real cron job.
+     * elapsed, recommend a random published product to the subscribed bots.
+     * Safe to call on every request / every scheduler tick (cheap when not due).
      */
     public function runAutoPromo(): void
     {
@@ -130,15 +129,34 @@ class TelegramService
             return; // not due yet
         }
 
+        $this->dispatchRandomPromo();
+    }
+
+    /**
+     * Immediately recommend a random published product (manual "Send now").
+     */
+    public function sendAutoPromoNow(): bool
+    {
+        return $this->dispatchRandomPromo();
+    }
+
+    /**
+     * Pick a random published product and post the recommendation, stamping
+     * the last-sent time so the interval restarts.
+     */
+    protected function dispatchRandomPromo(): bool
+    {
         $product = \App\Models\Product::published()->with('category')->inRandomOrder()->first();
         if (! $product) {
-            return;
+            return false;
         }
 
-        // Stamp immediately to avoid duplicate sends from concurrent requests.
+        // Stamp immediately to avoid duplicate sends from concurrent triggers.
         \App\Models\Setting::put('autotgpromo_last_sent', now()->toDateTimeString(), 'telegram');
 
         $this->notify('auto_promo', \App\Support\TelegramMessages::autoPromo($product));
+
+        return true;
     }
 
     protected function isLocalUrl(string $url): bool

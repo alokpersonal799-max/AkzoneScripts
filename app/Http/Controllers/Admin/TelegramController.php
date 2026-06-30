@@ -112,6 +112,16 @@ class TelegramController extends Controller
     }
 
     /**
+     * Manually post a product recommendation right now.
+     */
+    public function autoPromoNow(TelegramService $telegram): RedirectResponse
+    {
+        return $telegram->sendAutoPromoNow()
+            ? back()->with('success', 'A product recommendation was sent to your subscribed bots.')
+            : back()->with('error', 'No published products available to recommend.');
+    }
+
+    /**
      * @return array<string, mixed>
      */
     protected function validateBot(Request $request, ?TelegramBot $bot = null): array

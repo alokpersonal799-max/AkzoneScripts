@@ -165,8 +165,20 @@
                     </div>
                     <button type="submit" class="btn-primary btn-md">Save schedule</button>
                 </div>
-                <p class="text-xs text-slate-400">Triggered by site traffic (no cron needed). A random published product is posted once the interval elapses.</p>
+                <p class="text-xs text-slate-400">Posts a random product recommendation (“Buy / Visit now”) to your channel once the interval elapses.</p>
             </form>
+            <div class="mt-3 flex items-center gap-2 border-t border-slate-100 pt-4">
+                <form method="POST" action="{{ route('admin.tg.autopromo.now') }}">
+                    @csrf
+                    <button type="submit" class="btn-ghost btn-sm">Send a recommendation now</button>
+                </form>
+                <span class="text-xs text-slate-400">Test it instantly without waiting for the schedule.</span>
+            </div>
+            <div class="mt-3 rounded-xl bg-amber-50 px-4 py-3 text-xs text-amber-700">
+                <b>For reliable timed sending</b>, add this cron entry on your server (Hostinger/Namecheap → Cron Jobs):
+                <code class="mt-1 block rounded bg-amber-100 px-2 py-1 font-mono">* * * * * cd /path/to/AkzoneScripts &amp;&amp; php artisan schedule:run &gt;&gt; /dev/null 2&gt;&amp;1</code>
+                Without cron, it still sends based on site visits.
+            </div>
         </div>
 
         {{-- Previews --}}

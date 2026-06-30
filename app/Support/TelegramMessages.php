@@ -148,25 +148,27 @@ class TelegramMessages
     }
 
     /**
-     * Time-based "recommended product" auto promotion.
+     * Time-based "recommended product" auto promotion (purchase-focused).
      */
     public static function autoPromo(Product $product): array
     {
         $price = $product->price > 0 ? money($product->current_price) : 'FREE';
 
-        $text = "🔥 <b>RECOMMENDED FOR YOU</b> 🔥\n"
+        $text = "🔥 <b>TODAY'S RECOMMENDED PICK</b> 🔥\n"
             .self::RULE."\n\n"
             ."🧩 <b>".e($product->title)."</b>\n"
             .($product->tagline ? '<i>'.e($product->tagline)."</i>\n" : '')
-            ."\n💰 <b>".$price."</b>"
+            ."\n💰 Only <b>".$price."</b>"
             .($product->rating > 0 ? "  •  ⭐ <b>".number_format($product->rating, 1)."</b>" : '')
-            ."\n\n<blockquote>Hand-picked just for you — take a look and grab the preview! 👀</blockquote>"
+            .($product->sales > 0 ? "  •  🛒 <b>".number_format($product->sales)."</b> sold" : '')
+            ."\n\n<blockquote>⚡ Don't miss out — grab it now with instant delivery &amp; lifetime updates!</blockquote>"
             .self::footer();
 
-        $buttons = [['🔎 Visit product', route('products.show', $product)]];
+        $buttons = [['🛒 Buy / Visit now', route('products.show', $product)]];
         if ($product->demo_url) {
             $buttons[] = ['👀 Preview', $product->demo_url];
         }
+        $buttons[] = ['🛍 Browse store', self::storeUrl()];
 
         return [
             'text' => $text,
