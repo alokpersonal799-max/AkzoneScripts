@@ -141,6 +141,14 @@ class CheckoutController extends Controller
         $this->cart->clear();
         session()->forget(self::COUPON_SESSION);
 
+        // Email the buyer their receipt (failures must not break checkout).
+        try {
+            \Illuminate\Support\Facades\Mail::to($order->billing_email)
+                ->send(new \App\Mail\OrderReceiptMail($order->load('items')));
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
         return redirect()->route('orders.show', $order)
             ->with('success', 'Payment successful! Your digital products are ready to download.');
     }

@@ -54,6 +54,25 @@
                     <p class="mt-1 text-xs text-slate-400">Allowed: {{ implode(', ', config('marketplace.allowed_file_types')) }}. Stored privately.</p>
                 </div>
             </div>
+
+            {{-- Gallery (max 6) --}}
+            <div class="mt-5">
+                <label class="label">Gallery images <span class="text-slate-400">(up to 6 — shown in the product slider)</span></label>
+                @if ($product->gallery && count($product->gallery))
+                    <div class="mb-3 grid grid-cols-3 gap-3 sm:grid-cols-6">
+                        @foreach ($product->gallery as $image)
+                            <label class="group relative block cursor-pointer overflow-hidden rounded-lg border border-slate-200">
+                                <img src="{{ \Illuminate\Support\Facades\Storage::disk('public')->url($image) }}" alt="" class="aspect-square w-full object-cover">
+                                <span class="absolute inset-x-0 bottom-0 flex items-center justify-center gap-1 bg-rose-600/90 py-1 text-[10px] font-semibold text-white opacity-0 transition group-hover:opacity-100">
+                                    <input type="checkbox" name="remove_gallery[]" value="{{ $image }}" class="h-3 w-3"> Remove
+                                </span>
+                            </label>
+                        @endforeach
+                    </div>
+                @endif
+                <input id="gallery" name="gallery[]" type="file" accept="image/*" multiple
+                       class="block w-full text-sm text-slate-500 file:mr-3 file:rounded-lg file:border-0 file:bg-brand-50 file:px-3 file:py-1.5 file:text-sm file:font-semibold file:text-brand-600 hover:file:bg-brand-100">
+            </div>
             <div class="mt-5">
                 <label for="demo_url" class="label">Live demo URL</label>
                 <input id="demo_url" name="demo_url" type="url" value="{{ old('demo_url', $product->demo_url) }}" placeholder="https://..." class="input">

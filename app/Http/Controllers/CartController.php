@@ -39,6 +39,18 @@ class CartController extends Controller
     }
 
     /**
+     * Add a product and go straight to checkout (Buy Now).
+     */
+    public function buyNow(Product $product): RedirectResponse
+    {
+        abort_unless($product->status === 'published', 404);
+
+        $this->cart->add($product);
+
+        return redirect()->route('checkout.index');
+    }
+
+    /**
      * Remove a product from the cart.
      */
     public function remove(Product $product): RedirectResponse

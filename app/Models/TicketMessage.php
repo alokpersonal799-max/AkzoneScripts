@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class TicketMessage extends Model
 {
     protected $fillable = [
-        'ticket_id', 'user_id', 'is_admin', 'message',
+        'ticket_id', 'user_id', 'is_admin', 'message', 'attachment_path', 'attachment_name',
     ];
 
     protected function casts(): array

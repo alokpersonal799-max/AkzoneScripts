@@ -29,6 +29,8 @@ class CoreSeeder extends Seeder
             'social_github' => ['general', '#'],
             'social_discord' => ['general', '#'],
             'social_facebook' => ['general', '#'],
+            'contact_whatsapp' => ['general', ''],
+            'contact_telegram' => ['general', ''],
 
             // Hero
             'hero_badge' => ['hero', 'Trusted by thousands of builders'],

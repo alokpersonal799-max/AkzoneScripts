@@ -34,15 +34,32 @@ class TicketController extends Controller
 
     public function reply(Request $request, Ticket $ticket): RedirectResponse
     {
-        $data = $request->validate(['message' => ['required', 'string', 'max:5000']]);
+        $data = $request->validate([
+            'message' => ['required', 'string', 'max:5000'],
+            'attachment' => ['nullable', 'file', 'max:5120', 'mimes:jpg,jpeg,png,gif,webp,pdf,zip,rar,doc,docx,txt'],
+        ]);
 
-        $ticket->messages()->create([
+        $payload = [
             'user_id' => $request->user()->id,
             'is_admin' => true,
             'message' => $data['message'],
-        ]);
+        ];
+
+        if ($request->hasFile('attachment')) {
+            $file = $request->file('attachment');
+            $payload['attachment_path'] = $file->store('ticket-attachments', 'local');
+            $payload['attachment_name'] = $file->getClientOriginalName();
+        }
+
+        $ticket->messages()->create($payload);
 
         $ticket->update(['status' => 'answered', 'last_reply_at' => now()]);
+
+        // Notify the customer of the reply.
+        if ($ticket->user) {
+            \Illuminate\Support\Facades\Mail::to($ticket->user->email)
+                ->send(new \App\Mail\TicketReplyMail($ticket));
+        }
 
         return back()->with('success', 'Reply sent to the customer.');
     }

@@ -102,6 +102,10 @@ class ProductController extends Controller
             Storage::disk('products')->delete($product->file_path);
         }
 
+        foreach ((array) $product->gallery as $image) {
+            Storage::disk('public')->delete($image);
+        }
+
         $product->delete();
 
         return redirect()->route('admin.products.index')
@@ -131,6 +135,9 @@ class ProductController extends Controller
             'is_featured' => ['nullable', 'boolean'],
             'tags' => ['nullable', 'string', 'max:500'],
             'thumbnail' => ['nullable', 'image', 'max:4096'],
+            'gallery' => ['nullable', 'array', 'max:6'],
+            'gallery.*' => ['image', 'max:4096'],
+            'remove_gallery' => ['nullable', 'array'],
             'product_file' => [
                 $product && $product->file_path ? 'nullable' : 'nullable',
                 'file',
@@ -180,8 +187,31 @@ class ProductController extends Controller
             $data['file_size'] = $file->getSize();
         }
 
-        // Remove the transient upload field so it is not mass-assigned.
-        unset($data['product_file']);
+        // Gallery images (max 6 total). Start from the existing set.
+        $gallery = $product?->gallery ?? [];
+
+        // Remove any images the admin unchecked.
+        if ($request->filled('remove_gallery')) {
+            foreach ((array) $request->input('remove_gallery') as $path) {
+                Storage::disk('public')->delete($path);
+            }
+            $gallery = array_values(array_diff($gallery, (array) $request->input('remove_gallery')));
+        }
+
+        // Add newly uploaded gallery images.
+        if ($request->hasFile('gallery')) {
+            foreach ($request->file('gallery') as $image) {
+                if (count($gallery) >= 6) {
+                    break;
+                }
+                $gallery[] = $image->store('products/gallery', 'public');
+            }
+        }
+
+        $data['gallery'] = array_slice(array_values($gallery), 0, 6);
+
+        // Remove transient upload fields so they are not mass-assigned.
+        unset($data['product_file'], $data['remove_gallery']);
 
         return $data;
     }

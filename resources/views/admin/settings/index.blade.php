@@ -53,6 +53,17 @@
                 @endforeach
             </div>
 
+            <div class="grid gap-5 sm:grid-cols-2">
+                <div>
+                    <label for="contact_whatsapp" class="label">WhatsApp number <span class="text-slate-400">(with country code, no +)</span></label>
+                    <input id="contact_whatsapp" name="contact_whatsapp" type="text" value="{{ old('contact_whatsapp', setting('contact_whatsapp')) }}" class="input" placeholder="14155552671">
+                </div>
+                <div>
+                    <label for="contact_telegram" class="label">Telegram username <span class="text-slate-400">(without @)</span></label>
+                    <input id="contact_telegram" name="contact_telegram" type="text" value="{{ old('contact_telegram', setting('contact_telegram')) }}" class="input" placeholder="yourchannel">
+                </div>
+            </div>
+
             <div class="rounded-xl border border-slate-200 p-4">
                 <label class="flex items-center gap-2 text-sm font-semibold text-ink-900">
                     <input type="checkbox" name="announcement_enabled" value="1" {{ setting('announcement_enabled') === '1' ? 'checked' : '' }} class="rounded border-slate-300 text-brand-600 focus:ring-brand-500/30">

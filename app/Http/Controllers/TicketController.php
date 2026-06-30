@@ -3,12 +3,20 @@
 namespace App\Http\Controllers;
 
 use App\Models\Ticket;
+use App\Models\TicketMessage;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class TicketController extends Controller
 {
+    /**
+     * Validation rule for ticket attachments (image or common doc, <= 5MB).
+     */
+    protected array $attachmentRule = ['nullable', 'file', 'max:5120', 'mimes:jpg,jpeg,png,gif,webp,pdf,zip,rar,doc,docx,txt'];
+
     public function index(Request $request): View
     {
         $tickets = $request->user()->tickets()->latest()->paginate(10);
@@ -27,6 +35,7 @@ class TicketController extends Controller
             'subject' => ['required', 'string', 'max:255'],
             'priority' => ['required', 'in:low,normal,high'],
             'message' => ['required', 'string', 'max:5000'],
+            'attachment' => $this->attachmentRule,
         ]);
 
         $ticket = $request->user()->tickets()->create([
@@ -36,11 +45,11 @@ class TicketController extends Controller
             'last_reply_at' => now(),
         ]);
 
-        $ticket->messages()->create([
+        $ticket->messages()->create(array_merge([
             'user_id' => $request->user()->id,
             'is_admin' => false,
             'message' => $data['message'],
-        ]);
+        ], $this->storeAttachment($request)));
 
         return redirect()->route('tickets.show', $ticket)
             ->with('success', 'Your ticket has been submitted. We will reply soon.');
@@ -63,16 +72,52 @@ class TicketController extends Controller
             return back()->with('error', 'This ticket has been closed.');
         }
 
-        $data = $request->validate(['message' => ['required', 'string', 'max:5000']]);
+        $data = $request->validate([
+            'message' => ['required', 'string', 'max:5000'],
+            'attachment' => $this->attachmentRule,
+        ]);
 
-        $ticket->messages()->create([
+        $ticket->messages()->create(array_merge([
             'user_id' => $request->user()->id,
             'is_admin' => false,
             'message' => $data['message'],
-        ]);
+        ], $this->storeAttachment($request)));
 
         $ticket->update(['status' => 'customer-reply', 'last_reply_at' => now()]);
 
         return back()->with('success', 'Reply sent.');
+    }
+
+    /**
+     * Securely stream a ticket attachment to its owner (or any admin).
+     */
+    public function download(Request $request, TicketMessage $message): StreamedResponse
+    {
+        $message->load('ticket');
+        $user = $request->user();
+
+        abort_unless($user->isAdmin() || $message->ticket->user_id === $user->id, 403);
+        abort_if(! $message->attachment_path || ! Storage::disk('local')->exists($message->attachment_path), 404);
+
+        return Storage::disk('local')->download($message->attachment_path, $message->attachment_name);
+    }
+
+    /**
+     * Store an uploaded attachment on the private disk, returning columns to merge.
+     *
+     * @return array<string, string|null>
+     */
+    protected function storeAttachment(Request $request): array
+    {
+        if (! $request->hasFile('attachment')) {
+            return [];
+        }
+
+        $file = $request->file('attachment');
+
+        return [
+            'attachment_path' => $file->store('ticket-attachments', 'local'),
+            'attachment_name' => $file->getClientOriginalName(),
+        ];
     }
 }

@@ -7,7 +7,7 @@
     </div>
 
     <div class="card max-w-2xl p-6 sm:p-8">
-        <form method="POST" action="{{ route('tickets.store') }}" class="space-y-5">
+        <form method="POST" action="{{ route('tickets.store') }}" enctype="multipart/form-data" class="space-y-5">
             @csrf
             <div>
                 <label for="subject" class="label">Subject</label>
@@ -24,6 +24,10 @@
             <div>
                 <label for="message" class="label">Message</label>
                 <textarea id="message" name="message" rows="6" required class="input" placeholder="Tell us what's going on...">{{ old('message') }}</textarea>
+            </div>
+            <div>
+                <label for="attachment" class="label">Attachment <span class="text-slate-400">(optional, image or file, max 5MB)</span></label>
+                <input id="attachment" name="attachment" type="file" class="block w-full text-sm text-slate-500 file:mr-3 file:rounded-lg file:border-0 file:bg-brand-50 file:px-3 file:py-1.5 file:text-sm file:font-semibold file:text-brand-600 hover:file:bg-brand-100">
             </div>
             <button type="submit" class="btn-primary btn-md">Submit ticket</button>
         </form>

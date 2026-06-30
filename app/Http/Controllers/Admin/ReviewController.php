@@ -37,6 +37,15 @@ class ReviewController extends Controller
     {
         $review->update(['is_approved' => true]);
 
+        if ($review->user) {
+            try {
+                \Illuminate\Support\Facades\Mail::to($review->user->email)
+                    ->send(new \App\Mail\ReviewApprovedMail($review->load(['user', 'product'])));
+            } catch (\Throwable $e) {
+                report($e);
+            }
+        }
+
         return back()->with('success', 'Review approved and published.');
     }
 

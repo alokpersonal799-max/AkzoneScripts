@@ -65,6 +65,7 @@ Route::get('/currency/{code}', [CurrencyController::class, 'switch'])->name('cur
 Route::controller(CartController::class)->prefix('cart')->name('cart.')->group(function () {
     Route::get('/', 'index')->name('index');
     Route::post('/add/{product}', 'add')->name('add');
+    Route::post('/buy/{product}', 'buyNow')->name('buy');
     Route::delete('/remove/{product}', 'remove')->name('remove');
     Route::delete('/clear', 'clear')->name('clear');
 });
@@ -126,6 +127,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/', 'index')->name('index');
         Route::get('/create', 'create')->name('create');
         Route::post('/', 'store')->name('store');
+        Route::get('/attachment/{message}', 'download')->name('attachment');
         Route::get('/{ticket}', 'show')->name('show');
         Route::post('/{ticket}/reply', 'reply')->name('reply');
     });

@@ -196,6 +196,24 @@ class Product extends Model
     }
 
     /**
+     * All image URLs for the product gallery (thumbnail first, then gallery).
+     *
+     * @return array<int, string>
+     */
+    public function getGalleryUrlsAttribute(): array
+    {
+        $urls = [$this->thumbnail_url];
+
+        foreach ((array) $this->gallery as $path) {
+            if ($path && Storage::disk('public')->exists($path)) {
+                $urls[] = Storage::disk('public')->url($path);
+            }
+        }
+
+        return array_values(array_unique($urls));
+    }
+
+    /**
      * Human friendly file size, e.g. "2.4 MB".
      */
     public function getFormattedFileSizeAttribute(): string

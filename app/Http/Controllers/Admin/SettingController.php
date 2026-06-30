@@ -33,6 +33,8 @@ class SettingController extends Controller
             'social_github' => ['nullable', 'string', 'max:255'],
             'social_discord' => ['nullable', 'string', 'max:255'],
             'social_facebook' => ['nullable', 'string', 'max:255'],
+            'contact_whatsapp' => ['nullable', 'string', 'max:50'],
+            'contact_telegram' => ['nullable', 'string', 'max:100'],
             'announcement_enabled' => ['nullable', 'boolean'],
             'announcement_text' => ['nullable', 'string', 'max:500'],
             'logo' => ['nullable', 'image', 'max:2048'],
@@ -52,6 +54,8 @@ class SettingController extends Controller
         Setting::put('social_github', $data['social_github'] ?? '#', 'general');
         Setting::put('social_discord', $data['social_discord'] ?? '#', 'general');
         Setting::put('social_facebook', $data['social_facebook'] ?? '#', 'general');
+        Setting::put('contact_whatsapp', $data['contact_whatsapp'] ?? '', 'general');
+        Setting::put('contact_telegram', $data['contact_telegram'] ?? '', 'general');
         Setting::put('announcement_enabled', $request->boolean('announcement_enabled') ? '1' : '0', 'general');
         Setting::put('announcement_text', $data['announcement_text'] ?? '', 'general');
 
