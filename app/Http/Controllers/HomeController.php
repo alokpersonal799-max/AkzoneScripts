@@ -123,16 +123,25 @@ class HomeController extends Controller
         }
 
         if ($mode === 'countdown') {
-            $pid = setting('promo_countdown_product');
-            $until = setting('promo_countdown_until');
-            $product = $pid ? Product::published()->with('category')->find($pid) : null;
-            if ($product && $until && \Illuminate\Support\Carbon::parse($until)->isFuture()) {
-                return [
-                    'mode' => 'countdown',
-                    'label' => setting('promo_countdown_label', 'Limited time offer'),
-                    'product' => $product,
-                    'until' => \Illuminate\Support\Carbon::parse($until)->toIso8601String(),
-                ];
+            $offers = [];
+            $sets = [
+                ['promo_countdown_product', 'promo_countdown_label', 'promo_countdown_until'],
+                ['promo_countdown_product_2', 'promo_countdown_label_2', 'promo_countdown_until_2'],
+            ];
+            foreach ($sets as $keys) {
+                $pid = setting($keys[0]);
+                $until = setting($keys[2]);
+                $product = $pid ? Product::published()->with('category')->find($pid) : null;
+                if ($product && $until && \Illuminate\Support\Carbon::parse($until)->isFuture()) {
+                    $offers[] = [
+                        'label' => setting($keys[1], 'Limited time offer'),
+                        'product' => $product,
+                        'until' => \Illuminate\Support\Carbon::parse($until)->toIso8601String(),
+                    ];
+                }
+            }
+            if (! empty($offers)) {
+                return ['mode' => 'countdown', 'offers' => $offers];
             }
         }
 

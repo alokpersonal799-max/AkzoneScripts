@@ -46,6 +46,15 @@ class DemoSeeder extends Seeder
         }
         \App\Models\Setting::put('promo_countdown_label', 'Flash deal — ends soon', 'promotion');
         \App\Models\Setting::put('promo_countdown_until', now()->addDays(3)->format('Y-m-d H:i:s'), 'promotion');
+
+        // A second optional countdown offer.
+        $countdownId2 = $ids[1] ?? null;
+        if ($countdownId2) {
+            \App\Models\Setting::put('promo_countdown_product_2', (string) $countdownId2, 'promotion');
+            \App\Models\Setting::put('promo_countdown_label_2', 'Weekend special', 'promotion');
+            \App\Models\Setting::put('promo_countdown_until_2', now()->addDays(2)->format('Y-m-d H:i:s'), 'promotion');
+        }
+
         \App\Models\Setting::put('promo_message', '🎉 Launch week — use code AKZONE10 for 10% off your first order!', 'promotion');
     }
 

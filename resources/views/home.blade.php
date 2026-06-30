@@ -70,8 +70,8 @@
                         @if ($promoMode === 'products')
                             <div class="grid grid-cols-2 gap-3 p-4">
                                 @foreach ($promotion['products'] as $promoProduct)
-                                    <a href="{{ route('products.show', $promoProduct) }}" class="group rounded-xl border border-slate-100 p-2 transition hover:border-brand-200 hover:shadow-soft">
-                                        <img src="{{ $promoProduct->thumbnail_url }}" alt="{{ $promoProduct->title }}" class="h-20 w-full rounded-lg object-cover">
+                                    <a href="{{ route('products.show', $promoProduct) }}" class="group rounded-2xl border-2 border-slate-200 bg-white p-2.5 shadow-sm transition hover:-translate-y-0.5 hover:border-brand-400 hover:shadow-md">
+                                        <img src="{{ $promoProduct->thumbnail_url }}" alt="{{ $promoProduct->title }}" class="h-20 w-full rounded-xl border border-slate-100 object-cover">
                                         <p class="mt-2 truncate text-xs font-semibold text-ink-900 group-hover:text-brand-600">{{ $promoProduct->title }}</p>
                                         <div class="mt-1 flex items-center justify-between">
                                             <span class="text-xs font-bold text-brand-600">{{ money($promoProduct->current_price) }}</span>
@@ -81,55 +81,65 @@
                                 @endforeach
                             </div>
                         @elseif ($promoMode === 'message')
-                            <div class="flex min-h-[220px] flex-col items-center justify-center gap-3 p-6 text-center">
-                                <span class="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-brand-500 to-indigo-500 text-white">
-                                    <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="1.6" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M10.34 15.84c-.688-.06-1.386-.09-2.09-.09H7.5a4.5 4.5 0 1 1 0-9h.75c.704 0 1.402-.03 2.09-.09m0 9.18c.253.962.584 1.892.985 2.783.247.55.06 1.21-.463 1.511l-.657.38c-.551.318-1.26.117-1.527-.461a20.845 20.845 0 0 1-1.44-4.282m3.102.069a18.03 18.03 0 0 1-.59-4.59c0-1.586.205-3.124.59-4.59m0 9.18a23.848 23.848 0 0 1 8.835 2.535M10.34 6.66a23.847 23.847 0 0 0 8.835-2.535m0 0A23.74 23.74 0 0 0 18.795 3m.38 1.125a23.91 23.91 0 0 1 1.014 5.395m-1.014 8.855c-.118.38-.245.754-.38 1.125m.38-1.125a23.91 23.91 0 0 0 1.014-5.395m0-3.46c.495.413.811 1.035.811 1.73 0 .695-.316 1.317-.811 1.73m0-3.46a24.347 24.347 0 0 1 0 3.46" /></svg>
+                            <div class="relative flex min-h-[240px] flex-col items-center justify-center gap-4 overflow-hidden bg-gradient-to-br from-brand-50 via-indigo-50 to-rose-50 p-7 text-center">
+                                <div class="absolute -right-10 -top-10 h-32 w-32 rounded-full bg-brand-300/30 blur-2xl"></div>
+                                <div class="absolute -bottom-10 -left-8 h-32 w-32 rounded-full bg-indigo-300/30 blur-2xl"></div>
+                                <span class="relative flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-brand-500 to-indigo-500 text-white shadow-lift">
+                                    <span class="absolute inset-0 animate-ping rounded-2xl bg-brand-400/40"></span>
+                                    <svg class="relative h-8 w-8" fill="none" viewBox="0 0 24 24" stroke-width="1.6" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M21 11.25v8.25a1.5 1.5 0 0 1-1.5 1.5H5.25a1.5 1.5 0 0 1-1.5-1.5v-8.25M12 4.875A2.625 2.625 0 1 0 9.375 7.5H12m0-2.625V7.5m0-2.625A2.625 2.625 0 1 1 14.625 7.5H12m0 0V21m-8.625-9.75h18c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125h-18c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125Z" /></svg>
                                 </span>
-                                <p class="text-sm font-semibold text-ink-900">{{ $promotion['message'] }}</p>
+                                <p class="relative max-w-sm font-display text-lg font-bold leading-snug text-ink-900">{{ $promotion['message'] }}</p>
                                 @if (! empty($promotion['url']))
-                                    <a href="{{ $promotion['url'] }}" class="btn-primary btn-sm">Learn more</a>
+                                    <a href="{{ $promotion['url'] }}" class="relative btn-primary btn-md">
+                                        Learn more
+                                        <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" /></svg>
+                                    </a>
                                 @endif
                             </div>
                         @elseif ($promoMode === 'countdown')
-                            @php $cp = $promotion['product']; @endphp
-                            <a href="{{ route('products.show', $cp) }}"
-                               x-data="{ end: new Date('{{ $promotion['until'] }}').getTime(), now: Date.now(),
-                                         get diff(){ return Math.max(0, this.end - this.now) },
-                                         get d(){ return Math.floor(this.diff/864e5) },
-                                         get h(){ return Math.floor(this.diff%864e5/36e5) },
-                                         get m(){ return Math.floor(this.diff%36e5/6e4) },
-                                         get s(){ return Math.floor(this.diff%6e4/1e3) },
-                                         pad(n){ return String(n).padStart(2,'0') },
-                                         init(){ setInterval(() => this.now = Date.now(), 1000) } }"
-                               class="block p-4">
-                                <span class="inline-flex items-center gap-1.5 rounded-full bg-amber-100 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-amber-700">
-                                    <svg class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke-width="2.2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" /></svg>
-                                    {{ $promotion['label'] }}
-                                </span>
-                                <div class="mt-3 flex items-center gap-3">
-                                    <img src="{{ $cp->thumbnail_url }}" alt="{{ $cp->title }}" class="h-16 w-16 flex-shrink-0 rounded-xl object-cover">
-                                    <div class="min-w-0">
-                                        <p class="truncate text-sm font-bold text-ink-900">{{ $cp->title }}</p>
-                                        <p class="mt-0.5 text-sm font-bold text-brand-600">
-                                            {{ money($cp->current_price) }}
-                                            @if ($cp->is_on_sale)<span class="ml-1 text-xs text-slate-400 line-through">{{ money($cp->price) }}</span>@endif
-                                        </p>
-                                    </div>
-                                </div>
-                                <template x-if="diff > 0">
-                                    <div class="mt-3 grid grid-cols-4 gap-2">
-                                        @foreach (['d' => 'Days', 'h' => 'Hrs', 'm' => 'Min', 's' => 'Sec'] as $unit => $unitLabel)
-                                            <div class="flex flex-col items-center justify-center rounded-xl bg-slate-900 py-2 text-white">
-                                                <span class="font-display text-lg font-extrabold" x-text="pad({{ $unit }})">00</span>
-                                                <span class="text-[9px] uppercase text-white/50">{{ $unitLabel }}</span>
+                            <div class="space-y-3 p-4">
+                                @foreach ($promotion['offers'] as $offer)
+                                    @php $cp = $offer['product']; @endphp
+                                    <a href="{{ route('products.show', $cp) }}"
+                                       x-data="{ end: new Date('{{ $offer['until'] }}').getTime(), now: Date.now(),
+                                                 get diff(){ return Math.max(0, this.end - this.now) },
+                                                 get d(){ return Math.floor(this.diff/864e5) },
+                                                 get h(){ return Math.floor(this.diff%864e5/36e5) },
+                                                 get m(){ return Math.floor(this.diff%36e5/6e4) },
+                                                 get s(){ return Math.floor(this.diff%6e4/1e3) },
+                                                 pad(n){ return String(n).padStart(2,'0') },
+                                                 init(){ setInterval(() => this.now = Date.now(), 1000) } }"
+                                       class="block rounded-2xl border-2 border-amber-200 bg-gradient-to-br from-amber-50 to-rose-50 p-3 transition hover:-translate-y-0.5 hover:border-amber-300 hover:shadow-md">
+                                        <span class="inline-flex items-center gap-1.5 rounded-full bg-amber-100 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-amber-700">
+                                            <svg class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke-width="2.2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" /></svg>
+                                            {{ $offer['label'] }}
+                                        </span>
+                                        <div class="mt-2.5 flex items-center gap-3">
+                                            <img src="{{ $cp->thumbnail_url }}" alt="{{ $cp->title }}" class="h-14 w-14 flex-shrink-0 rounded-xl border border-amber-200 object-cover">
+                                            <div class="min-w-0">
+                                                <p class="truncate text-sm font-bold text-ink-900">{{ $cp->title }}</p>
+                                                <p class="mt-0.5 text-sm font-bold text-brand-600">
+                                                    {{ money($cp->current_price) }}
+                                                    @if ($cp->is_on_sale)<span class="ml-1 text-xs text-slate-400 line-through">{{ money($cp->price) }}</span>@endif
+                                                </p>
                                             </div>
-                                        @endforeach
-                                    </div>
-                                </template>
-                                <template x-if="diff <= 0">
-                                    <div class="mt-3 rounded-xl bg-rose-50 py-3 text-center text-sm font-bold text-rose-500">Offer ended</div>
-                                </template>
-                            </a>
+                                        </div>
+                                        <template x-if="diff > 0">
+                                            <div class="mt-2.5 grid grid-cols-4 gap-1.5">
+                                                @foreach (['d' => 'Days', 'h' => 'Hrs', 'm' => 'Min', 's' => 'Sec'] as $unit => $unitLabel)
+                                                    <div class="flex flex-col items-center justify-center rounded-lg bg-slate-900 py-1.5 text-white">
+                                                        <span class="font-display text-base font-extrabold" x-text="pad({{ $unit }})">00</span>
+                                                        <span class="text-[8px] uppercase text-white/50">{{ $unitLabel }}</span>
+                                                    </div>
+                                                @endforeach
+                                            </div>
+                                        </template>
+                                        <template x-if="diff <= 0">
+                                            <div class="mt-2.5 rounded-lg bg-rose-50 py-2 text-center text-xs font-bold text-rose-500">Offer ended</div>
+                                        </template>
+                                    </a>
+                                @endforeach
+                            </div>
                         @else
                             {{-- Default placeholder tiles --}}
                             <div class="grid grid-cols-3 gap-3 p-4">

@@ -21,7 +21,7 @@
                         'off' => ['Off', 'Normal hero, no promotion'],
                         'products' => ['Featured products', 'Show 3–4 product cards'],
                         'message' => ['Custom message', 'Show a banner message'],
-                        'countdown' => ['Countdown offer', 'One product + timer'],
+                        'countdown' => ['Countdown offer', 'Up to 2 products + timers'],
                     ] as $value => $meta)
                         <label class="flex cursor-pointer flex-col gap-1 rounded-xl border p-3 text-sm transition"
                                :class="mode === '{{ $value }}' ? 'border-brand-500 bg-brand-50' : 'border-slate-200 hover:bg-slate-50'">
@@ -75,27 +75,58 @@
 
             {{-- Countdown --}}
             <div x-show="mode === 'countdown'" x-cloak class="card p-6">
-                <h2 class="font-display text-lg font-bold text-ink-900">Countdown offer</h2>
-                <div class="mt-4 grid gap-5 sm:grid-cols-2">
-                    <div>
-                        <label for="promo_countdown_product" class="label">Product</label>
-                        <select id="promo_countdown_product" name="promo_countdown_product" class="input">
-                            <option value="">— Select a product —</option>
-                            @foreach ($products as $product)
-                                <option value="{{ $product->id }}" {{ (int) old('promo_countdown_product', $countdownProduct) === $product->id ? 'selected' : '' }}>{{ $product->title }}</option>
-                            @endforeach
-                        </select>
+                <h2 class="font-display text-lg font-bold text-ink-900">Countdown offers</h2>
+                <p class="mt-1 text-sm text-slate-500">Show one or two limited-time product offers with live timers. Offer #1 is required; offer #2 is optional.</p>
+
+                {{-- Offer #1 --}}
+                <div class="mt-5 rounded-2xl border border-slate-200 p-4">
+                    <p class="mb-3 text-xs font-bold uppercase tracking-wide text-brand-600">Offer #1</p>
+                    <div class="grid gap-5 sm:grid-cols-2">
+                        <div>
+                            <label for="promo_countdown_product" class="label">Product</label>
+                            <select id="promo_countdown_product" name="promo_countdown_product" class="input">
+                                <option value="">— Select a product —</option>
+                                @foreach ($products as $product)
+                                    <option value="{{ $product->id }}" {{ (int) old('promo_countdown_product', $countdownProduct) === $product->id ? 'selected' : '' }}>{{ $product->title }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div>
+                            <label for="promo_countdown_label" class="label">Label</label>
+                            <input id="promo_countdown_label" name="promo_countdown_label" type="text" value="{{ old('promo_countdown_label', $countdownLabel) }}" class="input" placeholder="Limited time offer">
+                        </div>
                     </div>
-                    <div>
-                        <label for="promo_countdown_label" class="label">Label</label>
-                        <input id="promo_countdown_label" name="promo_countdown_label" type="text" value="{{ old('promo_countdown_label', $countdownLabel) }}" class="input" placeholder="Limited time offer">
+                    <div class="mt-4">
+                        <label for="promo_countdown_until" class="label">Offer ends at</label>
+                        <input id="promo_countdown_until" name="promo_countdown_until" type="datetime-local" value="{{ old('promo_countdown_until', $countdownUntil ? \Illuminate\Support\Carbon::parse($countdownUntil)->format('Y-m-d\TH:i') : '') }}" class="input">
                     </div>
                 </div>
-                <div class="mt-4">
-                    <label for="promo_countdown_until" class="label">Offer ends at</label>
-                    <input id="promo_countdown_until" name="promo_countdown_until" type="datetime-local" value="{{ old('promo_countdown_until', $countdownUntil ? \Illuminate\Support\Carbon::parse($countdownUntil)->format('Y-m-d\TH:i') : '') }}" class="input">
-                    <p class="mt-1 text-xs text-slate-400">A live countdown timer is shown; when it hits zero the band reads “Offer ended”.</p>
+
+                {{-- Offer #2 (optional) --}}
+                <div class="mt-4 rounded-2xl border border-dashed border-slate-300 p-4">
+                    <p class="mb-3 text-xs font-bold uppercase tracking-wide text-slate-500">Offer #2 <span class="font-medium normal-case text-slate-400">— optional</span></p>
+                    <div class="grid gap-5 sm:grid-cols-2">
+                        <div>
+                            <label for="promo_countdown_product_2" class="label">Product</label>
+                            <select id="promo_countdown_product_2" name="promo_countdown_product_2" class="input">
+                                <option value="">— None —</option>
+                                @foreach ($products as $product)
+                                    <option value="{{ $product->id }}" {{ (int) old('promo_countdown_product_2', $countdownProduct2) === $product->id ? 'selected' : '' }}>{{ $product->title }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div>
+                            <label for="promo_countdown_label_2" class="label">Label</label>
+                            <input id="promo_countdown_label_2" name="promo_countdown_label_2" type="text" value="{{ old('promo_countdown_label_2', $countdownLabel2) }}" class="input" placeholder="Flash deal">
+                        </div>
+                    </div>
+                    <div class="mt-4">
+                        <label for="promo_countdown_until_2" class="label">Offer ends at</label>
+                        <input id="promo_countdown_until_2" name="promo_countdown_until_2" type="datetime-local" value="{{ old('promo_countdown_until_2', $countdownUntil2 ? \Illuminate\Support\Carbon::parse($countdownUntil2)->format('Y-m-d\TH:i') : '') }}" class="input">
+                    </div>
                 </div>
+
+                <p class="mt-3 text-xs text-slate-400">Each offer shows a live timer; when it hits zero it reads “Offer ended”.</p>
             </div>
 
             <div class="flex justify-end">
