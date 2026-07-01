@@ -17,6 +17,7 @@ use App\Http\Controllers\Admin\SystemController as AdminSystemController;
 use App\Http\Controllers\Admin\ActivityLogController as AdminActivityLogController;
 use App\Http\Controllers\Admin\ServiceController as AdminServiceController;
 use App\Http\Controllers\Admin\CronController as AdminCronController;
+use App\Http\Controllers\Admin\ManualController as AdminManualController;
 use App\Http\Controllers\Admin\ThemeController as AdminThemeController;
 use App\Http\Controllers\Admin\TelegramController as AdminTelegramController;
 use App\Http\Controllers\Admin\TicketController as AdminTicketController;
@@ -275,6 +276,9 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
 
     // Cron jobs setup.
     Route::get('/cron', [AdminCronController::class, 'index'])->name('cron.index');
+
+    // Installation & business setup manual.
+    Route::get('/manual', [AdminManualController::class, 'index'])->name('manual.index');
 
     // Activity log (audit trail).
     Route::get('/activity', [AdminActivityLogController::class, 'index'])->name('activity.index');
