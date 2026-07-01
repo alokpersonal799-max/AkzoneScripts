@@ -18,6 +18,7 @@ use App\Http\Controllers\Admin\ActivityLogController as AdminActivityLogControll
 use App\Http\Controllers\Admin\ServiceController as AdminServiceController;
 use App\Http\Controllers\Admin\CronController as AdminCronController;
 use App\Http\Controllers\Admin\ManualController as AdminManualController;
+use App\Http\Controllers\Admin\DemoDataController as AdminDemoDataController;
 use App\Http\Controllers\Admin\ThemeController as AdminThemeController;
 use App\Http\Controllers\Admin\TelegramController as AdminTelegramController;
 use App\Http\Controllers\Admin\TicketController as AdminTicketController;
@@ -279,6 +280,10 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
 
     // Installation & business setup manual.
     Route::get('/manual', [AdminManualController::class, 'index'])->name('manual.index');
+
+    // Demonstration data tool (limited-use import / clear from the dashboard).
+    Route::post('/demo-data/import', [AdminDemoDataController::class, 'import'])->name('demo.import');
+    Route::post('/demo-data/clear', [AdminDemoDataController::class, 'clear'])->name('demo.clear');
 
     // Activity log (audit trail).
     Route::get('/activity', [AdminActivityLogController::class, 'index'])->name('activity.index');
