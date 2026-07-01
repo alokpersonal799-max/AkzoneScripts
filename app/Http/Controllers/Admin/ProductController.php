@@ -77,6 +77,7 @@ class ProductController extends Controller
         return view('admin.products.edit', [
             'product' => $product,
             'categories' => Category::orderBy('name')->get(),
+            'changelogs' => $product->changelogs()->orderByDesc('released_at')->get(),
         ]);
     }
 
@@ -89,6 +90,15 @@ class ProductController extends Controller
         $data = $this->handleUploads($request, $data, $product);
 
         $product->update($data);
+
+        // Create a changelog entry if version and notes are provided.
+        if ($request->filled('changelog_version') && $request->filled('changelog_notes')) {
+            $product->changelogs()->create([
+                'version' => $request->input('changelog_version'),
+                'notes' => $request->input('changelog_notes'),
+                'released_at' => now()->toDateString(),
+            ]);
+        }
 
         return redirect()->route('admin.products.index')
             ->with('success', '"'.$product->title.'" has been updated.');

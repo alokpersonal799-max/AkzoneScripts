@@ -202,4 +202,45 @@
             <a href="{{ route('admin.products.index') }}" class="btn-ghost btn-lg">Cancel</a>
         </div>
     </div>
+
+    {{-- Version History (only when editing) --}}
+    @if ($isEdit)
+        <div class="lg:col-span-2">
+            <div class="card p-6">
+                <h3 class="font-display text-base font-bold text-ink-900">Version History</h3>
+                <p class="mt-1 text-xs text-slate-400">Track changes and updates to this product.</p>
+
+                {{-- Existing changelog entries --}}
+                @if (isset($changelogs) && $changelogs->count())
+                    <div class="mt-4 divide-y divide-slate-100 rounded-xl border border-slate-200">
+                        @foreach ($changelogs as $entry)
+                            <div class="flex items-start gap-4 px-4 py-3">
+                                <span class="mt-0.5 inline-flex items-center rounded-lg bg-brand-50 px-2 py-0.5 text-xs font-bold text-brand-700">v{{ $entry->version }}</span>
+                                <div class="flex-1 text-sm text-slate-600">{{ $entry->notes }}</div>
+                                <span class="whitespace-nowrap text-xs text-slate-400">{{ $entry->released_at->format('M j, Y') }}</span>
+                            </div>
+                        @endforeach
+                    </div>
+                @else
+                    <p class="mt-4 text-sm text-slate-400">No changelog entries yet.</p>
+                @endif
+
+                {{-- Add new entry --}}
+                <div class="mt-5 rounded-xl border border-dashed border-slate-300 bg-slate-50 p-4">
+                    <p class="text-sm font-semibold text-ink-900">Add new version entry</p>
+                    <div class="mt-3 grid gap-4 sm:grid-cols-[200px_1fr]">
+                        <div>
+                            <label for="changelog_version" class="label">Version</label>
+                            <input id="changelog_version" name="changelog_version" type="text" placeholder="e.g. 2.1.0" class="input">
+                        </div>
+                        <div>
+                            <label for="changelog_notes" class="label">Release notes</label>
+                            <textarea id="changelog_notes" name="changelog_notes" rows="2" placeholder="What changed in this version..." class="input"></textarea>
+                        </div>
+                    </div>
+                    <p class="mt-2 text-xs text-slate-400">Fill both fields to add an entry when you save. The release date will be set to today.</p>
+                </div>
+            </div>
+        </div>
+    @endif
 </form>

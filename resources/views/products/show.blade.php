@@ -85,6 +85,34 @@
                 @endif
             </div>
 
+            {{-- Changelog / Version History --}}
+            @if ($product->changelogs->count())
+                <div class="card mt-8 p-6 sm:p-8">
+                    <h2 class="flex items-center gap-2 font-display text-xl font-bold text-ink-900">
+                        <svg class="h-5 w-5 text-brand-500" fill="none" viewBox="0 0 24 24" stroke-width="1.6" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" /></svg>
+                        Changelog
+                    </h2>
+                    <div class="mt-5 relative">
+                        {{-- Timeline line --}}
+                        <div class="absolute left-[7px] top-2 bottom-2 w-0.5 bg-slate-200"></div>
+
+                        <div class="space-y-6">
+                            @foreach ($product->changelogs as $entry)
+                                <div class="relative pl-7">
+                                    {{-- Timeline dot --}}
+                                    <span class="absolute left-0 top-1.5 h-[15px] w-[15px] rounded-full border-2 border-brand-500 bg-white"></span>
+                                    <div class="flex flex-wrap items-baseline gap-2">
+                                        <span class="inline-flex items-center rounded-lg bg-brand-50 px-2 py-0.5 text-xs font-bold text-brand-700">v{{ $entry->version }}</span>
+                                        <span class="text-xs text-slate-400">{{ $entry->released_at->format('M j, Y') }}</span>
+                                    </div>
+                                    <p class="mt-1.5 text-sm leading-relaxed text-slate-600">{{ $entry->notes }}</p>
+                                </div>
+                            @endforeach
+                        </div>
+                    </div>
+                </div>
+            @endif
+
             {{-- Reviews --}}
             <div class="card mt-8 p-6 sm:p-8">
                 <div class="flex items-center justify-between">

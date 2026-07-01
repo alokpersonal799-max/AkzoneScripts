@@ -65,7 +65,7 @@ class ProductController extends Controller
         // Increment the view counter without bumping the updated_at timestamp.
         $product->incrementQuietly('views');
 
-        $product->load(['category', 'approvedReviews.user']);
+        $product->load(['category', 'approvedReviews.user', 'changelogs' => fn ($q) => $q->orderByDesc('released_at')]);
 
         $related = Product::query()
             ->published()

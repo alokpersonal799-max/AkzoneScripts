@@ -125,6 +125,14 @@ class Product extends Model
         return $this->hasMany(OrderItem::class);
     }
 
+    /**
+     * @return HasMany<ProductChangelog>
+     */
+    public function changelogs(): HasMany
+    {
+        return $this->hasMany(ProductChangelog::class);
+    }
+
     /*
     |--------------------------------------------------------------------------
     | Query Scopes

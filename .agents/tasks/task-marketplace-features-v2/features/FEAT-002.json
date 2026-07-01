@@ -1,0 +1,30 @@
+{
+  "id": "FEAT-002",
+  "type": "feat",
+  "description": "Product Changelog/Versions system - Create product_changelogs migration/model, add changelog management to admin product edit form, display changelog on product detail page publicly, add relationship to Product model.",
+  "status": "in_progress",
+  "steps": [
+    "Create database/migrations/2024_07_01_000100_create_product_changelogs_table.php with columns: id, product_id (foreign key to products), version (string 50), notes (text), released_at (date), timestamps. Index on product_id.",
+    "Create app/Models/ProductChangelog.php with fillable [product_id, version, notes, released_at], casts for released_at as date, belongsTo Product relationship.",
+    "Add hasMany ProductChangelog relationship (changelogs()) to app/Models/Product.php",
+    "Update app/Http/Controllers/Admin/ProductController.php: In the update method, after updating the product, check if request has changelog_version and changelog_notes filled - if so, create a new ProductChangelog entry with the product's id, the provided version, notes, and released_at as today. Also pass existing changelogs to the edit view.",
+    "Add a 'Version History' card section to resources/views/admin/products/_form.blade.php (at the bottom, only shown when editing): a table/list showing existing changelog entries (version, notes, date) and input fields for adding a new version entry (changelog_version text input, changelog_notes textarea).",
+    "Add a 'Changelog' section to resources/views/products/show.blade.php - after the Description card and before the Reviews card. Show a timeline-style list of version entries (version number, date, notes). Only show if the product has changelog entries. Load changelogs in the ProductController show method.",
+    "Update app/Http/Controllers/ProductController.php show method to eager-load changelogs (ordered by released_at desc) and pass them to the view."
+  ],
+  "acceptance_criteria": [
+    "Migration file creates product_changelogs table with correct columns",
+    "ProductChangelog model passes php -l",
+    "Product model has changelogs() relationship",
+    "Admin product form has changelog section for editing",
+    "Product detail page shows changelog timeline when entries exist",
+    "ProductController passes changelogs data to show view"
+  ],
+  "verification": [
+    "Run php -l on migration file, model, and updated controllers",
+    "Verify Blade directive balance in modified _form.blade.php and show.blade.php",
+    "Grep Product.php for changelogs relationship"
+  ],
+  "blocked_reason": null,
+  "findings": ""
+}
