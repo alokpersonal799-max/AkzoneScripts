@@ -139,7 +139,7 @@
         </nav>
 
         {{-- Mobile menu --}}
-        <div x-show="open" x-cloak x-transition.origin.top class="border-t border-slate-100 bg-white md:hidden">
+        <div x-show="open" x-cloak x-transition.origin.top class="max-h-[calc(100vh-4.5rem)] overflow-y-auto overscroll-contain border-t border-slate-100 bg-white md:hidden">
             <div class="px-4 py-4">
                 {{-- Mobile search --}}
                 <form action="{{ route('products.index') }}" method="GET" class="relative mb-4">

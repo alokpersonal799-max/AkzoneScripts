@@ -5,6 +5,20 @@
 @section('admin')
     @php $sym = base_symbol(); @endphp
 
+    {{-- Toolbar --}}
+    <div class="mb-6 flex items-center justify-between gap-3">
+        <div>
+            <h1 class="font-display text-2xl font-extrabold text-ink-900">Dashboard</h1>
+            <p class="text-sm text-slate-500">Welcome back, {{ auth()->user()->name }}.</p>
+        </div>
+        <button type="button" x-data="{ spin: false }" @click="spin = true; window.location.reload()"
+                class="inline-flex flex-none items-center gap-2 rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-sm font-semibold text-slate-600 shadow-sm transition hover:border-brand-300 hover:text-brand-600"
+                title="Refresh dashboard">
+            <svg class="h-4 w-4" :class="spin && 'animate-spin'" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99" /></svg>
+            <span class="hidden sm:inline">Refresh</span>
+        </button>
+    </div>
+
     {{-- Stats --}}
     <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         @php
