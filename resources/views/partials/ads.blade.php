@@ -30,7 +30,7 @@
     @endphp
 
     @if (! empty($adsenseCode) || ! empty($metaCode) || $ads->isNotEmpty())
-        <section class="mx-auto max-w-7xl px-4 pb-12 sm:px-6 lg:px-8" aria-label="Advertisement">
+        <section class="mx-auto mt-10 max-w-7xl px-4 pb-12 sm:px-6 lg:px-8" aria-label="Advertisement">
             <div class="rounded-2xl border border-slate-200 bg-white p-5">
                 <p class="mb-4 text-center text-[11px] font-semibold uppercase tracking-widest text-slate-400">Advertisement</p>
 
