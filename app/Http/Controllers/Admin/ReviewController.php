@@ -78,6 +78,20 @@ class ReviewController extends Controller
     }
 
     /**
+     * Toggle the "Verified purchaser" badge for a review. Admin-controlled, so it
+     * can be shown for genuine buyers (any product) or hidden as needed.
+     */
+    public function toggleVerified(Review $review): RedirectResponse
+    {
+        $review->is_verified = ! $review->is_verified;
+        $review->save();
+
+        return back()->with('success', $review->is_verified
+            ? 'Marked as a verified purchaser.'
+            : 'Removed the verified purchaser badge.');
+    }
+
+    /**
      * Save (or update/remove) the admin's public reply to a review.
      */
     public function reply(Request $request, Review $review): RedirectResponse

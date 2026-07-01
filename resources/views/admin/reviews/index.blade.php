@@ -28,6 +28,9 @@
                             @if ($review->is_testimonial)
                                 <span class="chip bg-indigo-50 text-indigo-700 ring-1 ring-indigo-200">Testimonial</span>
                             @endif
+                            @if ($review->is_verified)
+                                <span class="chip bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200">✓ Verified purchaser</span>
+                            @endif
                         </div>
                         <p class="mt-1 text-sm text-slate-500">
                             on
@@ -57,6 +60,10 @@
                     <form method="POST" action="{{ route('admin.reviews.testimonial', $review) }}">
                         @csrf @method('PATCH')
                         <button class="btn-ghost btn-sm">{{ $review->is_testimonial ? 'Remove from testimonials' : 'Mark as testimonial' }}</button>
+                    </form>
+                    <form method="POST" action="{{ route('admin.reviews.verified', $review) }}">
+                        @csrf @method('PATCH')
+                        <button class="btn-ghost btn-sm {{ $review->is_verified ? 'border border-emerald-200 text-emerald-700 hover:bg-emerald-50' : '' }}">{{ $review->is_verified ? 'Remove verified badge' : 'Mark verified purchaser' }}</button>
                     </form>
                     <button type="button" @click="reply = !reply" class="btn-ghost btn-sm border border-brand-200 text-brand-600 hover:bg-brand-50">{{ $review->admin_reply ? 'Edit reply' : 'Reply' }}</button>
                     <form method="POST" action="{{ route('admin.reviews.destroy', $review) }}" onsubmit="return confirm('Delete this review?');" class="ml-auto">
