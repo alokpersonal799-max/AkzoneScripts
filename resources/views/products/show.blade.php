@@ -154,7 +154,13 @@
                                 <div class="flex items-center gap-3">
                                     <span class="flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-brand-500 to-indigo-500 text-sm font-bold text-white">{{ strtoupper(substr($review->user->name ?? 'A', 0, 1)) }}</span>
                                     <div>
-                                        <p class="text-sm font-bold text-ink-900">{{ $review->user->name ?? 'Anonymous' }}</p>
+                                        <p class="flex items-center gap-1.5 text-sm font-bold text-ink-900">
+                                            {{ $review->user->name ?? 'Anonymous' }}
+                                            <span class="inline-flex items-center gap-0.5 rounded-full bg-emerald-100 px-1.5 py-0.5 text-[10px] font-bold text-emerald-700" title="Verified purchase, approved by store">
+                                                <svg class="h-2.5 w-2.5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.704 4.153a.75.75 0 0 1 .143 1.052l-8 10.5a.75.75 0 0 1-1.127.075l-4.5-4.5a.75.75 0 0 1 1.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 0 1 1.05-.143Z" clip-rule="evenodd" /></svg>
+                                                Verified
+                                            </span>
+                                        </p>
                                         <p class="text-xs text-slate-400">{{ $review->created_at->diffForHumans() }}</p>
                                     </div>
                                 </div>

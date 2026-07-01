@@ -234,7 +234,7 @@
         $demoHidden = setting('demo_tool_hidden', '0') === '1';
     @endphp
     @if (! $demoHidden)
-        <div x-data="{ show: null }" class="mt-6 rounded-2xl border border-dashed border-amber-300 bg-amber-50/70 p-5">
+        <div x-data="{ show: @js($errors->hasAny(['admin_email', 'admin_password']) ? 'clear' : null) }" class="mt-6 rounded-2xl border border-dashed border-amber-300 bg-amber-50/70 p-5">
             <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                 <div class="flex items-start gap-3">
                     <span class="flex h-10 w-10 flex-none items-center justify-center rounded-xl bg-amber-100 text-amber-600">
@@ -275,15 +275,40 @@
                     </div>
                     {{-- Clear confirm --}}
                     <div x-show="show === 'clear'">
-                        <h3 class="font-display text-lg font-bold text-ink-900">Clear demo data?</h3>
+                        <h3 class="font-display text-lg font-bold text-ink-900">Clear demo data &amp; set up your admin</h3>
                         <div class="mt-3 rounded-xl bg-rose-50 px-4 py-3 text-sm text-rose-700">
                             <p class="font-semibold">This cannot be undone</p>
-                            <p class="mt-1">Removes all sample products, categories, reviews, services, pages, adverts and demo accounts. Your own admin account is kept. You can clear demo data as many times as you like.</p>
+                            <p class="mt-1">Removes all sample products, categories, reviews, services, pages, adverts and demo accounts.</p>
                         </div>
-                        <div class="mt-5 flex justify-end gap-2">
-                            <button type="button" @click="show = null" class="btn-ghost btn-md">Cancel</button>
-                            <form method="POST" action="{{ route('admin.demo.clear') }}">@csrf<button type="submit" class="btn-md rounded-xl bg-rose-600 font-semibold text-white hover:bg-rose-700">Yes, clear demo data</button></form>
+                        <div class="mt-3 rounded-xl bg-amber-50 px-4 py-3 text-sm text-amber-800">
+                            <p>You're switching to <strong>real business use</strong>. The demo login is public, so set your <strong>own admin email &amp; password</strong> now. You can change them later in Settings — but <strong>don't forget them</strong>: if lost, you'd have to reinstall the script.</p>
                         </div>
+                        <form method="POST" action="{{ route('admin.demo.clear') }}" class="mt-4 space-y-3">
+                            @csrf
+                            <div>
+                                <label class="text-xs font-semibold text-slate-600">Your admin email</label>
+                                <input type="email" name="admin_email" required value="{{ old('admin_email', auth()->user()->email) }}"
+                                       class="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2 text-sm focus:border-brand-500 focus:outline-none focus:ring-4 focus:ring-brand-500/10">
+                                @error('admin_email')<p class="mt-1 text-xs text-rose-600">{{ $message }}</p>@enderror
+                            </div>
+                            <div class="grid gap-3 sm:grid-cols-2">
+                                <div>
+                                    <label class="text-xs font-semibold text-slate-600">New password</label>
+                                    <input type="password" name="admin_password" required minlength="8" autocomplete="new-password"
+                                           class="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2 text-sm focus:border-brand-500 focus:outline-none focus:ring-4 focus:ring-brand-500/10">
+                                    @error('admin_password')<p class="mt-1 text-xs text-rose-600">{{ $message }}</p>@enderror
+                                </div>
+                                <div>
+                                    <label class="text-xs font-semibold text-slate-600">Confirm password</label>
+                                    <input type="password" name="admin_password_confirmation" required minlength="8" autocomplete="new-password"
+                                           class="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2 text-sm focus:border-brand-500 focus:outline-none focus:ring-4 focus:ring-brand-500/10">
+                                </div>
+                            </div>
+                            <div class="flex justify-end gap-2 pt-1">
+                                <button type="button" @click="show = null" class="btn-ghost btn-md">Cancel</button>
+                                <button type="submit" class="btn-md rounded-xl bg-rose-600 font-semibold text-white hover:bg-rose-700">Clear &amp; save admin</button>
+                            </div>
+                        </form>
                     </div>
                     {{-- Hide permanently confirm --}}
                     <div x-show="show === 'hide'">

@@ -15,8 +15,10 @@ use App\Models\Setting;
 use App\Models\TelegramBot;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Schema;
 use Throwable;
 
@@ -65,14 +67,37 @@ class DemoDataController extends Controller
 
     /**
      * Remove the demonstration content from the store. May be used any number of times.
+     * Because demo logins are public, the admin must set their own real email &
+     * password here so the store is secure for business use.
      */
-    public function clear(): RedirectResponse
+    public function clear(Request $request): RedirectResponse
     {
         if ($this->isHidden()) {
             return back()->with('error', 'The demo data tool has been permanently hidden.');
         }
 
+        $data = $request->validate([
+            'admin_email' => ['required', 'email', 'max:255'],
+            'admin_password' => ['required', 'string', 'min:8', 'confirmed'],
+        ], [], [
+            'admin_email' => 'admin email',
+            'admin_password' => 'admin password',
+        ]);
+
+        $current = Auth::user();
+
         try {
+            // 1) Convert the current account into the real admin (own email + password).
+            //    This happens first so it is excluded from the demo-account cleanup below.
+            if ($current) {
+                $current->forceFill([
+                    'email' => $data['admin_email'],
+                    'password' => Hash::make($data['admin_password']),
+                    'role' => 'admin',
+                ])->save();
+            }
+
+            // 2) Delete demo content.
             $this->safeDelete(fn () => ProductChangelog::query()->delete(), 'product_changelogs');
             $this->safeDelete(fn () => Review::query()->delete(), 'reviews');
             $this->safeDelete(fn () => Product::query()->delete(), 'products');
@@ -83,24 +108,30 @@ class DemoDataController extends Controller
             $this->safeDelete(fn () => Page::query()->delete(), 'pages');
             $this->safeDelete(fn () => TelegramBot::query()->delete(), 'telegram_bots');
 
-            // Remove seeded demo accounts, but never the admin performing this action.
+            // 3) Remove seeded demo accounts, but never the admin performing this action.
             $this->safeDelete(function () {
                 User::whereIn('email', self::DEMO_EMAILS)
                     ->where('id', '!=', Auth::id())
                     ->delete();
             }, 'users');
 
-            // Turn off promo/popup that referenced now-deleted demo products, and
-            // leave demonstration mode so the credit/demo badges disappear.
+            // 4) Turn off promo/popup that referenced now-deleted demo products, and
+            //    leave demonstration mode so the credit/demo badges disappear.
             foreach (['hero_promo_enabled', 'popup_enabled', 'announcement_enabled'] as $flag) {
                 Setting::put($flag, '0', 'promotion');
             }
             Setting::put('demo_mode', '0', 'general');
+
+            // 5) Keep the current session authenticated after the password change.
+            if ($current) {
+                Auth::login($current->fresh());
+                $request->session()->regenerate();
+            }
         } catch (Throwable $e) {
             return back()->with('error', 'Could not clear demo data: '.$e->getMessage());
         }
 
-        return back()->with('success', 'Demo data cleared. Your store is now clean and ready for business.');
+        return back()->with('success', 'Demo data cleared and your admin login updated. Your store is now clean and ready for business. Remember your new email & password — keep them safe!');
     }
 
     /**
