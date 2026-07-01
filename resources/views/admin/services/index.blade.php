@@ -11,6 +11,19 @@
     <a href="{{ route('admin.services.create') }}" class="btn-primary btn-md">Add service</a>
 </div>
 
+{{-- Visibility toggle --}}
+<form method="POST" action="{{ route('admin.services.settings') }}" class="card mb-6 flex items-center justify-between gap-4 p-5">
+    @csrf @method('PUT')
+    <div>
+        <p class="font-semibold text-ink-900">Show Services on the site</p>
+        <p class="mt-0.5 text-sm text-slate-500">When off, the Services nav link is hidden and the page shows a "coming soon" message.</p>
+    </div>
+    <label class="relative inline-flex cursor-pointer items-center">
+        <input type="checkbox" name="services_enabled" value="1" {{ $servicesEnabled ? 'checked' : '' }} class="peer sr-only" onchange="this.form.submit()">
+        <div class="peer h-6 w-11 rounded-full bg-slate-200 after:absolute after:left-[2px] after:top-[2px] after:h-5 after:w-5 after:rounded-full after:bg-white after:transition-all after:content-[''] peer-checked:bg-brand-500 peer-checked:after:translate-x-full"></div>
+    </label>
+</form>
+
 <div class="card overflow-hidden">
     <div class="divide-y divide-slate-100">
         @forelse ($services as $service)

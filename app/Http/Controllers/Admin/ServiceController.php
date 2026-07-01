@@ -16,7 +16,18 @@ class ServiceController extends Controller
     {
         return view('admin.services.index', [
             'services' => Service::orderBy('sort_order')->orderBy('name')->get(),
+            'servicesEnabled' => \App\Models\Setting::get('services_enabled', '1') === '1',
         ]);
+    }
+
+    /**
+     * Toggle global visibility of the Services page + nav link.
+     */
+    public function settings(Request $request): RedirectResponse
+    {
+        \App\Models\Setting::put('services_enabled', $request->boolean('services_enabled') ? '1' : '0', 'general');
+
+        return back()->with('success', 'Services visibility updated.');
     }
 
     public function create(): View

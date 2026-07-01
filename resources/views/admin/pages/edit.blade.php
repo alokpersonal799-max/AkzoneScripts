@@ -32,6 +32,17 @@
             <p class="mt-1.5 text-xs text-slate-400" x-show="contentType === 'html'">Raw HTML, CSS, and JavaScript will be rendered exactly as entered.</p>
         </div>
 
+        {{-- Page style --}}
+        <div>
+            <label for="layout" class="label">Page style</label>
+            <select id="layout" name="layout" x-model="layout" class="input sm:max-w-xs">
+                <option value="card">Standard (boxed card)</option>
+                <option value="wide">Wide (roomy, for rich pages)</option>
+                <option value="plain">Minimal (no card, full-bleed content)</option>
+            </select>
+            <p class="mt-1.5 text-xs text-slate-400">Controls how the page is framed on the public site.</p>
+        </div>
+
         {{-- Title --}}
         <div>
             <label for="title" class="label">Title</label>

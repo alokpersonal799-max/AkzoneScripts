@@ -271,6 +271,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::get('/cron', [AdminCronController::class, 'index'])->name('cron.index');
 
     // Services management.
+    Route::put('/services/settings', [AdminServiceController::class, 'settings'])->name('services.settings');
     Route::resource('services', AdminServiceController::class)->except('show');
     Route::post('/system/clear-error-log', [AdminSystemController::class, 'clearErrorLog'])->name('system.error-log.clear');
 

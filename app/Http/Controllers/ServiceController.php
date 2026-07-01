@@ -17,8 +17,12 @@ class ServiceController extends Controller
      */
     public function index(): View
     {
+        $enabled = setting('services_enabled', '1') === '1';
+
         return view('services.index', [
-            'services' => Service::active()->orderBy('sort_order')->orderBy('name')->get(),
+            'services' => $enabled
+                ? Service::active()->orderBy('sort_order')->orderBy('name')->get()
+                : collect(),
         ]);
     }
 
