@@ -2,7 +2,7 @@
   "id": "FEAT-003",
   "type": "feat",
   "description": "Custom Pages Redesign - Update admin page editor to support raw HTML/CSS/JS content (code editor textarea), add pre-designed page templates (Privacy Policy, Refund Policy, Terms of Service, About Us, FAQ, Contact Info) that admin can select when creating, add page preview functionality, modernize the public page rendering with nice typography and layout.",
-  "status": "in_progress",
+  "status": "completed",
   "steps": [
     "Update resources/views/admin/pages/edit.blade.php to: (a) Replace the simple textarea with a monospace code editor textarea that supports HTML/CSS/JS, with a note that raw HTML is fully supported. (b) Add a 'content_type' radio toggle at top: 'visual' (plain text with nl2br rendering) vs 'html' (raw HTML rendered as-is). (c) When creating a new page (not editing), show a 'Start from template' dropdown/selector with options: Blank, Privacy Policy, Refund Policy, Terms of Service, About Us, FAQ, Contact Info. (d) Add Alpine.js logic to populate the content textarea with the selected template's pre-built HTML content. (e) Add a 'Preview' button that opens a modal or new tab showing how the page will look. (f) Store content_type in a hidden field.",
     "Update app/Models/Page.php to add 'content_type' to fillable array (values: 'text' or 'html', default 'text').",
@@ -30,5 +30,5 @@
     "Grep Page.php for content_type in fillable"
   ],
   "blocked_reason": null,
-  "findings": ""
+  "findings": "All PHP files pass php -l. Blade directives balanced. Preview route uses POST method at admin/pages/preview. Template JS is in a separate partial (_templates_js.blade.php) included from edit.blade.php. The content_type hidden input syncs with Alpine.js x-model. Route is registered after the resource route to avoid conflicts."
 }
