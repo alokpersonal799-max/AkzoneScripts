@@ -27,7 +27,48 @@ class ReviewController extends Controller
             'reviews' => $reviews,
             'filter' => $filter,
             'pendingCount' => Review::where('is_approved', false)->count(),
+            'stats' => [
+                'total' => Review::count(),
+                'pending' => Review::where('is_approved', false)->count(),
+                'approved' => Review::where('is_approved', true)->count(),
+                'verified' => Review::where('is_verified', true)->count(),
+                'testimonials' => Review::where('is_testimonial', true)->count(),
+            ],
         ]);
+    }
+
+    /**
+     * Apply an action to many reviews at once.
+     */
+    public function bulk(Request $request): RedirectResponse
+    {
+        $data = $request->validate([
+            'action' => ['required', 'in:approve,unapprove,verify,unverify,testimonial,untestimonial,delete'],
+            'ids' => ['required', 'string'],
+        ]);
+
+        $ids = array_filter(array_map('intval', explode(',', $data['ids'])));
+
+        if (empty($ids)) {
+            return back()->with('error', 'No reviews selected.');
+        }
+
+        // Operate per-model so the product rating/count is recalculated correctly.
+        $reviews = Review::whereIn('id', $ids)->get();
+
+        foreach ($reviews as $review) {
+            match ($data['action']) {
+                'approve' => $review->update(['is_approved' => true]),
+                'unapprove' => $review->update(['is_approved' => false, 'is_testimonial' => false]),
+                'verify' => $review->update(['is_verified' => true]),
+                'unverify' => $review->update(['is_verified' => false]),
+                'testimonial' => $review->update(['is_approved' => true, 'is_testimonial' => true]),
+                'untestimonial' => $review->update(['is_testimonial' => false]),
+                'delete' => $review->delete(),
+            };
+        }
+
+        return back()->with('success', 'Bulk action applied to '.$reviews->count().' review(s).');
     }
 
     /**

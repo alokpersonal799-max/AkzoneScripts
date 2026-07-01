@@ -257,6 +257,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::patch('/reviews/{review}/unapprove', [AdminReviewController::class, 'unapprove'])->name('reviews.unapprove');
     Route::patch('/reviews/{review}/testimonial', [AdminReviewController::class, 'toggleTestimonial'])->name('reviews.testimonial');
     Route::patch('/reviews/{review}/verified', [AdminReviewController::class, 'toggleVerified'])->name('reviews.verified');
+    Route::post('/reviews/bulk', [AdminReviewController::class, 'bulk'])->name('reviews.bulk');
     Route::patch('/reviews/{review}/reply', [AdminReviewController::class, 'reply'])->name('reviews.reply');
     Route::delete('/reviews/{review}', [AdminReviewController::class, 'destroy'])->name('reviews.destroy');
 

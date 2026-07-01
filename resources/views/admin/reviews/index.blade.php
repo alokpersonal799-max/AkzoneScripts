@@ -3,6 +3,23 @@
 @section('page-title', 'Reviews')
 
 @section('admin')
+    {{-- Stats --}}
+    <div class="mb-6 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">
+        @foreach ([
+            ['Total reviews', $stats['total'], 'slate'],
+            ['Pending', $stats['pending'], 'amber'],
+            ['Approved', $stats['approved'], 'emerald'],
+            ['Verified', $stats['verified'], 'brand'],
+            ['Testimonials', $stats['testimonials'], 'indigo'],
+        ] as $s)
+            <div class="card p-4">
+                <p class="text-xs font-semibold uppercase tracking-wide text-slate-400">{{ $s[0] }}</p>
+                <p class="mt-1 font-display text-2xl font-extrabold text-{{ $s[2] }}-600">{{ number_format($s[1]) }}</p>
+            </div>
+        @endforeach
+    </div>
+
+    <div x-data="{ selected: [], allIds: @js($reviews->pluck('id')->values()) }">
     <div class="mb-6 flex flex-wrap items-center gap-2">
         @foreach (['' => 'All', 'pending' => 'Pending', 'approved' => 'Approved', 'testimonials' => 'Testimonials'] as $key => $label)
             <a href="{{ route('admin.reviews.index', $key ? ['filter' => $key] : []) }}"
@@ -10,13 +27,42 @@
                 {{ $label }}@if ($key === 'pending' && $pendingCount) <span class="ml-1 rounded-full bg-amber-400 px-1.5 text-xs text-white">{{ $pendingCount }}</span>@endif
             </a>
         @endforeach
+
+        <label class="ml-auto flex items-center gap-2 text-sm text-slate-500">
+            <input type="checkbox" @change="selected = $event.target.checked ? [...allIds] : []" :checked="selected.length && selected.length === allIds.length" class="rounded border-slate-300 text-brand-600 focus:ring-brand-500">
+            Select all
+        </label>
+    </div>
+
+    {{-- Bulk action bar --}}
+    <div x-show="selected.length" x-cloak class="mb-4 flex flex-wrap items-center gap-3 rounded-xl border border-brand-200 bg-brand-50 px-4 py-3">
+        <span class="text-sm font-semibold text-brand-700"><span x-text="selected.length"></span> selected</span>
+        <form method="POST" action="{{ route('admin.reviews.bulk') }}" class="flex flex-wrap items-center gap-2"
+              @submit="if (document.querySelector('#bulk-action').value === 'delete' && !confirm('Delete ' + selected.length + ' review(s)? This cannot be undone.')) $event.preventDefault();">
+            @csrf
+            <input type="hidden" name="ids" :value="selected.join(',')">
+            <select id="bulk-action" name="action" class="rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-sm">
+                <option value="approve">Approve</option>
+                <option value="unapprove">Unapprove</option>
+                <option value="verify">Mark verified purchaser</option>
+                <option value="unverify">Remove verified badge</option>
+                <option value="testimonial">Mark as testimonial</option>
+                <option value="untestimonial">Remove testimonial</option>
+                <option value="delete">Delete</option>
+            </select>
+            <button type="submit" class="btn-primary btn-sm">Apply</button>
+        </form>
+        <button type="button" @click="selected = []" class="text-sm font-semibold text-slate-500 hover:text-ink-900">Clear</button>
     </div>
 
     <div class="space-y-4">
         @forelse ($reviews as $review)
-            <div class="card p-5" x-data="{ reply: false }">
+            @php $genuine = $review->product && ! $review->product->is_free && $review->user && $review->user->hasPurchased($review->product_id); @endphp
+            <div class="card p-5" x-data="{ reply: false }" :class="selected.includes({{ $review->id }}) && 'ring-2 ring-brand-500/40'">
                 <div class="flex flex-wrap items-start justify-between gap-3">
-                    <div class="min-w-0">
+                    <div class="flex min-w-0 gap-3">
+                        <input type="checkbox" value="{{ $review->id }}" x-model.number="selected" class="mt-1 h-4 w-4 flex-none rounded border-slate-300 text-brand-600 focus:ring-brand-500">
+                        <div class="min-w-0">
                         <div class="flex flex-wrap items-center gap-2">
                             <x-star-rating :rating="$review->rating" size="h-4 w-4" />
                             <span class="font-semibold text-ink-900">{{ $review->user->name ?? 'User' }}</span>
@@ -30,6 +76,12 @@
                             @endif
                             @if ($review->is_verified)
                                 <span class="chip bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200">✓ Verified purchaser</span>
+                            @endif
+                            @if ($genuine)
+                                <span class="inline-flex items-center gap-1 rounded-full bg-gradient-to-r from-emerald-500 to-teal-500 px-2 py-0.5 text-[11px] font-bold text-white shadow-sm" title="This reviewer genuinely purchased this paid product">
+                                    <svg class="h-3 w-3" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.704 4.153a.75.75 0 0 1 .143 1.052l-8 10.5a.75.75 0 0 1-1.127.075l-4.5-4.5a.75.75 0 0 1 1.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 0 1 1.05-.143Z" clip-rule="evenodd" /></svg>
+                                    Genuine paid buyer
+                                </span>
                             @endif
                         </div>
                         <p class="mt-1 text-sm text-slate-500">
@@ -48,6 +100,7 @@
                                 <p class="mt-0.5 text-slate-600">{{ $review->admin_reply }}</p>
                             </div>
                         @endif
+                        </div>
                     </div>
                 </div>
 
@@ -94,4 +147,5 @@
     </div>
 
     <div class="mt-6">{{ $reviews->links() }}</div>
+    </div>
 @endsection
