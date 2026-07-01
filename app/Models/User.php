@@ -26,6 +26,8 @@ class User extends Authenticatable
         'is_banned',
         'avatar',
         'bio',
+        'phone',
+        'phone_country',
         'last_login_at',
         'last_login_ip',
     ];
@@ -61,6 +63,41 @@ class User extends Authenticatable
     public function isAdmin(): bool
     {
         return $this->role === 'admin';
+    }
+
+    /**
+     * The user's avatar URL. Falls back to an auto-generated initials avatar
+     * (inline SVG) so every user always has a nice profile picture — even
+     * with no uploaded image and no internet connection.
+     */
+    public function getAvatarUrlAttribute(): string
+    {
+        if ($this->avatar) {
+            return \Illuminate\Support\Facades\Storage::disk('public')->url($this->avatar);
+        }
+
+        $initial = strtoupper(mb_substr(trim((string) $this->name) ?: 'U', 0, 1));
+        $palette = ['#2563eb', '#7c3aed', '#db2777', '#059669', '#ea580c', '#0891b2', '#d946ef', '#f59e0b'];
+        $bg = $palette[abs(crc32((string) ($this->email ?: $this->name ?: 'u'))) % count($palette)];
+
+        $svg = '<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128">'
+            .'<rect width="128" height="128" rx="28" fill="'.$bg.'"/>'
+            .'<text x="64" y="64" dy=".12em" font-family="Arial,Helvetica,sans-serif" font-size="60" font-weight="700" fill="#ffffff" text-anchor="middle" dominant-baseline="middle">'.htmlspecialchars($initial, ENT_QUOTES).'</text>'
+            .'</svg>';
+
+        return 'data:image/svg+xml;base64,'.base64_encode($svg);
+    }
+
+    /**
+     * The full phone number including country dial code, if set.
+     */
+    public function getFullPhoneAttribute(): ?string
+    {
+        if (! $this->phone) {
+            return null;
+        }
+
+        return trim(($this->phone_country ? $this->phone_country.' ' : '').$this->phone);
     }
 
     /**

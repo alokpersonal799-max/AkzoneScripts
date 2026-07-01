@@ -130,6 +130,8 @@ class DemoSeeder extends Seeder
                 'name' => 'Demo Customer',
                 'password' => \Illuminate\Support\Facades\Hash::make('password'),
                 'role' => 'user',
+                'phone' => '9876543210',
+                'phone_country' => '+91',
                 'email_verified_at' => now(),
                 'last_login_at' => now()->subHours(3),
                 'last_login_ip' => '127.0.0.1',

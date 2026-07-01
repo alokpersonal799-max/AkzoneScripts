@@ -10,6 +10,22 @@
 
         <div><label for="manual_upi_id" class="label">UPI ID</label><input id="manual_upi_id" name="manual_upi_id" type="text" value="{{ old('manual_upi_id', setting('manual_upi_id')) }}" class="input" placeholder="yourname@bank"></div>
 
+        {{-- Per-method visibility toggles --}}
+        <div class="grid gap-3 rounded-xl border border-slate-200 p-4 sm:grid-cols-3">
+            <label class="flex items-center gap-2 text-sm font-semibold text-ink-900">
+                <input type="checkbox" name="manual_upi_enabled" value="1" {{ setting('manual_upi_enabled', '1') === '1' ? 'checked' : '' }} class="rounded border-slate-300 text-brand-600 focus:ring-brand-500/30">
+                Show UPI / QR
+            </label>
+            <label class="flex items-center gap-2 text-sm font-semibold text-ink-900">
+                <input type="checkbox" name="manual_bank_enabled" value="1" {{ setting('manual_bank_enabled', '1') === '1' ? 'checked' : '' }} class="rounded border-slate-300 text-brand-600 focus:ring-brand-500/30">
+                Show Bank
+            </label>
+            <label class="flex items-center gap-2 text-sm font-semibold text-ink-900">
+                <input type="checkbox" name="manual_crypto_enabled" value="1" {{ setting('manual_crypto_enabled', '1') === '1' ? 'checked' : '' }} class="rounded border-slate-300 text-brand-600 focus:ring-brand-500/30">
+                Show Crypto
+            </label>
+        </div>
+
         <div class="flex items-center gap-4">
             <span class="flex h-20 w-20 items-center justify-center overflow-hidden rounded-xl bg-slate-100">
                 @if (setting('manual_qr'))
@@ -25,6 +41,21 @@
         </div>
 
         <div><label for="manual_bank_details" class="label">Bank details</label><textarea id="manual_bank_details" name="manual_bank_details" rows="3" class="input" placeholder="Account name, number, IFSC/SWIFT, bank name...">{{ old('manual_bank_details', setting('manual_bank_details')) }}</textarea></div>
+
+        {{-- Crypto QR --}}
+        <div class="flex items-center gap-4">
+            <span class="flex h-20 w-20 items-center justify-center overflow-hidden rounded-xl bg-slate-100">
+                @if (setting('manual_crypto_qr'))
+                    <img src="{{ \Illuminate\Support\Facades\Storage::disk('public')->url(setting('manual_crypto_qr')) }}" alt="Crypto QR" class="h-full w-full object-contain">
+                @else
+                    <span class="text-xs text-slate-400">QR</span>
+                @endif
+            </span>
+            <div>
+                <label for="manual_crypto_qr" class="label">Crypto QR code <span class="text-slate-400">(optional)</span></label>
+                <input id="manual_crypto_qr" name="manual_crypto_qr" type="file" accept="image/*" class="block text-sm text-slate-500 file:mr-3 file:rounded-lg file:border-0 file:bg-brand-50 file:px-3 file:py-1.5 file:text-sm file:font-semibold file:text-brand-600 hover:file:bg-brand-100">
+            </div>
+        </div>
 
         {{-- Crypto wallets (repeatable) --}}
         <div>

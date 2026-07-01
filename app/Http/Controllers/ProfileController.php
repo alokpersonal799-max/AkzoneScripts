@@ -32,6 +32,8 @@ class ProfileController extends Controller
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'email', 'max:255', 'unique:users,email,'.$user->id],
             'bio' => ['nullable', 'string', 'max:1000'],
+            'phone' => ['nullable', 'string', 'max:30'],
+            'phone_country' => ['nullable', 'string', 'max:8'],
             'avatar' => ['nullable', 'image', 'max:2048'],
         ]);
 

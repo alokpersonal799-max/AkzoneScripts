@@ -242,6 +242,7 @@ class SettingController extends Controller
             'manual_upi_id' => ['nullable', 'string', 'max:255'],
             'manual_bank_details' => ['nullable', 'string', 'max:2000'],
             'manual_qr' => ['nullable', 'image', 'max:2048'],
+            'manual_crypto_qr' => ['nullable', 'image', 'max:2048'],
             'crypto_label' => ['nullable', 'array'],
             'crypto_label.*' => ['nullable', 'string', 'max:100'],
             'crypto_address' => ['nullable', 'array'],
@@ -255,6 +256,19 @@ class SettingController extends Controller
             }
             Setting::put('manual_qr', $request->file('manual_qr')->store('branding', 'public'), 'manual');
         }
+
+        if ($request->hasFile('manual_crypto_qr')) {
+            $existing = Setting::get('manual_crypto_qr');
+            if ($existing) {
+                Storage::disk('public')->delete($existing);
+            }
+            Setting::put('manual_crypto_qr', $request->file('manual_crypto_qr')->store('branding', 'public'), 'manual');
+        }
+
+        // Per-method visibility toggles.
+        Setting::put('manual_upi_enabled', $request->boolean('manual_upi_enabled') ? '1' : '0', 'manual');
+        Setting::put('manual_bank_enabled', $request->boolean('manual_bank_enabled') ? '1' : '0', 'manual');
+        Setting::put('manual_crypto_enabled', $request->boolean('manual_crypto_enabled') ? '1' : '0', 'manual');
 
         // Build the crypto wallet list from paired label/address inputs.
         $crypto = [];

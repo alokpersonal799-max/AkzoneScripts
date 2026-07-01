@@ -15,17 +15,14 @@
                 @method('PATCH')
 
                 <div class="flex items-center gap-4">
-                    <span class="flex h-16 w-16 items-center justify-center overflow-hidden rounded-2xl bg-gradient-to-br from-brand-500 to-indigo-500 text-2xl font-bold text-white">
-                        @if ($user->avatar)
-                            <img src="{{ \Illuminate\Support\Facades\Storage::disk('public')->url($user->avatar) }}" alt="avatar" class="h-full w-full object-cover">
-                        @else
-                            {{ strtoupper(substr($user->name, 0, 1)) }}
-                        @endif
+                    <span class="h-16 w-16 flex-shrink-0 overflow-hidden rounded-2xl">
+                        <img src="{{ $user->avatar_url }}" alt="avatar" class="h-full w-full object-cover">
                     </span>
                     <div>
                         <label for="avatar" class="label">Profile photo</label>
                         <input id="avatar" name="avatar" type="file" accept="image/*"
                                class="block text-sm text-slate-500 file:mr-3 file:rounded-lg file:border-0 file:bg-brand-50 file:px-3 file:py-1.5 file:text-sm file:font-semibold file:text-brand-600 hover:file:bg-brand-100">
+                        <p class="mt-1 text-xs text-slate-400">Leave empty to use your auto-generated avatar.</p>
                     </div>
                 </div>
 
@@ -37,6 +34,16 @@
                     <div>
                         <label for="email" class="label">Email</label>
                         <input id="email" name="email" type="email" value="{{ old('email', $user->email) }}" required class="input">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="label">Mobile number</label>
+                    <div class="flex gap-2">
+                        <select name="phone_country" class="input w-40 flex-shrink-0">
+                            @include('partials.country-codes', ['selected' => old('phone_country', $user->phone_country)])
+                        </select>
+                        <input name="phone" type="tel" value="{{ old('phone', $user->phone) }}" class="input" placeholder="Phone number">
                     </div>
                 </div>
 

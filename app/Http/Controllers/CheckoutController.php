@@ -51,9 +51,13 @@ class CheckoutController extends Controller
         return [
             'instructions' => setting('manual_instructions'),
             'upi' => setting('manual_upi_id'),
+            'upi_enabled' => setting('manual_upi_enabled', '1') === '1',
             'qr' => setting('manual_qr') ? \Illuminate\Support\Facades\Storage::disk('public')->url(setting('manual_qr')) : null,
             'bank' => setting('manual_bank_details'),
+            'bank_enabled' => setting('manual_bank_enabled', '1') === '1',
             'crypto' => json_decode(setting('manual_crypto', '[]'), true) ?: [],
+            'crypto_enabled' => setting('manual_crypto_enabled', '1') === '1',
+            'crypto_qr' => setting('manual_crypto_qr') ? \Illuminate\Support\Facades\Storage::disk('public')->url(setting('manual_crypto_qr')) : null,
         ];
     }
 
@@ -125,6 +129,8 @@ class CheckoutController extends Controller
         $validated = $request->validate([
             'billing_name' => ['required', 'string', 'max:255'],
             'billing_email' => ['required', 'email', 'max:255'],
+            'billing_phone' => ['nullable', 'string', 'max:30'],
+            'billing_phone_country' => ['nullable', 'string', 'max:8'],
             'payment_method' => ['required', 'in:'.implode(',', array_keys($methods))],
             'transaction_id' => ['required_if:payment_method,manual', 'nullable', 'string', 'max:255'],
             'payment_proof' => ['required_if:payment_method,manual', 'nullable', 'image', 'max:5120'],
@@ -166,6 +172,7 @@ class CheckoutController extends Controller
                 'payment_proof' => $proofPath,
                 'billing_name' => $validated['billing_name'],
                 'billing_email' => $validated['billing_email'],
+                'billing_phone' => trim((($validated['billing_phone_country'] ?? '').' '.($validated['billing_phone'] ?? ''))) ?: null,
                 'paid_at' => $isManual ? null : now(),
             ]);
 
