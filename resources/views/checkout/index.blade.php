@@ -59,111 +59,119 @@
                             $firstManual = $mUpi ? 'upi' : ($mBank ? 'bank' : ($mCrypto ? 'crypto' : ''));
                         @endphp
                         <div x-show="method === 'manual'" x-cloak class="mt-5"
-                             x-data="{ sub: '{{ $firstManual }}', secs: 600, timer: null,
+                             x-data="{ sub: '', started: false, secs: 600, timer: null,
+                                       choose(m){ this.sub = m; if (! this.started) { this.started = true; this.start(); } },
                                        start(){ this.secs = 600; clearInterval(this.timer); this.timer = setInterval(() => { if (this.secs > 0) this.secs--; else clearInterval(this.timer); }, 1000); },
                                        get mm(){ return String(Math.floor(this.secs/60)).padStart(2,'0'); },
                                        get ss(){ return String(this.secs%60).padStart(2,'0'); },
-                                       get expired(){ return this.secs <= 0; } }"
-                             x-init="start()">
+                                       get expired(){ return this.secs <= 0; } }">
 
                             @if ($firstManual === '')
                                 <p class="rounded-xl bg-amber-50 px-4 py-3 text-sm text-amber-700">No manual payment methods are configured yet. Please contact support.</p>
                             @else
                                 @if ($manual['instructions'])<p class="mb-3 text-sm text-slate-600">{{ $manual['instructions'] }}</p>@endif
 
+                                <p class="mb-2 text-sm font-semibold text-ink-900">Choose how you'd like to pay:</p>
+
                                 {{-- Method chooser --}}
                                 <div class="grid grid-cols-3 gap-2">
                                     @if ($mUpi)
-                                        <button type="button" @click="sub='upi'" :class="sub==='upi' ? 'border-brand-500 bg-brand-50 text-brand-700' : 'border-slate-200 text-slate-600 hover:bg-slate-50'" class="flex flex-col items-center gap-1 rounded-xl border-2 px-3 py-3 text-xs font-bold transition">
+                                        <button type="button" @click="choose('upi')" :class="sub==='upi' ? 'border-brand-500 bg-brand-50 text-brand-700' : 'border-slate-200 text-slate-600 hover:bg-slate-50'" class="flex flex-col items-center gap-1 rounded-xl border-2 px-3 py-3 text-xs font-bold transition">
                                             <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke-width="1.6" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 4.875c0-.621.504-1.125 1.125-1.125h4.5c.621 0 1.125.504 1.125 1.125v4.5c0 .621-.504 1.125-1.125 1.125h-4.5A1.125 1.125 0 0 1 3.75 9.375v-4.5ZM3.75 14.625c0-.621.504-1.125 1.125-1.125h4.5c.621 0 1.125.504 1.125 1.125v4.5c0 .621-.504 1.125-1.125 1.125h-4.5a1.125 1.125 0 0 1-1.125-1.125v-4.5ZM13.5 4.875c0-.621.504-1.125 1.125-1.125h4.5c.621 0 1.125.504 1.125 1.125v4.5c0 .621-.504 1.125-1.125 1.125h-4.5A1.125 1.125 0 0 1 13.5 9.375v-4.5Z" /></svg>
                                             UPI / QR
                                         </button>
                                     @endif
                                     @if ($mBank)
-                                        <button type="button" @click="sub='bank'" :class="sub==='bank' ? 'border-brand-500 bg-brand-50 text-brand-700' : 'border-slate-200 text-slate-600 hover:bg-slate-50'" class="flex flex-col items-center gap-1 rounded-xl border-2 px-3 py-3 text-xs font-bold transition">
+                                        <button type="button" @click="choose('bank')" :class="sub==='bank' ? 'border-brand-500 bg-brand-50 text-brand-700' : 'border-slate-200 text-slate-600 hover:bg-slate-50'" class="flex flex-col items-center gap-1 rounded-xl border-2 px-3 py-3 text-xs font-bold transition">
                                             <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke-width="1.6" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3 21h18M3 10h18M5 6l7-3 7 3M4 10v11m16-11v11M8 14v3m4-3v3m4-3v3" /></svg>
                                             Bank
                                         </button>
                                     @endif
                                     @if ($mCrypto)
-                                        <button type="button" @click="sub='crypto'" :class="sub==='crypto' ? 'border-brand-500 bg-brand-50 text-brand-700' : 'border-slate-200 text-slate-600 hover:bg-slate-50'" class="flex flex-col items-center gap-1 rounded-xl border-2 px-3 py-3 text-xs font-bold transition">
+                                        <button type="button" @click="choose('crypto')" :class="sub==='crypto' ? 'border-brand-500 bg-brand-50 text-brand-700' : 'border-slate-200 text-slate-600 hover:bg-slate-50'" class="flex flex-col items-center gap-1 rounded-xl border-2 px-3 py-3 text-xs font-bold transition">
                                             <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke-width="1.6" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18Zm-2.25-9h4.5m-4.5 0V8.25m0 3.75v3.75m4.5-3.75V8.25m0 3.75v3.75M9 7.5h4.125a1.875 1.875 0 0 1 0 3.75H9m0 0h4.5a1.875 1.875 0 0 1 0 3.75H9" /></svg>
                                             Crypto
                                         </button>
                                     @endif
                                 </div>
 
-                                {{-- Countdown --}}
-                                <div class="mt-4 flex items-center justify-between rounded-xl border px-4 py-3"
-                                     :class="expired ? 'border-rose-200 bg-rose-50' : 'border-amber-200 bg-amber-50'">
-                                    <span class="text-sm font-semibold" :class="expired ? 'text-rose-600' : 'text-amber-700'">
-                                        <span x-show="!expired">⏳ Complete payment &amp; submit proof within</span>
-                                        <span x-show="expired" x-cloak>⛔ Time expired — restart to continue</span>
-                                    </span>
-                                    <span class="font-display text-xl font-extrabold tabular-nums" :class="expired ? 'text-rose-600' : 'text-ink-900'" x-text="mm + ':' + ss">10:00</span>
-                                </div>
+                                {{-- Prompt shown until a method is chosen --}}
+                                <div x-show="sub === ''" class="mt-4 rounded-xl bg-slate-50 px-4 py-3 text-sm text-slate-500">👆 Select a payment method above to view the details and start your 10-minute payment window.</div>
 
-                                {{-- Details per method --}}
-                                <div class="mt-4 space-y-4">
-                                    @if ($mUpi)
-                                        <div x-show="sub==='upi'" x-cloak class="grid gap-4 sm:grid-cols-2">
-                                            <div class="rounded-lg border border-slate-200 bg-white p-3">
-                                                <p class="text-xs font-semibold text-slate-400">UPI ID</p>
-                                                <p class="font-mono text-sm text-ink-900">{{ $manual['upi'] }}</p>
-                                            </div>
-                                            @if ($manual['qr'])
-                                                <div class="rounded-lg border border-slate-200 bg-white p-3">
-                                                    <p class="text-xs font-semibold text-slate-400">Scan to pay</p>
-                                                    <img src="{{ $manual['qr'] }}" alt="UPI QR" class="mt-1 h-32 w-32 object-contain">
-                                                </div>
-                                            @endif
-                                        </div>
-                                    @endif
-                                    @if ($mBank)
-                                        <div x-show="sub==='bank'" x-cloak class="rounded-lg border border-slate-200 bg-white p-3">
-                                            <p class="text-xs font-semibold text-slate-400">Bank transfer</p>
-                                            <p class="mt-1 whitespace-pre-line text-sm text-ink-900">{{ $manual['bank'] }}</p>
-                                        </div>
-                                    @endif
-                                    @if ($mCrypto)
-                                        <div x-show="sub==='crypto'" x-cloak class="grid gap-4 sm:grid-cols-2">
-                                            <div class="rounded-lg border border-slate-200 bg-white p-3">
-                                                <p class="text-xs font-semibold text-slate-400">Crypto wallets</p>
-                                                <ul class="mt-1 space-y-1">
-                                                    @foreach ($manual['crypto'] as $w)
-                                                        <li class="text-sm"><span class="font-semibold text-ink-900">{{ $w['label'] }}:</span> <span class="break-all font-mono text-slate-600">{{ $w['address'] }}</span></li>
-                                                    @endforeach
-                                                </ul>
-                                            </div>
-                                            @if ($manual['crypto_qr'])
-                                                <div class="rounded-lg border border-slate-200 bg-white p-3">
-                                                    <p class="text-xs font-semibold text-slate-400">Scan to pay</p>
-                                                    <img src="{{ $manual['crypto_qr'] }}" alt="Crypto QR" class="mt-1 h-32 w-32 object-contain">
-                                                </div>
-                                            @endif
-                                        </div>
-                                    @endif
-                                </div>
-
-                                {{-- Proof (locked when expired) --}}
-                                <div class="mt-4 rounded-xl border border-slate-200 bg-slate-50 p-4 transition" :class="expired ? 'pointer-events-none opacity-50' : ''">
-                                    <div class="grid gap-4 sm:grid-cols-2">
-                                        <div>
-                                            <label for="transaction_id" class="label">Transaction ID</label>
-                                            <input id="transaction_id" name="transaction_id" type="text" value="{{ old('transaction_id') }}" class="input" placeholder="Your payment reference">
-                                        </div>
-                                        <div>
-                                            <label for="payment_proof" class="label">Payment screenshot</label>
-                                            <input id="payment_proof" name="payment_proof" type="file" accept="image/*" class="block w-full text-sm text-slate-500 file:mr-3 file:rounded-lg file:border-0 file:bg-brand-50 file:px-3 file:py-1.5 file:text-sm file:font-semibold file:text-brand-600 hover:file:bg-brand-100">
-                                        </div>
+                                {{-- Everything below appears only after a method is selected --}}
+                                <div x-show="sub !== ''" x-cloak>
+                                    {{-- Countdown --}}
+                                    <div class="mt-4 flex items-center justify-between rounded-xl border px-4 py-3"
+                                         :class="expired ? 'border-rose-200 bg-rose-50' : 'border-amber-200 bg-amber-50'">
+                                        <span class="text-sm font-semibold" :class="expired ? 'text-rose-600' : 'text-amber-700'">
+                                            <span x-show="!expired">⏳ Complete payment &amp; submit proof within</span>
+                                            <span x-show="expired" x-cloak>⛔ Time expired — restart to continue</span>
+                                        </span>
+                                        <span class="font-display text-xl font-extrabold tabular-nums" :class="expired ? 'text-rose-600' : 'text-ink-900'" x-text="mm + ':' + ss">10:00</span>
                                     </div>
-                                    <p class="mt-2 text-xs text-slate-400">Your order is verified by our team after payment. Downloads unlock once approved.</p>
-                                </div>
 
-                                {{-- Expired notice --}}
-                                <div x-show="expired" x-cloak class="mt-3 flex items-center justify-between rounded-xl bg-rose-50 px-4 py-3">
-                                    <span class="text-sm font-semibold text-rose-600">Payment window expired.</span>
-                                    <button type="button" @click="start()" class="btn-primary btn-sm">Restart timer</button>
+                                    {{-- Details per method --}}
+                                    <div class="mt-4 space-y-4">
+                                        @if ($mUpi)
+                                            <div x-show="sub==='upi'" x-cloak class="grid gap-4 sm:grid-cols-2">
+                                                <div class="rounded-lg border border-slate-200 bg-white p-3">
+                                                    <p class="text-xs font-semibold text-slate-400">UPI ID</p>
+                                                    <p class="font-mono text-sm text-ink-900">{{ $manual['upi'] }}</p>
+                                                </div>
+                                                @if ($manual['qr'])
+                                                    <div class="rounded-lg border border-slate-200 bg-white p-3">
+                                                        <p class="text-xs font-semibold text-slate-400">Scan to pay</p>
+                                                        <img src="{{ $manual['qr'] }}" alt="UPI QR" class="mt-1 h-32 w-32 object-contain">
+                                                    </div>
+                                                @endif
+                                            </div>
+                                        @endif
+                                        @if ($mBank)
+                                            <div x-show="sub==='bank'" x-cloak class="rounded-lg border border-slate-200 bg-white p-3">
+                                                <p class="text-xs font-semibold text-slate-400">Bank transfer</p>
+                                                <p class="mt-1 whitespace-pre-line text-sm text-ink-900">{{ $manual['bank'] }}</p>
+                                            </div>
+                                        @endif
+                                        @if ($mCrypto)
+                                            <div x-show="sub==='crypto'" x-cloak class="grid gap-4 sm:grid-cols-2">
+                                                <div class="rounded-lg border border-slate-200 bg-white p-3">
+                                                    <p class="text-xs font-semibold text-slate-400">Crypto wallet address</p>
+                                                    <ul class="mt-1 space-y-1">
+                                                        @foreach ($manual['crypto'] as $w)
+                                                            <li class="text-sm"><span class="font-semibold text-ink-900">{{ $w['label'] }}:</span> <span class="break-all font-mono text-slate-600">{{ $w['address'] }}</span></li>
+                                                        @endforeach
+                                                    </ul>
+                                                </div>
+                                                @if ($manual['crypto_qr'])
+                                                    <div class="rounded-lg border border-slate-200 bg-white p-3">
+                                                        <p class="text-xs font-semibold text-slate-400">Scan to pay</p>
+                                                        <img src="{{ $manual['crypto_qr'] }}" alt="Crypto QR" class="mt-1 h-32 w-32 object-contain">
+                                                    </div>
+                                                @endif
+                                            </div>
+                                        @endif
+                                    </div>
+
+                                    {{-- Proof (locked when expired) --}}
+                                    <div class="mt-4 rounded-xl border border-slate-200 bg-slate-50 p-4 transition" :class="expired ? 'pointer-events-none opacity-50' : ''">
+                                        <div class="grid gap-4 sm:grid-cols-2">
+                                            <div>
+                                                <label for="transaction_id" class="label">Transaction ID</label>
+                                                <input id="transaction_id" name="transaction_id" type="text" value="{{ old('transaction_id') }}" class="input" placeholder="Your payment reference">
+                                            </div>
+                                            <div>
+                                                <label for="payment_proof" class="label">Payment screenshot</label>
+                                                <input id="payment_proof" name="payment_proof" type="file" accept="image/*" class="block w-full text-sm text-slate-500 file:mr-3 file:rounded-lg file:border-0 file:bg-brand-50 file:px-3 file:py-1.5 file:text-sm file:font-semibold file:text-brand-600 hover:file:bg-brand-100">
+                                            </div>
+                                        </div>
+                                        <p class="mt-2 text-xs text-slate-400">Your order is verified by our team after payment. Downloads unlock once approved.</p>
+                                    </div>
+
+                                    {{-- Expired notice --}}
+                                    <div x-show="expired" x-cloak class="mt-3 flex items-center justify-between rounded-xl bg-rose-50 px-4 py-3">
+                                        <span class="text-sm font-semibold text-rose-600">Payment window expired.</span>
+                                        <button type="button" @click="start()" class="btn-primary btn-sm">Restart timer</button>
+                                    </div>
                                 </div>
                             @endif
                         </div>

@@ -247,3 +247,63 @@ This is a commercial script. All rights reserved.
 
 - Instagram: [@i_am2_black](https://instagram.com/i_am2_black)
 - Email: Configure in Admin → Settings → General
+
+
+---
+
+## Latest Features (v1.x)
+
+### Buyer experience
+- **PDF invoices** — branded, downloadable receipt for every order (via dompdf), with a thank-you message. "Download Invoice" on the order + My Purchases pages.
+- **Product changelog / versions** — admins log version history per product; buyers see a version timeline on the product page.
+- **Auto avatars** — every user gets an instant, offline-safe initials avatar (inline SVG) when they haven't uploaded a photo.
+- **Mobile number with country code** — on the profile page and at checkout (197 countries with dial codes). Buyer phone shows on the admin order view.
+
+### Manual payment (offline)
+- When a buyer chooses **Manual payment**, they pick one of up to **3 methods** (each toggleable in admin):
+  - **UPI / QR** — UPI ID + scannable QR
+  - **Bank** — bank transfer details
+  - **Crypto** — wallet address(es) + optional crypto QR
+- Details + a **10-minute countdown** appear **only after a method is selected**. The transaction ID + screenshot must be submitted before the timer expires, or the form locks with a **Restart** option.
+
+### Custom pages
+- Create pages with **plain text or raw HTML/CSS/JS**.
+- **Pre-built templates** (Privacy Policy, Refund Policy, Terms, About, FAQ, Contact Info) — pick one, then edit.
+- Live **preview** before publishing. Modern typography on the public page.
+
+### Promotions & announcements
+- **Announcement bar** — 5 priority styles (offer/info/success/warning/alert), custom/auto link, dismissible (remembered per visitor).
+- **Hero promotion** — featured products / custom message / up to 2 countdown offers, rendered inside the hero preview.
+- **Popup** — custom message, product card, or countdown offer; auto-close timer; one-time or every-visit.
+
+### Advertisement banners
+- **Google AdSense / Meta** code, or **manual banners** (upload/URL).
+- Layout styles: **1 (full-width) / 2 / 3 / 4 / 6 / 8** per row.
+- Per-page enable: marketplace, cart, checkout, dashboard, purchases, wishlist, support, home (free & below reviews), custom pages, contact.
+
+### Themes
+- **9 themes**: Default, Emerald, Ocean, Sunset, Midnight, Festival, Christmas, Valentine, Prime Sale.
+- **Festive effects**: confetti (Festival), snow (Christmas), floating hearts (Valentine), corner SALE ribbon (Prime Sale).
+- **Theme scheduling** — auto-activate a theme between two dates.
+
+### Telegram bot
+- Multiple bots, per-event toggles: registrations, product/category added, promotions, purchases, reviews, free downloads, auto promo, custom broadcast.
+- **Auto product promotion** on a schedule (cron or traffic-triggered) with a purchase-focused message + buttons (2 per row).
+- Live message previews in admin.
+
+### Admin health & system
+- **Dashboard health widget** + full **System page**: PHP, DB, storage, cache, SMTP, error-log size, disk space, session driver, debug mode.
+- **Error log viewer** with clear button; cache-clear tools.
+- **Storage providers**: Local, Amazon S3, DigitalOcean Spaces, Cloudflare R2 (runtime switch).
+
+---
+
+## Cron (optional, for scheduled tasks)
+
+For auto Telegram promotion and scheduled themes to run reliably, add this cron entry on your host:
+
+```
+* * * * * cd /path/to/AkzoneScripts && php artisan schedule:run >> /dev/null 2>&1
+```
+
+Without cron, auto-promotion still runs based on site traffic.
