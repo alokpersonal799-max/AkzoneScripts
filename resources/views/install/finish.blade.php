@@ -51,8 +51,8 @@
         @endif
 
         <div class="mt-7 grid gap-3 sm:grid-cols-2">
-            <a href="{{ rtrim($appUrl, '/') }}/admin" class="btn-primary btn-lg">Login to admin dashboard</a>
-            <a href="{{ $appUrl }}" class="btn-ghost btn-lg border border-slate-200">Visit website</a>
+            <a href="{{ url('/admin') }}" class="btn-primary btn-lg">Login to admin dashboard</a>
+            <a href="{{ url('/') }}" class="btn-ghost btn-lg border border-slate-200">Visit website</a>
         </div>
 
         <p class="mt-5 text-xs text-slate-400">The installer is locked by the <code>storage/installed</code> file. Delete that file only if you need to re-run setup. See the <a href="{{ route('install.manual') }}" class="font-semibold text-slate-500 hover:text-brand-600">Setup Manual</a> for full details.</p>
