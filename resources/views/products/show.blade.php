@@ -327,7 +327,7 @@
                         Guaranteed Safe &amp; Secure Checkout
                     </div>
                     <div class="flex flex-wrap items-center justify-center gap-2 px-4 py-3">
-                        @foreach (['VISA', 'Mastercard', 'PayPal', 'Stripe', 'Amex'] as $pay)
+                        @foreach (['VISA', 'Mastercard', 'RuPay', 'UPI', 'PayPal', 'Stripe', 'Amex'] as $pay)
                             <span class="rounded-md border border-slate-200 bg-white px-2.5 py-1 text-[10px] font-bold text-slate-500">{{ $pay }}</span>
                         @endforeach
                     </div>

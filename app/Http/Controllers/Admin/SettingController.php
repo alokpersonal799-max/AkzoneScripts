@@ -125,6 +125,9 @@ class SettingController extends Controller
             'portfolio_url' => ['nullable', 'url', 'max:255'],
             'timezone' => ['nullable', 'string', 'max:64', 'timezone'],
             'logo' => ['nullable', 'image', 'max:2048'],
+            'pwa_install_enabled' => ['nullable', 'in:0,1'],
+            'pwa_install_mobile' => ['nullable', 'in:0,1'],
+            'pwa_install_desktop' => ['nullable', 'in:0,1'],
         ]);
 
         if ($request->hasFile('logo')) {
@@ -140,6 +143,10 @@ class SettingController extends Controller
         }
         if (! empty($data['timezone'])) {
             Setting::put('timezone', $data['timezone'], 'general');
+        }
+
+        foreach (['pwa_install_enabled', 'pwa_install_mobile', 'pwa_install_desktop'] as $key) {
+            Setting::put($key, ($data[$key] ?? '0') === '1' ? '1' : '0', 'general');
         }
 
         return back()->with('success', 'General settings saved.');

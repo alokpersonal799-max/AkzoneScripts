@@ -50,6 +50,33 @@
             <div><label for="contact_telegram" class="label">Global Telegram username <span class="text-slate-400">(no @)</span></label><input id="contact_telegram" name="contact_telegram" type="text" value="{{ old('contact_telegram', setting('contact_telegram')) }}" class="input" placeholder="yourchannel"></div>
         </div>
 
+        {{-- Installable app (PWA) visibility --}}
+        <div class="rounded-2xl border border-slate-200 bg-slate-50/60 p-5">
+            <h3 class="flex items-center gap-2 text-sm font-bold text-ink-900">
+                <svg class="h-4 w-4 text-brand-500" fill="none" viewBox="0 0 24 24" stroke-width="1.7" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3" /></svg>
+                Installable app (PWA)
+            </h3>
+            <p class="mt-1 text-xs text-slate-500">Controls the floating &ldquo;Install app&rdquo; button. It only appears on browsers that support installation.</p>
+
+            <div class="mt-4 space-y-3">
+                <label class="flex items-center gap-3">
+                    <input type="hidden" name="pwa_install_enabled" value="0">
+                    <input type="checkbox" name="pwa_install_enabled" value="1" @checked(setting('pwa_install_enabled', '1') === '1') class="h-4 w-4 rounded border-slate-300 text-brand-600 focus:ring-brand-500">
+                    <span class="text-sm font-medium text-slate-700">Enable the install-app button</span>
+                </label>
+                <label class="flex items-center gap-3">
+                    <input type="hidden" name="pwa_install_mobile" value="0">
+                    <input type="checkbox" name="pwa_install_mobile" value="1" @checked(setting('pwa_install_mobile', '1') === '1') class="h-4 w-4 rounded border-slate-300 text-brand-600 focus:ring-brand-500">
+                    <span class="text-sm font-medium text-slate-700">Show on phones <span class="text-slate-400">(small screens)</span></span>
+                </label>
+                <label class="flex items-center gap-3">
+                    <input type="hidden" name="pwa_install_desktop" value="0">
+                    <input type="checkbox" name="pwa_install_desktop" value="1" @checked(setting('pwa_install_desktop', '1') === '1') class="h-4 w-4 rounded border-slate-300 text-brand-600 focus:ring-brand-500">
+                    <span class="text-sm font-medium text-slate-700">Show on tablets, laptops &amp; computers <span class="text-slate-400">(large screens)</span></span>
+                </label>
+            </div>
+        </div>
+
         <button type="submit" class="btn-primary btn-md">Save general settings</button>
     </form>
 </div>

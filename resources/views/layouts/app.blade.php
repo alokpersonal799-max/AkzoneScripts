@@ -333,7 +333,7 @@
                     Secure payments
                 </div>
                 <div class="flex flex-wrap items-center justify-center gap-2">
-                    @foreach (['VISA', 'Mastercard', 'PayPal', 'Stripe', 'Bitcoin', 'Ethereum', 'USDT'] as $pay)
+                    @foreach (['VISA', 'Mastercard', 'RuPay', 'UPI', 'PayPal', 'Stripe', 'Bitcoin', 'Ethereum', 'USDT'] as $pay)
                         <span class="rounded-md border border-slate-200 bg-white px-2.5 py-1 text-[10px] font-bold text-slate-500">{{ $pay }}</span>
                     @endforeach
                 </div>

@@ -12,9 +12,20 @@
             navigator.serviceWorker.register('{{ asset('sw.js') }}').catch(function () {});
         });
     }
+    window.__akzonePwa = {
+        enabled: {{ setting('pwa_install_enabled', '1') === '1' ? 'true' : 'false' }},
+        mobile: {{ setting('pwa_install_mobile', '1') === '1' ? 'true' : 'false' }},
+        desktop: {{ setting('pwa_install_desktop', '1') === '1' ? 'true' : 'false' }}
+    };
+    function akzonePwaAllowed() {
+        if (!window.__akzonePwa.enabled) return false;
+        var isLargeScreen = window.matchMedia('(min-width: 768px)').matches;
+        return isLargeScreen ? window.__akzonePwa.desktop : window.__akzonePwa.mobile;
+    }
     window.addEventListener('beforeinstallprompt', function (e) {
         e.preventDefault();
         window.__akzoneInstall = e;
+        if (!akzonePwaAllowed()) return;
         var b = document.getElementById('akzone-install-btn');
         if (b) b.style.display = 'inline-flex';
     });

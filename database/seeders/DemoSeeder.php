@@ -28,6 +28,7 @@ class DemoSeeder extends Seeder
         $this->seedDemoSettings();
         $categories = $this->seedCategories();
         $this->seedProducts($categories);
+        $this->seedReviews();
         $this->seedPromotion();
         $this->seedChangelogs();
         $this->seedPages();
@@ -252,6 +253,85 @@ class DemoSeeder extends Seeder
                     'download_message' => $p['download_message'] ?? null,
                 ]
             );
+        }
+    }
+
+    /**
+     * Seed approved demo reviews so products display star ratings and the
+     * homepage testimonials section has content right after installation.
+     */
+    protected function seedReviews(): void
+    {
+        // A small pool of demo reviewers (in addition to the demo customer).
+        $reviewers = [
+            ['name' => 'Rahul Verma', 'email' => 'rahul.verma@example.com'],
+            ['name' => 'Sophie Turner', 'email' => 'sophie.t@example.com'],
+            ['name' => 'Daniel Osei', 'email' => 'daniel.osei@example.com'],
+            ['name' => 'Mei Lin', 'email' => 'mei.lin@example.com'],
+            ['name' => 'Carlos Mendes', 'email' => 'carlos.m@example.com'],
+            ['name' => 'Aisha Khan', 'email' => 'aisha.khan@example.com'],
+            ['name' => 'Tom Becker', 'email' => 'tom.becker@example.com'],
+            ['name' => 'Priya Nair', 'email' => 'priya.nair@example.com'],
+        ];
+
+        $users = collect($reviewers)->map(fn ($r) => \App\Models\User::updateOrCreate(
+            ['email' => $r['email']],
+            [
+                'name' => $r['name'],
+                'password' => \Illuminate\Support\Facades\Hash::make('password'),
+                'role' => 'user',
+                'email_verified_at' => now(),
+            ]
+        ))->all();
+
+        // Include the demo customer in the reviewer pool.
+        $demoCustomer = \App\Models\User::where('email', 'user@akzone.com')->first();
+        if ($demoCustomer) {
+            $users[] = $demoCustomer;
+        }
+
+        $comments = [
+            5 => [
+                'Absolutely worth every penny. Clean code and superb documentation.',
+                'Exactly what I needed — installed in minutes and works flawlessly.',
+                'Best purchase I have made this year. The support is fast and friendly.',
+                'Beautiful design and rock-solid under the hood. Highly recommended!',
+                'Saved me weeks of development time. Five stars all the way.',
+                'The code quality is outstanding. Easy to read and extend.',
+            ],
+            4 => [
+                'Great product overall, just needed a couple of small tweaks for my setup.',
+                'Really solid. Would love to see a few more customization options.',
+                'Very happy with it. Documentation could cover a bit more edge cases.',
+                'Does the job well and looks polished. Minor learning curve.',
+            ],
+            3 => [
+                'Good starting point but I had to adjust a few things myself.',
+                'Decent value. Works as described, nothing extraordinary.',
+            ],
+        ];
+
+        $ratingWeights = [5, 5, 5, 5, 4, 4, 5, 4, 3, 5]; // mostly high
+
+        foreach (Product::where('status', 'published')->get() as $product) {
+            $count = rand(3, 7);
+            $pool = collect($users)->shuffle()->take(min($count, count($users)));
+
+            foreach ($pool as $i => $user) {
+                $rating = $ratingWeights[array_rand($ratingWeights)];
+                $comment = $comments[$rating][array_rand($comments[$rating])];
+
+                \App\Models\Review::updateOrCreate(
+                    ['product_id' => $product->id, 'user_id' => $user->id],
+                    [
+                        'rating' => $rating,
+                        'comment' => $comment,
+                        'is_approved' => true,
+                        // Feature a couple of the best reviews as homepage testimonials.
+                        'is_testimonial' => $rating === 5 && $i < 2,
+                    ]
+                );
+            }
         }
     }
 
