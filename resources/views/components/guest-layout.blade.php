@@ -4,7 +4,20 @@
     @include('partials.head')
 </head>
 <body class="min-h-screen bg-slate-100 font-sans text-slate-600 antialiased">
-    <div class="flex min-h-screen items-center justify-center px-4 py-12">
+    {{-- Animated gradient background (large screens only, decorative) --}}
+    <style>
+        @keyframes authdrift1 { 0%,100% { transform: translate(0,0) scale(1); } 50% { transform: translate(60px,-40px) scale(1.15); } }
+        @keyframes authdrift2 { 0%,100% { transform: translate(0,0) scale(1); } 50% { transform: translate(-50px,50px) scale(1.1); } }
+        @keyframes authdrift3 { 0%,100% { transform: translate(0,0) scale(1); } 50% { transform: translate(40px,60px) scale(1.2); } }
+        .auth-orb { position: absolute; border-radius: 9999px; filter: blur(70px); opacity: .55; }
+    </style>
+    <div class="pointer-events-none fixed inset-0 hidden overflow-hidden lg:block" aria-hidden="true">
+        <div class="auth-orb" style="width:420px;height:420px;top:-80px;left:-60px;background:#93bbfd;animation:authdrift1 16s ease-in-out infinite;"></div>
+        <div class="auth-orb" style="width:380px;height:380px;bottom:-90px;right:-40px;background:#c4b5fd;animation:authdrift2 20s ease-in-out infinite;"></div>
+        <div class="auth-orb" style="width:300px;height:300px;top:40%;right:12%;background:#f9a8d4;animation:authdrift3 24s ease-in-out infinite;"></div>
+    </div>
+
+    <div class="relative flex min-h-screen items-center justify-center px-4 py-12">
         <div class="w-full max-w-md">
             <div class="rounded-2xl bg-white p-8 shadow-soft ring-1 ring-slate-100 sm:p-10">
                 {{-- Brand --}}

@@ -32,24 +32,36 @@
 @endphp
 
 <div class="flex min-h-screen">
+    <style>
+        /* Sidebar collapse only affects large screens; mobile drawer stays full. */
+        @media (min-width: 1024px) {
+            aside.is-collapsed { width: 5rem !important; }
+            aside.is-collapsed .nav-label { display: none !important; }
+            aside.is-collapsed .nav-link { justify-content: center; }
+            .admin-main.is-collapsed { padding-left: 5rem !important; }
+        }
+    </style>
     {{-- Sidebar --}}
     <aside class="fixed inset-y-0 left-0 z-50 flex w-64 transform flex-col border-r border-slate-200 bg-white transition-all duration-200 lg:translate-x-0"
-           :class="(sidebar ? 'translate-x-0 ' : '-translate-x-full lg:translate-x-0 ') + (collapsed ? 'lg:w-20' : 'lg:w-64')">
+           :class="(sidebar ? 'translate-x-0 ' : '-translate-x-full lg:translate-x-0 ') + (collapsed ? 'is-collapsed' : '')">
         <div class="flex h-16 flex-shrink-0 items-center gap-2 border-b border-slate-100 px-4">
             <span class="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-brand-500 to-indigo-500 font-display font-extrabold text-white">A</span>
-            <span class="font-display text-lg font-extrabold text-ink-900" x-show="!collapsed">Admin</span>
-            <button type="button" @click="toggleCollapse()" class="ml-auto hidden rounded-lg p-1.5 text-slate-400 transition hover:bg-slate-100 hover:text-ink-900 lg:block" title="Collapse sidebar">
+            <span class="nav-label font-display text-lg font-extrabold text-ink-900">Admin</span>
+            <button type="button" @click="toggleCollapse()" class="nav-label ml-auto hidden rounded-lg p-1.5 text-slate-400 transition hover:bg-slate-100 hover:text-ink-900 lg:block" title="Collapse sidebar">
                 <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke-width="1.7" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" /></svg>
+            </button>
+            {{-- Expand button shown only when collapsed (lg) --}}
+            <button type="button" @click="toggleCollapse()" x-show="collapsed" class="mx-auto hidden rounded-lg p-1.5 text-slate-400 transition hover:bg-slate-100 hover:text-ink-900 lg:block" title="Expand sidebar" style="display:none;">
+                <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke-width="1.7" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" /></svg>
             </button>
         </div>
         <nav class="flex-1 space-y-1 overflow-y-auto p-3">
             @foreach ($adminNav as $item)
                 @php $active = request()->routeIs($item['match']); @endphp
                 <a href="{{ $item['url'] ?? route($item['route']) }}" title="{{ $item['label'] }}"
-                   class="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold transition {{ $active ? 'bg-brand-50 text-brand-700' : 'text-slate-600 hover:bg-slate-50 hover:text-ink-900' }}"
-                   :class="collapsed ? 'lg:justify-center' : ''">
+                   class="nav-link flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold transition {{ $active ? 'bg-brand-50 text-brand-700' : 'text-slate-600 hover:bg-slate-50 hover:text-ink-900' }}">
                     <svg class="h-5 w-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="{{ $item['icon'] }}" /></svg>
-                    <span x-show="!collapsed">{{ $item['label'] }}</span>
+                    <span class="nav-label">{{ $item['label'] }}</span>
                 </a>
             @endforeach
 
@@ -57,16 +69,15 @@
             <form method="POST" action="{{ route('logout') }}" class="pt-1">
                 @csrf
                 <button type="submit" title="Log out"
-                        class="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold text-rose-600 transition hover:bg-rose-50"
-                        :class="collapsed ? 'lg:justify-center' : ''">
+                        class="nav-link flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold text-rose-600 transition hover:bg-rose-50">
                     <svg class="h-5 w-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15m3 0 3-3m0 0-3-3m3 3H9" /></svg>
-                    <span x-show="!collapsed">Log out</span>
+                    <span class="nav-label">Log out</span>
                 </button>
             </form>
         </nav>
 
         {{-- Credit --}}
-        <div class="flex-shrink-0 border-t border-slate-100 p-4" x-show="!collapsed" x-transition>
+        <div class="nav-label flex-shrink-0 border-t border-slate-100 p-4">
             <a href="https://instagram.com/i_am2_black" target="_blank" rel="noopener"
                class="block rounded-xl bg-gradient-to-br from-brand-500 to-indigo-500 p-3 text-center text-white shadow-soft transition hover:opacity-95">
                 <p class="text-[11px] font-medium uppercase tracking-wide text-white/80">Platform crafted by</p>
@@ -83,7 +94,7 @@
     <div x-show="sidebar" x-cloak @click="sidebar = false" class="fixed inset-0 z-40 bg-slate-900/30 lg:hidden"></div>
 
     {{-- Main --}}
-    <div class="flex flex-1 flex-col transition-all duration-200 lg:pl-64" :class="collapsed ? 'lg:pl-20' : 'lg:pl-64'">
+    <div class="admin-main flex flex-1 flex-col transition-all duration-200 lg:pl-64" :class="collapsed ? 'is-collapsed' : ''">
         <header class="sticky top-0 z-30 flex h-16 items-center gap-4 border-b border-slate-200 bg-white/90 px-4 backdrop-blur sm:px-6">
             <button @click="sidebar = !sidebar" class="rounded-lg p-2 text-slate-600 hover:bg-slate-100 lg:hidden">
                 <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" /></svg>

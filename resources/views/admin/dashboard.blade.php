@@ -14,6 +14,7 @@
                 ['label' => 'Total sold', 'value' => number_format($stats['sold']), 'sub' => number_format($stats['downloads']).' free downloads', 'tint' => 'bg-emerald-50 text-emerald-600', 'icon' => 'm3.75 13.5 10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75Z'],
                 ['label' => 'Total views', 'value' => number_format($stats['views']), 'sub' => 'all-time product views', 'tint' => 'bg-sky-50 text-sky-600', 'icon' => 'M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178ZM15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z'],
                 ['label' => 'Customers', 'value' => number_format($stats['customers']), 'sub' => $stats['published'].' published · '.$stats['free_products'].' free', 'tint' => 'bg-brand-50 text-brand-600', 'icon' => 'M15 19.128a9.38 9.38 0 0 0 2.625.372 9.337 9.337 0 0 0 4.121-.952 4.125 4.125 0 0 0-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 0 1 8.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0 1 11.964-3.07M12 6.375a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0Z'],
+                ['label' => 'Active services', 'value' => number_format($stats['services']), 'sub' => 'live on the services page', 'tint' => 'bg-fuchsia-50 text-fuchsia-600', 'icon' => 'M11.42 15.17 17.25 21A2.652 2.652 0 0 0 21 17.25l-5.877-5.877M11.42 15.17l2.496-3.03c.317-.384.74-.626 1.208-.766M11.42 15.17l-4.655 5.653a2.548 2.548 0 1 1-3.586-3.586l6.837-5.63m5.108-.233c.55-.164 1.163-.188 1.743-.14a4.5 4.5 0 0 0 4.486-6.336l-3.276 3.277a3.004 3.004 0 0 1-2.25-2.25l3.276-3.276a4.5 4.5 0 0 0-6.336 4.486c.091 1.076-.071 2.264-.904 2.95l-.102.085m-1.745 1.437L5.909 7.5H4.5L2.25 3.75l1.5-1.5L7.5 4.5v1.409l4.26 4.26m-1.745 1.437 1.745-1.437'],
             ];
         @endphp
         @foreach ($cards as $card)
@@ -223,25 +224,5 @@
                 </div>
             @endforeach
         </div>
-    </div>
-
-    {{-- Catalog snapshot (incl. active services) --}}
-    <div class="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-4">
-        @foreach ([
-            ['label' => 'Active services', 'value' => number_format($stats['services']), 'icon' => 'M11.42 15.17 17.25 21A2.652 2.652 0 0 0 21 17.25l-5.877-5.877M11.42 15.17l2.496-3.03c.317-.384.74-.626 1.208-.766M11.42 15.17l-4.655 5.653a2.548 2.548 0 1 1-3.586-3.586l6.837-5.63m5.108-.233c.55-.164 1.163-.188 1.743-.14a4.5 4.5 0 0 0 4.486-6.336l-3.276 3.277a3.004 3.004 0 0 1-2.25-2.25l3.276-3.276a4.5 4.5 0 0 0-6.336 4.486c.091 1.076-.071 2.264-.904 2.95l-.102.085m-1.745 1.437L5.909 7.5H4.5L2.25 3.75l1.5-1.5L7.5 4.5v1.409l4.26 4.26m-1.745 1.437 1.745-1.437', 'tint' => 'bg-fuchsia-50 text-fuchsia-600'],
-            ['label' => 'Published products', 'value' => number_format($stats['published']), 'icon' => 'M20.25 7.5l-.625 10.632a2.25 2.25 0 0 1-2.247 2.118H6.622a2.25 2.25 0 0 1-2.247-2.118L3.75 7.5', 'tint' => 'bg-brand-50 text-brand-600'],
-            ['label' => 'Free products', 'value' => number_format($stats['free_products']), 'icon' => 'm3.75 13.5 10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75Z', 'tint' => 'bg-emerald-50 text-emerald-600'],
-            ['label' => 'Conversion', 'value' => $stats['conversion'].'%', 'icon' => 'M2.25 18 9 11.25l4.306 4.307a11.95 11.95 0 0 1 5.814-5.519l2.74-1.22m0 0-5.94-2.281m5.94 2.28-2.28 5.941', 'tint' => 'bg-sky-50 text-sky-600'],
-        ] as $mini)
-            <div class="card flex items-center gap-3 p-4">
-                <span class="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-xl {{ $mini['tint'] }}">
-                    <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke-width="1.6" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="{{ $mini['icon'] }}" /></svg>
-                </span>
-                <div>
-                    <p class="font-display text-lg font-extrabold text-ink-900">{{ $mini['value'] }}</p>
-                    <p class="text-xs text-slate-400">{{ $mini['label'] }}</p>
-                </div>
-            </div>
-        @endforeach
     </div>
 @endsection
