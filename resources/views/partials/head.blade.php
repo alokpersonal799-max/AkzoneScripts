@@ -32,13 +32,10 @@
 
 <script src="https://cdn.tailwindcss.com"></script>
 @php
-    $themePalettes = [
-        'default'  => ['50'=>'#eff5ff','100'=>'#dbe8fe','200'=>'#bfd7fe','300'=>'#93bbfd','400'=>'#609afa','500'=>'#3b82f6','600'=>'#2563eb','700'=>'#1d4ed8','800'=>'#1e40af','900'=>'#1e3a8a'],
-        'festival' => ['50'=>'#fdf4ff','100'=>'#fae8ff','200'=>'#f5d0fe','300'=>'#f0abfc','400'=>'#e879f9','500'=>'#d946ef','600'=>'#c026d3','700'=>'#a21caf','800'=>'#86198f','900'=>'#701a75'],
-        'prime'    => ['50'=>'#fff7ed','100'=>'#ffedd5','200'=>'#fed7aa','300'=>'#fdba74','400'=>'#fb923c','500'=>'#f97316','600'=>'#ea580c','700'=>'#c2410c','800'=>'#9a3412','900'=>'#7c2d12'],
-    ];
-    $activeTheme = setting('active_theme', 'default');
-    $brandPalette = $themePalettes[$activeTheme] ?? $themePalettes['default'];
+    $activeTheme = active_theme();
+    $themeCfg = config('themes.'.$activeTheme) ?? config('themes.default');
+    $brandPalette = $themeCfg['brand'] ?? config('themes.default.brand');
+    $themeEffect = $themeCfg['effect'] ?? 'none';
 @endphp
 <script>document.documentElement.setAttribute('data-theme', @json($activeTheme));</script>
 <script>
@@ -120,6 +117,33 @@
 <style>
     html[data-theme="prime"] body { background-color: #fff7ed; }
     html[data-theme="prime"] .shadow-lift { box-shadow: 0 12px 40px -12px rgba(234,88,12,.30) !important; }
+</style>
+@elseif ($activeTheme === 'christmas')
+<style>
+    html[data-theme="christmas"] body { background-color: #fef2f2; }
+    html[data-theme="christmas"] .shadow-lift { box-shadow: 0 12px 40px -12px rgba(220,38,38,.30) !important; }
+</style>
+@elseif ($activeTheme === 'valentine')
+<style>
+    html[data-theme="valentine"] body { background-color: #fdf2f8; }
+    html[data-theme="valentine"] .shadow-lift { box-shadow: 0 12px 40px -12px rgba(219,39,119,.30) !important; }
+</style>
+@elseif ($activeTheme === 'emerald')
+<style> html[data-theme="emerald"] body { background-color: #f0fdf4; } </style>
+@elseif ($activeTheme === 'ocean')
+<style> html[data-theme="ocean"] body { background-color: #ecfeff; } </style>
+@elseif ($activeTheme === 'sunset')
+<style> html[data-theme="sunset"] body { background-color: #fffbeb; } </style>
+@elseif ($activeTheme === 'midnight')
+<style> html[data-theme="midnight"] body { background-color: #eef2ff; } </style>
+@endif
+
+{{-- Decorative theme effect animations (confetti / snow / hearts / ribbon) --}}
+@if (in_array($themeEffect, ['confetti', 'snow', 'hearts', 'ribbon'], true))
+<style>
+    .theme-fx-item { position: absolute; top: -40px; will-change: transform; animation-name: theme-fall; animation-timing-function: linear; animation-iteration-count: infinite; }
+    @keyframes theme-fall { 0% { transform: translateY(-40px) rotate(0deg); } 100% { transform: translateY(106vh) rotate(360deg); } }
+    .theme-ribbon { position: absolute; top: 20px; right: -56px; transform: rotate(45deg); background: linear-gradient(90deg,#dc2626,#f97316); color: #fff; font-weight: 800; font-size: 12px; letter-spacing: 3px; padding: 7px 64px; box-shadow: 0 8px 20px rgba(0,0,0,.18); }
 </style>
 @endif
 

@@ -5,6 +5,8 @@
 </head>
 <body class="min-h-screen bg-slate-50 font-sans text-slate-600 antialiased">
 
+    @include('partials.theme-effects')
+
     {{-- Top announcement bar (managed in Admin → Promotions) --}}
     @if (setting('announcement_enabled', '0') === '1' && setting('announcement_text'))
         @php

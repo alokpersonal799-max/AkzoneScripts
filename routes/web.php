@@ -274,6 +274,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     // Store theme.
     Route::get('/theme', [AdminThemeController::class, 'index'])->name('theme.index');
     Route::put('/theme', [AdminThemeController::class, 'update'])->name('theme.update');
+    Route::put('/theme/schedule', [AdminThemeController::class, 'schedule'])->name('theme.schedule');
 
     // Contact messages.
     Route::get('/contacts', [AdminContactController::class, 'index'])->name('contacts.index');
