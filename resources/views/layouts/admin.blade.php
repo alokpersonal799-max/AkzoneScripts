@@ -48,8 +48,9 @@
     <aside class="fixed inset-y-0 left-0 z-50 flex w-64 transform flex-col border-r border-slate-200 bg-white transition-all duration-200 lg:translate-x-0"
            :class="(sidebar ? 'translate-x-0 ' : '-translate-x-full lg:translate-x-0 ') + (collapsed ? 'is-collapsed' : '')">
         <div class="flex h-16 flex-shrink-0 items-center gap-2 border-b border-slate-100 px-4">
-            <span class="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-brand-500 to-indigo-500 font-display font-extrabold text-white">A</span>
-            <span class="nav-label font-display text-lg font-extrabold text-ink-900">Admin</span>
+            @php $adminBrand = setting('site_name', config('app.name', 'Admin')); @endphp
+            <span class="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-brand-500 to-indigo-500 font-display font-extrabold text-white">{{ strtoupper(substr($adminBrand, 0, 1)) }}</span>
+            <span class="nav-label truncate font-display text-lg font-extrabold text-ink-900">{{ $adminBrand }}</span>
             <button type="button" @click="toggleCollapse()" class="nav-label ml-auto hidden rounded-lg p-1.5 text-slate-400 transition hover:bg-slate-100 hover:text-ink-900 lg:block" title="Collapse sidebar">
                 <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke-width="1.7" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" /></svg>
             </button>
@@ -170,7 +171,6 @@
                 <p class="text-sm text-slate-500">
                     &copy; {{ date('Y') }} {{ setting('site_name', config('app.name')) }}. All rights reserved.
                 </p>
-                @if (setting('demo_mode', '0') === '1')
                 <p class="flex items-center gap-1.5 text-sm text-slate-500">
                     This complete PHP script platform was created by
                     <a href="https://instagram.com/i_am2_black" target="_blank" rel="noopener" class="inline-flex items-center gap-1 font-semibold text-brand-600 hover:text-brand-700">
@@ -179,7 +179,6 @@
                     </a>
                     &middot; feel free to contact for orders.
                 </p>
-                @endif
             </div>
         </footer>
     </div>
