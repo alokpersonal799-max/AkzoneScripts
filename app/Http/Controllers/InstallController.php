@@ -290,6 +290,24 @@ class InstallController extends Controller
 
     /*
     |--------------------------------------------------------------------------
+    | Setup Manual (accessible any time from the installer)
+    |--------------------------------------------------------------------------
+    */
+    public function manual(): View
+    {
+        $base = base_path();
+        $php = PHP_BINARY && ! str_contains(strtolower(PHP_BINARY), 'fpm') ? PHP_BINARY : 'php';
+
+        return view('install.manual', [
+            'step' => 0,
+            'basePath' => $base,
+            'appUrl' => rtrim(env('APP_URL', $this->guessUrl()), '/'),
+            'cronCommand' => '* * * * * cd '.$base.' && '.$php.' artisan schedule:run >> /dev/null 2>&1',
+        ]);
+    }
+
+    /*
+    |--------------------------------------------------------------------------
     | Helpers
     |--------------------------------------------------------------------------
     */

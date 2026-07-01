@@ -22,11 +22,14 @@ class EnsureInstalled
         $onInstaller = $request->is('install', 'install/*');
         $allowed = $request->is('up'); // Laravel health check endpoint
 
+        // The read-only setup manual stays viewable even after installation.
+        $isManual = $request->is('install/manual');
+
         if (! $installed && ! $onInstaller && ! $allowed) {
             return redirect()->route('install.requirements');
         }
 
-        if ($installed && $onInstaller) {
+        if ($installed && $onInstaller && ! $isManual) {
             return redirect()->route('home');
         }
 
