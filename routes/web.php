@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\AdvertisementController as AdminAdvertisementController;
 use App\Http\Controllers\Admin\CategoryController as AdminCategoryController;
 use App\Http\Controllers\Admin\CouponController as AdminCouponController;
 use App\Http\Controllers\Admin\CurrencyController as AdminCurrencyController;
@@ -261,6 +262,13 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     // Hero promotion manager.
     Route::get('/promotions', [AdminPromotionController::class, 'index'])->name('promotions.index');
     Route::put('/promotions', [AdminPromotionController::class, 'update'])->name('promotions.update');
+
+    // Advertisement banner manager (AdSense / Meta / manual ads).
+    Route::get('/advertisements', [AdminAdvertisementController::class, 'index'])->name('ads.index');
+    Route::put('/advertisements/settings', [AdminAdvertisementController::class, 'updateSettings'])->name('ads.settings');
+    Route::post('/advertisements', [AdminAdvertisementController::class, 'store'])->name('ads.store');
+    Route::put('/advertisements/{ad}', [AdminAdvertisementController::class, 'update'])->name('ads.update');
+    Route::delete('/advertisements/{ad}', [AdminAdvertisementController::class, 'destroy'])->name('ads.destroy');
 
     // Contact messages.
     Route::get('/contacts', [AdminContactController::class, 'index'])->name('contacts.index');

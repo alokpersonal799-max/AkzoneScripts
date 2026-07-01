@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\Advertisement;
 use App\Models\Category;
 use App\Models\ContactMessage;
 use App\Models\Page;
@@ -34,6 +35,7 @@ class DemoSeeder extends Seeder
         $this->seedTelegramBot();
         $this->seedStorageSettings();
         $this->seedAutoTelegramPromo();
+        $this->seedAdvertisements();
     }
 
     /**
@@ -421,5 +423,42 @@ class DemoSeeder extends Seeder
         \App\Models\Setting::put('auto_tg_promo_interval', '24', 'promotion');
         \App\Models\Setting::put('auto_tg_promo_template', "New product available!\n\n{title}\n{price}\n\n{link}", 'promotion');
         \App\Models\Setting::put('auto_tg_promo_last_sent', '', 'promotion');
+    }
+
+    /**
+     * Seed advertisement banner settings + demo banners so the feature is
+     * ready to test right after installation.
+     */
+    protected function seedAdvertisements(): void
+    {
+        \App\Models\Setting::put('ads_enabled', '1', 'ads');
+        \App\Models\Setting::put('ads_layout', '4', 'ads');
+        \App\Models\Setting::put('ads_adsense_code', '', 'ads');
+        \App\Models\Setting::put('ads_meta_code', '', 'ads');
+
+        foreach (['marketplace', 'cart', 'checkout', 'dashboard', 'purchases', 'wishlist', 'support'] as $page) {
+            \App\Models\Setting::put('ads_page_'.$page, '1', 'ads');
+        }
+
+        $banners = [
+            ['title' => 'Your Ad Here', 'image' => 'https://placehold.co/600x300/2563eb/ffffff?text=Your+Ad+Here'],
+            ['title' => 'Special Offer', 'image' => 'https://placehold.co/600x300/16a34a/ffffff?text=Special+Offer'],
+            ['title' => 'Premium Scripts', 'image' => 'https://placehold.co/600x300/db2777/ffffff?text=Premium+Scripts'],
+            ['title' => 'Limited Deal', 'image' => 'https://placehold.co/600x300/f59e0b/ffffff?text=Limited+Deal'],
+            ['title' => 'Advertise Here', 'image' => 'https://placehold.co/600x300/7c3aed/ffffff?text=Advertise+Here'],
+            ['title' => 'Boost Sales', 'image' => 'https://placehold.co/600x300/0ea5e9/ffffff?text=Boost+Sales'],
+        ];
+
+        foreach ($banners as $i => $banner) {
+            Advertisement::updateOrCreate(
+                ['title' => $banner['title']],
+                [
+                    'image_url' => $banner['image'],
+                    'link_url' => 'https://example.com',
+                    'is_active' => true,
+                    'sort_order' => $i + 1,
+                ]
+            );
+        }
     }
 }

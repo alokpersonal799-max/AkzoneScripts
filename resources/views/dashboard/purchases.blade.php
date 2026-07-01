@@ -81,4 +81,6 @@
 
         <div class="mt-8">{{ $orderItems->links() }}</div>
     @endif
+
+    @include('partials.ads', ['page' => 'purchases'])
 @endsection

@@ -32,4 +32,6 @@
         </div>
         <div class="mt-6">{{ $tickets->links() }}</div>
     @endif
+
+    @include('partials.ads', ['page' => 'support'])
 @endsection

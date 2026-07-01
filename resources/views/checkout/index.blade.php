@@ -161,4 +161,6 @@
         </div>
     </div>
 </div>
+
+@include('partials.ads', ['page' => 'checkout'])
 @endsection

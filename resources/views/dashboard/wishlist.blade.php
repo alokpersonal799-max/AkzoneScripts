@@ -22,4 +22,6 @@
         </div>
         <div class="mt-8">{{ $products->links() }}</div>
     @endif
+
+    @include('partials.ads', ['page' => 'wishlist'])
 @endsection

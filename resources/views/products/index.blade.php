@@ -102,4 +102,6 @@
         </div>
     </div>
 </div>
+
+@include('partials.ads', ['page' => 'marketplace'])
 @endsection

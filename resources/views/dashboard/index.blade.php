@@ -80,4 +80,6 @@
             </div>
         @endif
     </div>
+
+    @include('partials.ads', ['page' => 'dashboard'])
 @endsection

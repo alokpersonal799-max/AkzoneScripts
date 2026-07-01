@@ -63,4 +63,6 @@
         </div>
     @endif
 </div>
+
+@include('partials.ads', ['page' => 'cart'])
 @endsection
