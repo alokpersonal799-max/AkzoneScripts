@@ -75,6 +75,8 @@ class AuthenticatedSessionController extends Controller
             ])->saveQuietly();
         }
 
+        \App\Models\DailyStat::bump('logins');
+
         // Admins go straight to the admin dashboard, everyone else to theirs.
         $redirect = Auth::user()->isAdmin()
             ? route('admin.dashboard')

@@ -159,6 +159,74 @@ class TelegramService
         return true;
     }
 
+    /**
+     * Send the daily summary report once per day at (or after) the configured
+     * time. Safe to call every scheduler tick.
+     */
+    public function runDailyReport(): void
+    {
+        try {
+            if (! Schema::hasTable('settings') || setting('tg_daily_report_enabled', '0') !== '1') {
+                return;
+            }
+        } catch (\Throwable $e) {
+            return;
+        }
+
+        $today = now()->toDateString();
+        if (setting('tg_daily_report_last') === $today) {
+            return; // already sent today
+        }
+
+        [$h, $m] = array_pad(explode(':', (string) setting('tg_daily_report_time', '20:00')), 2, '00');
+        $scheduled = now()->copy()->setTime((int) $h, (int) $m, 0);
+        if (now()->lt($scheduled)) {
+            return; // not time yet
+        }
+
+        \App\Models\Setting::put('tg_daily_report_last', $today, 'telegram');
+        $this->notify('daily_report', \App\Support\TelegramMessages::dailyReport($this->dailyReportData()));
+    }
+
+    /**
+     * Immediately send the daily report (manual "Send now").
+     */
+    public function sendDailyReportNow(): bool
+    {
+        \App\Models\Setting::put('tg_daily_report_last', now()->toDateString(), 'telegram');
+        $this->notify('daily_report', \App\Support\TelegramMessages::dailyReport($this->dailyReportData()));
+
+        return true;
+    }
+
+    /**
+     * Gather today's metrics for the daily report.
+     *
+     * @return array<string, mixed>
+     */
+    public function dailyReportData(): array
+    {
+        $today = \Illuminate\Support\Carbon::today();
+        $stat = \App\Models\DailyStat::todayRow();
+
+        $top = \App\Models\OrderItem::query()
+            ->whereHas('order', fn ($q) => $q->where('status', 'completed')->whereDate('paid_at', $today))
+            ->select('product_title', \Illuminate\Support\Facades\DB::raw('COUNT(*) as c'))
+            ->groupBy('product_title')->orderByDesc('c')->first();
+
+        return [
+            'views' => (int) $stat->views,
+            'registrations' => \App\Models\User::where('role', 'user')->whereDate('created_at', $today)->count(),
+            'logins' => (int) $stat->logins,
+            'password_resets' => (int) $stat->password_resets,
+            'sales' => (float) \App\Models\Order::where('status', 'completed')->whereDate('paid_at', $today)->sum('total'),
+            'top_product' => $top?->product_title,
+            'orders_total' => \App\Models\Order::whereDate('created_at', $today)->count(),
+            'orders_completed' => \App\Models\Order::where('status', 'completed')->whereDate('paid_at', $today)->count(),
+            'orders_pending' => \App\Models\Order::where('status', 'pending')->count(),
+        ];
+    }
+
     protected function isLocalUrl(string $url): bool
     {
         $host = parse_url($url, PHP_URL_HOST) ?: '';

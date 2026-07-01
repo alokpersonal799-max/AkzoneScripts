@@ -212,4 +212,60 @@ class TelegramMessages
             'buttons' => [],
         ];
     }
+
+    /**
+     * Actionable admin alert (mirrors the admin notification bell).
+     */
+    public static function adminAlert(string $type, string $title, ?string $body = null, ?string $url = null): array
+    {
+        $icons = [
+            'order' => '🛒', 'ticket' => '🎫', 'review' => '⭐', 'report' => '🚩',
+            'user' => '👤', 'contact' => '✉️', 'product' => '🧩',
+        ];
+        $icon = $icons[$type] ?? '🔔';
+
+        $text = "🔔 <b>ADMIN ACTION NEEDED</b>\n"
+            .self::RULE."\n\n"
+            .$icon.' <b>'.e($title)."</b>\n"
+            .($body ? '<i>'.e($body)."</i>\n" : '')
+            ."\n<blockquote>Tap below to review and take action.</blockquote>"
+            .self::footer();
+
+        return [
+            'text' => $text,
+            'photo' => null,
+            'buttons' => $url ? [['⚡ Take action', $url]] : [],
+        ];
+    }
+
+    /**
+     * Daily summary report.
+     *
+     * @param  array<string, mixed>  $d
+     */
+    public static function dailyReport(array $d): array
+    {
+        $text = "📊 <b>DAILY REPORT</b>\n"
+            ."<i>".self::site()." • ".now()->format('D, M j, Y • g:i A')."</i>\n"
+            .self::RULE."\n\n"
+            ."<b>Traffic &amp; users</b>\n"
+            ."👁 Views: <b>".number_format((int) $d['views'])."</b>\n"
+            ."🆕 New registrations: <b>".number_format((int) $d['registrations'])."</b>\n"
+            ."🔐 Logins: <b>".number_format((int) $d['logins'])."</b>\n"
+            ."🔑 Password resets: <b>".number_format((int) $d['password_resets'])."</b>\n\n"
+            ."<b>Sales</b>\n"
+            ."💰 Revenue today: <b>".money((float) $d['sales'])."</b>\n"
+            ."🔥 Top seller: <b>".e($d['top_product'] ?: '—')."</b>\n\n"
+            ."<b>Orders</b>\n"
+            ."🧾 Total: <b>".number_format((int) $d['orders_total'])."</b>\n"
+            ."✅ Completed: <b>".number_format((int) $d['orders_completed'])."</b>\n"
+            ."⏳ Pending: <b>".number_format((int) $d['orders_pending'])."</b>"
+            .self::footer();
+
+        return [
+            'text' => $text,
+            'photo' => null,
+            'buttons' => [['📈 Open dashboard', route('admin.dashboard')]],
+        ];
+    }
 }

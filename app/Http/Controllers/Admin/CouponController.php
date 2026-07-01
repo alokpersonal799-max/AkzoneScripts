@@ -60,11 +60,15 @@ class CouponController extends Controller
         $data = $request->validate([
             'code' => ['required', 'string', 'max:50', $codeRule],
             'type' => ['required', 'in:percent,fixed'],
-            'value' => ['required', 'numeric', 'min:0'],
+            'value' => ['required', 'numeric', 'min:0', $request->input('type') === 'percent' ? 'max:100' : 'max:9999999'],
             'min_order' => ['nullable', 'numeric', 'min:0'],
             'max_uses' => ['nullable', 'integer', 'min:1'],
             'expires_at' => ['nullable', 'date'],
             'is_active' => ['nullable', 'boolean'],
+        ], [
+            'value.max' => $request->input('type') === 'percent'
+                ? 'A percentage discount cannot exceed 100%.'
+                : 'The discount amount is too large.',
         ]);
 
         $data['code'] = strtoupper($data['code']);

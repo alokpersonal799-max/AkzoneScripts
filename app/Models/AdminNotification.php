@@ -22,11 +22,19 @@ class AdminNotification extends Model
      */
     public static function notifyAdmins(string $type, string $title, ?string $body = null, ?string $url = null): void
     {
-        if (! Schema::hasTable('admin_notifications')) {
-            return;
+        if (Schema::hasTable('admin_notifications')) {
+            static::create(compact('type', 'title', 'body', 'url'));
         }
 
-        static::create(compact('type', 'title', 'body', 'url'));
+        // Mirror actionable alerts to Telegram (bots subscribed to "admin_alert").
+        try {
+            app(\App\Services\TelegramService::class)->notify(
+                'admin_alert',
+                \App\Support\TelegramMessages::adminAlert($type, $title, $body, $url)
+            );
+        } catch (\Throwable $e) {
+            // Telegram must never block the core notification.
+        }
     }
 
     public function isRead(): bool

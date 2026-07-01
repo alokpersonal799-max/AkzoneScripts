@@ -15,3 +15,8 @@ Artisan::command('inspire', function () {
 Schedule::call(function () {
     app(TelegramService::class)->runAutoPromo();
 })->everyMinute()->name('telegram-auto-promo')->withoutOverlapping();
+
+// Telegram daily report — sends once per day at the admin-configured time.
+Schedule::call(function () {
+    app(TelegramService::class)->runDailyReport();
+})->everyMinute()->name('telegram-daily-report')->withoutOverlapping();

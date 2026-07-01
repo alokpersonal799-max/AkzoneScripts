@@ -30,6 +30,8 @@ class TelegramBot extends Model
         'review' => 'New product review',
         'free_download' => 'Free product downloaded',
         'auto_promo' => 'Auto product promotion',
+        'admin_alert' => 'Admin action alerts',
+        'daily_report' => 'Daily summary report',
         'custom' => 'Custom broadcast messages',
     ];
 

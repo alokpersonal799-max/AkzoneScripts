@@ -126,14 +126,12 @@ class CheckoutController extends Controller
     {
         $methods = $this->enabledMethods();
 
-        $validated = $request->validate([
+        // Billing details are always required.
+        $request->validate([
             'billing_name' => ['required', 'string', 'max:255'],
             'billing_email' => ['required', 'email', 'max:255'],
             'billing_phone' => ['nullable', 'string', 'max:30'],
             'billing_phone_country' => ['nullable', 'string', 'max:8'],
-            'payment_method' => ['required', 'in:'.implode(',', array_keys($methods))],
-            'transaction_id' => ['required_if:payment_method,manual', 'nullable', 'string', 'max:255'],
-            'payment_proof' => ['required_if:payment_method,manual', 'nullable', 'image', 'max:5120'],
         ]);
 
         $user = $request->user();
@@ -150,29 +148,45 @@ class CheckoutController extends Controller
         $subtotal = (float) $items->sum(fn ($product) => $product->current_price);
         $coupon = $this->activeCoupon($subtotal);
         $discount = $coupon ? $coupon->discountFor($subtotal) : 0;
-        $isManual = $validated['payment_method'] === 'manual';
+        $total = max($subtotal - $discount, 0);
 
-        // Store the payment proof screenshot for manual payments.
+        // A fully-covered order (100% coupon / fixed amount ≥ total) needs no
+        // payment method, transaction ID or screenshot.
+        $isFree = $total <= 0;
+
+        if (! $isFree) {
+            $request->validate([
+                'payment_method' => ['required', 'in:'.implode(',', array_keys($methods))],
+                'transaction_id' => ['required_if:payment_method,manual', 'nullable', 'string', 'max:255'],
+                'payment_proof' => ['required_if:payment_method,manual', 'nullable', 'image', 'max:5120'],
+            ]);
+        }
+
+        $paymentMethod = $isFree ? 'free' : $request->input('payment_method');
+        $isManual = ! $isFree && $paymentMethod === 'manual';
+        $txnId = $request->input('transaction_id');
+        $billingPhone = trim((($request->input('billing_phone_country') ?? '').' '.($request->input('billing_phone') ?? ''))) ?: null;
+
         $proofPath = null;
         if ($isManual && $request->hasFile('payment_proof')) {
             $proofPath = $request->file('payment_proof')->store('payment-proofs', 'public');
         }
 
-        $order = DB::transaction(function () use ($user, $items, $validated, $subtotal, $discount, $coupon, $isManual, $proofPath): Order {
+        $order = DB::transaction(function () use ($user, $items, $request, $subtotal, $discount, $total, $coupon, $isManual, $isFree, $paymentMethod, $txnId, $proofPath, $billingPhone): Order {
             $order = Order::create([
                 'user_id' => $user->id,
                 'subtotal' => $subtotal,
                 'tax' => 0,
                 'discount' => $discount,
                 'coupon_code' => $coupon?->code,
-                'total' => max($subtotal - $discount, 0),
+                'total' => $total,
                 'status' => $isManual ? 'pending' : 'completed',
-                'payment_method' => $validated['payment_method'],
-                'transaction_id' => $isManual ? $validated['transaction_id'] : strtoupper('TXN-'.uniqid()),
+                'payment_method' => $paymentMethod,
+                'transaction_id' => $isManual ? $txnId : strtoupper(($isFree ? 'FREE-' : 'TXN-').uniqid()),
                 'payment_proof' => $proofPath,
-                'billing_name' => $validated['billing_name'],
-                'billing_email' => $validated['billing_email'],
-                'billing_phone' => trim((($validated['billing_phone_country'] ?? '').' '.($validated['billing_phone'] ?? ''))) ?: null,
+                'billing_name' => $request->input('billing_name'),
+                'billing_email' => $request->input('billing_email'),
+                'billing_phone' => $billingPhone,
                 'paid_at' => $isManual ? null : now(),
             ]);
 
@@ -206,9 +220,9 @@ class CheckoutController extends Controller
                 ->with('info', 'Thanks! Your payment is awaiting verification. You will get access once an admin confirms it.');
         }
 
-        \App\Models\AdminNotification::notifyAdmins('order', 'New order placed', $order->order_number.' · '.money($order->total), route('admin.orders.show', $order));
+        // Completed instantly (free order or online gateway).
+        \App\Models\AdminNotification::notifyAdmins('order', $isFree ? 'New free order' : 'New order placed', $order->order_number.' · '.money($order->total), route('admin.orders.show', $order));
 
-        // Announce each purchased product to connected Telegram bots.
         $order->loadMissing('items.product');
         foreach ($order->items as $item) {
             if ($item->product) {
@@ -223,7 +237,9 @@ class CheckoutController extends Controller
         }
 
         return redirect()->route('orders.show', $order)
-            ->with('success', 'Payment successful! Your digital products are ready to download.');
+            ->with('success', $isFree
+                ? 'Your free order is ready — download your products below!'
+                : 'Payment successful! Your digital products are ready to download.');
     }
 
     public function show(Request $request, Order $order): View

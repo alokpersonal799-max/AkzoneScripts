@@ -288,6 +288,8 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::post('/telegram/broadcast', [AdminTelegramController::class, 'broadcast'])->name('tg.broadcast');
     Route::put('/telegram/auto-promo', [AdminTelegramController::class, 'autoPromo'])->name('tg.autopromo');
     Route::post('/telegram/auto-promo/send', [AdminTelegramController::class, 'autoPromoNow'])->name('tg.autopromo.now');
+    Route::put('/telegram/daily-report', [AdminTelegramController::class, 'dailyReport'])->name('tg.dailyreport');
+    Route::post('/telegram/daily-report/send', [AdminTelegramController::class, 'dailyReportNow'])->name('tg.dailyreport.now');
     Route::put('/telegram/{bot}', [AdminTelegramController::class, 'update'])->name('tg.update');
     Route::delete('/telegram/{bot}', [AdminTelegramController::class, 'destroy'])->name('tg.destroy');
     Route::post('/telegram/{bot}/test', [AdminTelegramController::class, 'test'])->name('tg.test');

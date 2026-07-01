@@ -37,7 +37,11 @@
             <div class="card p-6">
                 <h2 class="font-display text-lg font-bold text-ink-900">Payment method</h2>
 
-                @if (empty($methods))
+                @if ($total <= 0)
+                    <div class="mt-3 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700">
+                        🎉 Your order total is <strong>{{ money(0) }}</strong> — no payment needed. Just click <strong>Complete order</strong> for instant access.
+                    </div>
+                @elseif (empty($methods))
                     <p class="mt-3 rounded-xl bg-rose-50 px-4 py-3 text-sm text-rose-700">No payment methods are enabled. Please contact support.</p>
                 @else
                     <div class="mt-4 space-y-3">
@@ -235,8 +239,8 @@
                     <div class="flex justify-between border-t border-slate-100 pt-3 text-base font-bold"><dt class="text-ink-900">Total</dt><dd class="text-brand-600">{{ money($total) }}</dd></div>
                 </dl>
 
-                @if ($items->isNotEmpty() && ! empty($methods))
-                    <button type="submit" form="checkoutForm" class="btn-primary btn-lg mt-6 w-full">Complete purchase</button>
+                @if ($items->isNotEmpty() && ($total <= 0 || ! empty($methods)))
+                    <button type="submit" form="checkoutForm" class="btn-primary btn-lg mt-6 w-full">{{ $total <= 0 ? 'Complete order' : 'Complete purchase' }}</button>
                     <p class="mt-3 text-center text-xs text-slate-400">By completing this purchase you agree to our terms of service.</p>
                 @else
                     <a href="{{ route('products.index') }}" class="btn-ghost btn-lg mt-6 w-full">Browse more products</a>

@@ -27,6 +27,8 @@ class TelegramController extends Controller
             'autoEnabled' => setting('autotgpromo_enabled', '0') === '1',
             'autoInterval' => (int) setting('autotgpromo_interval', 6),
             'autoUnit' => setting('autotgpromo_unit', 'hours'),
+            'reportEnabled' => setting('tg_daily_report_enabled', '0') === '1',
+            'reportTime' => setting('tg_daily_report_time', '20:00'),
         ]);
     }
 
@@ -122,6 +124,31 @@ class TelegramController extends Controller
     }
 
     /**
+     * Save the daily report schedule.
+     */
+    public function dailyReport(Request $request): RedirectResponse
+    {
+        $data = $request->validate([
+            'tg_daily_report_time' => ['nullable', 'date_format:H:i'],
+        ]);
+
+        \App\Models\Setting::put('tg_daily_report_enabled', $request->boolean('tg_daily_report_enabled') ? '1' : '0', 'telegram');
+        \App\Models\Setting::put('tg_daily_report_time', $data['tg_daily_report_time'] ?? '20:00', 'telegram');
+
+        return back()->with('success', 'Daily report settings saved.');
+    }
+
+    /**
+     * Send the daily report immediately (test).
+     */
+    public function dailyReportNow(TelegramService $telegram): RedirectResponse
+    {
+        $telegram->sendDailyReportNow();
+
+        return back()->with('success', 'Daily report sent to your subscribed bots.');
+    }
+
+    /**
      * @return array<string, mixed>
      */
     protected function validateBot(Request $request, ?TelegramBot $bot = null): array
@@ -187,6 +214,8 @@ class TelegramController extends Controller
             'review' => TelegramMessages::review($user, $product, 5),
             'free_download' => TelegramMessages::freeDownload($user, $product),
             'auto_promo' => TelegramMessages::autoPromo($product),
+            'admin_alert' => TelegramMessages::adminAlert('order', 'Payment to verify', 'AKZ-1042 · Jane Cooper', route('admin.dashboard')),
+            'daily_report' => TelegramMessages::dailyReport(['views' => 1240, 'registrations' => 8, 'logins' => 63, 'password_resets' => 2, 'sales' => 349, 'top_product' => 'Nebula — SaaS Landing Template', 'orders_total' => 11, 'orders_completed' => 9, 'orders_pending' => 2]),
             'custom' => TelegramMessages::custom('✨ <b>Special weekend sale!</b> Use code <b>SAVE20</b> for 20% off everything this weekend only.'),
         ];
     }

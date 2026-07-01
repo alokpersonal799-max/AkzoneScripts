@@ -29,10 +29,14 @@ class DashboardController extends Controller
 
         $stats = [
             'revenue' => (float) (clone $completedOrders)->sum('total'),
+            'revenue_today' => (float) Order::where('status', 'completed')->whereDate('paid_at', Carbon::today())->sum('total'),
+            'orders_today' => Order::whereDate('created_at', Carbon::today())->count(),
             'orders' => $completedCount,
+            'orders_pending' => Order::where('status', 'pending')->count(),
             'products' => Product::count(),
             'published' => Product::where('status', 'published')->count(),
             'customers' => User::where('role', 'user')->count(),
+            'customers_today' => User::where('role', 'user')->whereDate('created_at', Carbon::today())->count(),
             'sold' => (int) Product::sum('sales'),
             'downloads' => (int) Product::whereIn('id', $freeProductIds)->sum('downloads'),
             'free_products' => $freeProductIds->count(),

@@ -181,6 +181,33 @@
             </div>
         </div>
 
+        {{-- Daily report --}}
+        <div class="card p-6">
+            <h2 class="font-display text-lg font-bold text-ink-900">Daily report</h2>
+            <p class="mt-1 text-sm text-slate-500">A beautiful daily summary (views, new users, logins, password resets, sales, top seller, orders) sent to bots subscribed to <b>Daily summary report</b>.</p>
+            <form method="POST" action="{{ route('admin.tg.dailyreport') }}" class="mt-4 space-y-4">
+                @csrf @method('PUT')
+                <label class="flex items-center gap-2 text-sm font-semibold text-ink-900">
+                    <input type="checkbox" name="tg_daily_report_enabled" value="1" {{ old('tg_daily_report_enabled', $reportEnabled) ? 'checked' : '' }} class="rounded border-slate-300 text-brand-600 focus:ring-brand-500/30">
+                    Enable daily report
+                </label>
+                <div class="flex flex-wrap items-end gap-3">
+                    <div>
+                        <label for="tg_daily_report_time" class="label">Send at (server time)</label>
+                        <input id="tg_daily_report_time" name="tg_daily_report_time" type="time" value="{{ old('tg_daily_report_time', $reportTime) }}" class="input w-40">
+                    </div>
+                    <button type="submit" class="btn-primary btn-md">Save report schedule</button>
+                </div>
+            </form>
+            <div class="mt-3 flex items-center gap-2 border-t border-slate-100 pt-4">
+                <form method="POST" action="{{ route('admin.tg.dailyreport.now') }}">
+                    @csrf
+                    <button type="submit" class="btn-ghost btn-sm">Send report now</button>
+                </form>
+                <span class="text-xs text-slate-400">Test the report instantly. Needs the cron entry above for automatic daily sending.</span>
+            </div>
+        </div>
+
         {{-- Previews --}}
         <div>
             <h2 class="font-display text-lg font-bold text-ink-900">Message previews</h2>
@@ -194,6 +221,9 @@
                     'purchase' => 'Purchase',
                     'review' => 'Review',
                     'free_download' => 'Free download',
+                    'auto_promo' => 'Auto promotion',
+                    'admin_alert' => 'Admin action alert',
+                    'daily_report' => 'Daily report',
                     'custom' => 'Custom message',
                 ];
             @endphp
