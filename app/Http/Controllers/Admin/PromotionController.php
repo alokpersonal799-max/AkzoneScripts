@@ -33,6 +33,17 @@ class PromotionController extends Controller
             'announcementText' => Setting::get('announcement_text', ''),
             'announcementType' => Setting::get('announcement_type', 'offer'),
             'announcementLink' => Setting::get('announcement_link', ''),
+            // Popup settings
+            'popupEnabled' => Setting::get('popup_enabled', '0') === '1',
+            'popupMode' => Setting::get('popup_mode', 'message'),
+            'popupProduct' => (int) Setting::get('popup_product', 0),
+            'popupHeading' => Setting::get('popup_heading', ''),
+            'popupMessage' => Setting::get('popup_message', ''),
+            'popupLink' => Setting::get('popup_link', ''),
+            'popupLinkText' => Setting::get('popup_link_text', ''),
+            'popupTimerUntil' => Setting::get('popup_timer_until', ''),
+            'popupAutoCloseSeconds' => (int) Setting::get('popup_auto_close_seconds', 8),
+            'popupFrequency' => Setting::get('popup_frequency', 'once'),
         ]);
     }
 
@@ -57,6 +68,16 @@ class PromotionController extends Controller
             'announcement_text' => ['nullable', 'string', 'max:255'],
             'announcement_type' => ['nullable', 'in:info,offer,success,warning,alert'],
             'announcement_link' => ['nullable', 'url', 'max:255'],
+            // Popup settings
+            'popup_mode' => ['nullable', 'in:message,product,offer'],
+            'popup_product' => ['nullable', 'integer', 'exists:products,id'],
+            'popup_heading' => ['nullable', 'string', 'max:120'],
+            'popup_message' => ['nullable', 'string', 'max:500'],
+            'popup_link' => ['nullable', 'url', 'max:255'],
+            'popup_link_text' => ['nullable', 'string', 'max:60'],
+            'popup_timer_until' => ['nullable', 'date'],
+            'popup_auto_close_seconds' => ['nullable', 'integer', 'min:0', 'max:120'],
+            'popup_frequency' => ['nullable', 'in:once,always'],
         ], [
             'promo_products.max' => 'You can feature at most 4 products.',
             'promo_countdown_until.after' => 'The offer end time must be in the future.',
@@ -84,6 +105,18 @@ class PromotionController extends Controller
         Setting::put('announcement_text', $data['announcement_text'] ?? '', 'promotion');
         Setting::put('announcement_type', $data['announcement_type'] ?? 'offer', 'promotion');
         Setting::put('announcement_link', $data['announcement_link'] ?? '', 'promotion');
+
+        // Promotional popup settings.
+        Setting::put('popup_enabled', $request->boolean('popup_enabled') ? '1' : '0', 'promotion');
+        Setting::put('popup_mode', $data['popup_mode'] ?? 'message', 'promotion');
+        Setting::put('popup_product', (string) ($data['popup_product'] ?? ''), 'promotion');
+        Setting::put('popup_heading', $data['popup_heading'] ?? '', 'promotion');
+        Setting::put('popup_message', $data['popup_message'] ?? '', 'promotion');
+        Setting::put('popup_link', $data['popup_link'] ?? '', 'promotion');
+        Setting::put('popup_link_text', $data['popup_link_text'] ?? '', 'promotion');
+        Setting::put('popup_timer_until', $data['popup_timer_until'] ?? '', 'promotion');
+        Setting::put('popup_auto_close_seconds', (string) ($data['popup_auto_close_seconds'] ?? '8'), 'promotion');
+        Setting::put('popup_frequency', $data['popup_frequency'] ?? 'once', 'promotion');
 
         $labels = ['off' => 'turned off', 'products' => 'set to featured products', 'message' => 'set to a custom message', 'countdown' => 'set to a countdown offer'];
 

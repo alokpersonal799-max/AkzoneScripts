@@ -56,6 +56,26 @@ class DemoSeeder extends Seeder
         }
 
         \App\Models\Setting::put('promo_message', '🎉 Launch week — use code AKZONE10 for 10% off your first order!', 'promotion');
+
+        // Promotional popup settings for demo/testing.
+        $this->seedPopup();
+    }
+
+    /**
+     * Seed promotional popup settings so the feature works out of the box.
+     */
+    protected function seedPopup(): void
+    {
+        \App\Models\Setting::put('popup_enabled', '1', 'promotion');
+        \App\Models\Setting::put('popup_mode', 'message', 'promotion');
+        \App\Models\Setting::put('popup_heading', 'Welcome!', 'promotion');
+        \App\Models\Setting::put('popup_message', 'Check out our latest premium scripts and design assets. New products added weekly!', 'promotion');
+        \App\Models\Setting::put('popup_link', '/products', 'promotion');
+        \App\Models\Setting::put('popup_link_text', 'Browse Products', 'promotion');
+        \App\Models\Setting::put('popup_auto_close_seconds', '10', 'promotion');
+        \App\Models\Setting::put('popup_frequency', 'once', 'promotion');
+        \App\Models\Setting::put('popup_product', '', 'promotion');
+        \App\Models\Setting::put('popup_timer_until', '', 'promotion');
     }
 
     /**

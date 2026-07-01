@@ -286,5 +286,10 @@
     @if (setting('tawk_enabled') === '1' && setting('tawk_embed'))
         {!! setting('tawk_embed') !!}
     @endif
+
+    {{-- Promotional Popup --}}
+    @if (setting('popup_enabled', '0') === '1')
+        @include('partials.popup')
+    @endif
 </body>
 </html>
