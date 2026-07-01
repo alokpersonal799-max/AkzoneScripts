@@ -86,11 +86,11 @@
                     <p class="text-xs font-bold uppercase tracking-wide text-brand-600">Message fields</p>
                     <div>
                         <label for="popup_heading" class="label">Heading</label>
-                        <input id="popup_heading" name="popup_heading" type="text" value="{{ old('popup_heading', $popupHeading) }}" class="input" placeholder="Welcome!">
+                        <input id="popup_heading" :name="popupMode === 'message' ? 'popup_heading' : null" type="text" value="{{ old('popup_heading', $popupHeading) }}" class="input" placeholder="Welcome!">
                     </div>
                     <div>
                         <label for="popup_message_msg" class="label">Message</label>
-                        <textarea id="popup_message_msg" name="popup_message" rows="3" class="input" placeholder="Check out our latest products...">{{ old('popup_message', $popupMessage) }}</textarea>
+                        <textarea id="popup_message_msg" :name="popupMode === 'message' ? 'popup_message' : null" rows="3" class="input" placeholder="Check out our latest products...">{{ old('popup_message', $popupMessage) }}</textarea>
                     </div>
                     <div class="grid gap-4 sm:grid-cols-2">
                         <div>
@@ -109,7 +109,7 @@
                     <p class="text-xs font-bold uppercase tracking-wide text-brand-600">Product fields</p>
                     <div>
                         <label for="popup_product_select" class="label">Select product</label>
-                        <select id="popup_product_select" name="popup_product" class="input">
+                        <select id="popup_product_select" :name="popupMode === 'product' ? 'popup_product' : null" class="input">
                             <option value="">-- Select a product --</option>
                             @foreach ($products as $product)
                                 <option value="{{ $product->id }}" {{ (int) old('popup_product', $popupProduct) === $product->id ? 'selected' : '' }}>{{ $product->title }}</option>
@@ -118,7 +118,7 @@
                     </div>
                     <div>
                         <label for="popup_message_prod" class="label">Optional message</label>
-                        <textarea id="popup_message_prod" name="popup_message" rows="2" class="input" placeholder="Check this out...">{{ old('popup_message', $popupMessage) }}</textarea>
+                        <textarea id="popup_message_prod" :name="popupMode === 'product' ? 'popup_message' : null" rows="2" class="input" placeholder="Check this out...">{{ old('popup_message', $popupMessage) }}</textarea>
                     </div>
                 </div>
 
@@ -127,7 +127,7 @@
                     <p class="text-xs font-bold uppercase tracking-wide text-brand-600">Offer fields</p>
                     <div>
                         <label for="popup_product_offer" class="label">Select product</label>
-                        <select id="popup_product_offer" name="popup_product" class="input">
+                        <select id="popup_product_offer" :name="popupMode === 'offer' ? 'popup_product' : null" class="input">
                             <option value="">-- Select a product --</option>
                             @foreach ($products as $product)
                                 <option value="{{ $product->id }}" {{ (int) old('popup_product', $popupProduct) === $product->id ? 'selected' : '' }}>{{ $product->title }}</option>
@@ -140,11 +140,11 @@
                     </div>
                     <div>
                         <label for="popup_heading_offer" class="label">Heading <span class="text-slate-400">(optional)</span></label>
-                        <input id="popup_heading_offer" name="popup_heading" type="text" value="{{ old('popup_heading', $popupHeading) }}" class="input" placeholder="Limited Time Offer!">
+                        <input id="popup_heading_offer" :name="popupMode === 'offer' ? 'popup_heading' : null" type="text" value="{{ old('popup_heading', $popupHeading) }}" class="input" placeholder="Limited Time Offer!">
                     </div>
                     <div>
                         <label for="popup_message_offer" class="label">Message <span class="text-slate-400">(optional)</span></label>
-                        <textarea id="popup_message_offer" name="popup_message" rows="2" class="input" placeholder="Grab this deal before time runs out...">{{ old('popup_message', $popupMessage) }}</textarea>
+                        <textarea id="popup_message_offer" :name="popupMode === 'offer' ? 'popup_message' : null" rows="2" class="input" placeholder="Grab this deal before time runs out...">{{ old('popup_message', $popupMessage) }}</textarea>
                     </div>
                 </div>
 

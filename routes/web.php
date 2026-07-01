@@ -146,7 +146,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/free-download/{product}', [DownloadController::class, 'free'])->name('products.free');
 
     // Order invoice PDF download.
-    Route::get('/orders/{order}/invoice', [InvoiceController::class, 'download'])->name('orders.invoice');
+    Route::get('/orders/{order}/invoice', [InvoiceController::class, 'download'])->middleware('throttle:10,1')->name('orders.invoice');
 
     // Reviews & reports.
     Route::post('/products/{product}/reviews', [ReviewController::class, 'store'])->name('reviews.store');

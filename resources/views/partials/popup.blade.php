@@ -17,7 +17,13 @@
     $popupProduct = null;
 
     if (($popupMode === 'product' || $popupMode === 'offer') && $popupProductId) {
-        $popupProduct = \App\Models\Product::where('id', $popupProductId)->where('status', 'published')->first();
+        $popupProduct = \Illuminate\Support\Facades\Cache::remember(
+            'popup_product_' . $popupProductId,
+            300, // 5 minutes
+            function () use ($popupProductId) {
+                return \App\Models\Product::where('id', $popupProductId)->where('status', 'published')->first();
+            }
+        );
     }
 
     // Build a content hash for localStorage key (changing content resets "once" tracking)
