@@ -6,7 +6,15 @@
             <span id="akz-crop-count" style="font-size:.75rem;color:#64748b;"></span>
         </div>
         <div style="padding:1rem;background:#f8fafc;">
-            <div style="max-height:60vh;"><img id="akz-crop-img" style="max-width:100%;display:block;"></div>
+            <div style="display:flex;flex-wrap:wrap;gap:.4rem;margin-bottom:.75rem;">
+                <span style="font-size:.75rem;font-weight:600;color:#64748b;align-self:center;margin-right:.25rem;">Ratio:</span>
+                <button type="button" class="akz-ratio-btn" data-r="0" style="border-radius:.5rem;padding:.3rem .7rem;font-size:.75rem;font-weight:600;background:#2563eb;color:#fff;border:1px solid #2563eb;">Free</button>
+                <button type="button" class="akz-ratio-btn" data-r="1" style="border-radius:.5rem;padding:.3rem .7rem;font-size:.75rem;font-weight:600;background:#fff;color:#475569;border:1px solid #e2e8f0;">1:1</button>
+                <button type="button" class="akz-ratio-btn" data-r="1.6" style="border-radius:.5rem;padding:.3rem .7rem;font-size:.75rem;font-weight:600;background:#fff;color:#475569;border:1px solid #e2e8f0;">16:10</button>
+                <button type="button" class="akz-ratio-btn" data-r="1.7778" style="border-radius:.5rem;padding:.3rem .7rem;font-size:.75rem;font-weight:600;background:#fff;color:#475569;border:1px solid #e2e8f0;">16:9</button>
+                <button type="button" class="akz-ratio-btn" data-r="1.3333" style="border-radius:.5rem;padding:.3rem .7rem;font-size:.75rem;font-weight:600;background:#fff;color:#475569;border:1px solid #e2e8f0;">4:3</button>
+            </div>
+            <div style="max-height:56vh;"><img id="akz-crop-img" style="max-width:100%;display:block;"></div>
         </div>
         <div style="display:flex;justify-content:flex-end;gap:.5rem;padding:1rem 1.25rem;border-top:1px solid #e2e8f0;">
             <button type="button" id="akz-crop-skip" style="border-radius:.75rem;padding:.5rem 1rem;font-size:.875rem;font-weight:600;color:#475569;background:#f1f5f9;">Use original</button>
@@ -36,9 +44,28 @@
         function openCropper(dataUrl) {
             imgEl.src = dataUrl;
             modal.style.display = 'flex';
+            setActiveRatioBtn('0');
             if (cropper) { cropper.destroy(); cropper = null; }
-            cropper = new Cropper(imgEl, { aspectRatio: ratio, viewMode: 1, autoCropArea: 1, background: false, movable: true, zoomable: true });
+            cropper = new Cropper(imgEl, { aspectRatio: NaN, viewMode: 1, autoCropArea: 1, background: false, movable: true, zoomable: true, responsive: true });
         }
+
+        function setActiveRatioBtn(r) {
+            modal.querySelectorAll('.akz-ratio-btn').forEach(function (b) {
+                var on = b.getAttribute('data-r') === r;
+                b.style.background = on ? '#2563eb' : '#fff';
+                b.style.color = on ? '#fff' : '#475569';
+                b.style.borderColor = on ? '#2563eb' : '#e2e8f0';
+            });
+        }
+
+        modal.querySelectorAll('.akz-ratio-btn').forEach(function (btn) {
+            btn.addEventListener('click', function () {
+                if (!cropper) return;
+                var r = parseFloat(btn.getAttribute('data-r'));
+                cropper.setAspectRatio((!r || isNaN(r)) ? NaN : r);
+                setActiveRatioBtn(btn.getAttribute('data-r'));
+            });
+        });
 
         function hideModal() {
             modal.style.display = 'none';
