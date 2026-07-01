@@ -14,6 +14,7 @@ use App\Http\Controllers\Admin\SettingController as AdminSettingController;
 use App\Http\Controllers\Admin\StorageController as AdminStorageController;
 use App\Http\Controllers\Admin\PromotionController as AdminPromotionController;
 use App\Http\Controllers\Admin\SystemController as AdminSystemController;
+use App\Http\Controllers\Admin\ActivityLogController as AdminActivityLogController;
 use App\Http\Controllers\Admin\ServiceController as AdminServiceController;
 use App\Http\Controllers\Admin\CronController as AdminCronController;
 use App\Http\Controllers\Admin\ThemeController as AdminThemeController;
@@ -38,6 +39,7 @@ use App\Http\Controllers\InvoiceController;
 use App\Http\Controllers\PageController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\PwaController;
 use App\Http\Controllers\ServiceController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\ReviewController;
@@ -70,6 +72,10 @@ Route::controller(InstallController::class)->prefix('install')->name('install.')
 */
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
+
+// PWA manifest + icon.
+Route::get('/manifest.webmanifest', [PwaController::class, 'manifest'])->name('pwa.manifest');
+Route::get('/pwa-icon.svg', [PwaController::class, 'icon'])->name('pwa.icon');
 
 Route::get('/products', [ProductController::class, 'index'])->name('products.index');
 Route::get('/products/{product}', [ProductController::class, 'show'])->name('products.show');
@@ -269,6 +275,10 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
 
     // Cron jobs setup.
     Route::get('/cron', [AdminCronController::class, 'index'])->name('cron.index');
+
+    // Activity log (audit trail).
+    Route::get('/activity', [AdminActivityLogController::class, 'index'])->name('activity.index');
+    Route::delete('/activity', [AdminActivityLogController::class, 'clear'])->name('activity.clear');
 
     // Services management.
     Route::put('/services/settings', [AdminServiceController::class, 'settings'])->name('services.settings');

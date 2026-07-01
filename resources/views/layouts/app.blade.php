@@ -7,6 +7,11 @@
 
     @include('partials.theme-effects')
 
+    <button id="akzone-install-btn" onclick="akzoneInstall()" style="display:none" class="fixed bottom-5 right-5 z-40 items-center gap-2 rounded-full bg-brand-600 px-4 py-2.5 text-sm font-semibold text-white shadow-lift transition hover:bg-brand-700">
+        <svg class="inline h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3" /></svg>
+        Install app
+    </button>
+
     {{-- Top announcement bar (managed in Admin → Promotions) --}}
     @if (setting('announcement_enabled', '0') === '1' && setting('announcement_text'))
         @php

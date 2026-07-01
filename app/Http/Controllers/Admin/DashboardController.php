@@ -41,6 +41,7 @@ class DashboardController extends Controller
             'downloads' => (int) Product::whereIn('id', $freeProductIds)->sum('downloads'),
             'free_products' => $freeProductIds->count(),
             'views' => $totalViews,
+            'services' => \Illuminate\Support\Facades\Schema::hasTable('services') ? \App\Models\Service::where('is_active', true)->count() : 0,
             'conversion' => $totalViews > 0 ? round(($completedCount / $totalViews) * 100, 2) : 0,
         ];
 

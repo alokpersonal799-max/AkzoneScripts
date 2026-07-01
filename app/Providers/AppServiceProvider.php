@@ -28,6 +28,20 @@ class AppServiceProvider extends ServiceProvider
         // Automatically generate a slug whenever a product is saved.
         Product::observe(ProductObserver::class);
 
+        // Audit trail: log create/update/delete on key models.
+        foreach ([
+            \App\Models\Product::class,
+            \App\Models\Category::class,
+            \App\Models\Service::class,
+            \App\Models\Coupon::class,
+            \App\Models\Page::class,
+            \App\Models\Order::class,
+            \App\Models\Advertisement::class,
+            \App\Models\TelegramBot::class,
+        ] as $auditable) {
+            $auditable::observe(\App\Observers\ActivityObserver::class);
+        }
+
         // Apply admin-configured SMTP settings at runtime (if enabled).
         $this->applyMailSettings();
 

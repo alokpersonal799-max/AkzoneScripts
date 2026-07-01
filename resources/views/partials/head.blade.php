@@ -2,6 +2,34 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="csrf-token" content="{{ csrf_token() }}">
 
+{{-- PWA --}}
+<link rel="manifest" href="{{ route('pwa.manifest') }}">
+<meta name="theme-color" content="#2563eb">
+<link rel="apple-touch-icon" href="{{ route('pwa.icon') }}">
+<script>
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', function () {
+            navigator.serviceWorker.register('{{ asset('sw.js') }}').catch(function () {});
+        });
+    }
+    window.addEventListener('beforeinstallprompt', function (e) {
+        e.preventDefault();
+        window.__akzoneInstall = e;
+        var b = document.getElementById('akzone-install-btn');
+        if (b) b.style.display = 'inline-flex';
+    });
+    function akzoneInstall() {
+        var e = window.__akzoneInstall;
+        if (!e) return;
+        e.prompt();
+        e.userChoice.finally(function () {
+            window.__akzoneInstall = null;
+            var b = document.getElementById('akzone-install-btn');
+            if (b) b.style.display = 'none';
+        });
+    }
+</script>
+
 @php
     $metaTitle = isset($title) ? $title.' — '.setting('site_name', config('marketplace.name')) : (setting('seo_title') ?: setting('site_name', config('marketplace.name')));
     $metaDesc = setting('seo_description') ?: config('marketplace.tagline');

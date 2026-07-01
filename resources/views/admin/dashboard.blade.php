@@ -224,4 +224,24 @@
             @endforeach
         </div>
     </div>
+
+    {{-- Catalog snapshot (incl. active services) --}}
+    <div class="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-4">
+        @foreach ([
+            ['label' => 'Active services', 'value' => number_format($stats['services']), 'icon' => 'M11.42 15.17 17.25 21A2.652 2.652 0 0 0 21 17.25l-5.877-5.877M11.42 15.17l2.496-3.03c.317-.384.74-.626 1.208-.766M11.42 15.17l-4.655 5.653a2.548 2.548 0 1 1-3.586-3.586l6.837-5.63m5.108-.233c.55-.164 1.163-.188 1.743-.14a4.5 4.5 0 0 0 4.486-6.336l-3.276 3.277a3.004 3.004 0 0 1-2.25-2.25l3.276-3.276a4.5 4.5 0 0 0-6.336 4.486c.091 1.076-.071 2.264-.904 2.95l-.102.085m-1.745 1.437L5.909 7.5H4.5L2.25 3.75l1.5-1.5L7.5 4.5v1.409l4.26 4.26m-1.745 1.437 1.745-1.437', 'tint' => 'bg-fuchsia-50 text-fuchsia-600'],
+            ['label' => 'Published products', 'value' => number_format($stats['published']), 'icon' => 'M20.25 7.5l-.625 10.632a2.25 2.25 0 0 1-2.247 2.118H6.622a2.25 2.25 0 0 1-2.247-2.118L3.75 7.5', 'tint' => 'bg-brand-50 text-brand-600'],
+            ['label' => 'Free products', 'value' => number_format($stats['free_products']), 'icon' => 'm3.75 13.5 10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75Z', 'tint' => 'bg-emerald-50 text-emerald-600'],
+            ['label' => 'Conversion', 'value' => $stats['conversion'].'%', 'icon' => 'M2.25 18 9 11.25l4.306 4.307a11.95 11.95 0 0 1 5.814-5.519l2.74-1.22m0 0-5.94-2.281m5.94 2.28-2.28 5.941', 'tint' => 'bg-sky-50 text-sky-600'],
+        ] as $mini)
+            <div class="card flex items-center gap-3 p-4">
+                <span class="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-xl {{ $mini['tint'] }}">
+                    <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke-width="1.6" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="{{ $mini['icon'] }}" /></svg>
+                </span>
+                <div>
+                    <p class="font-display text-lg font-extrabold text-ink-900">{{ $mini['value'] }}</p>
+                    <p class="text-xs text-slate-400">{{ $mini['label'] }}</p>
+                </div>
+            </div>
+        @endforeach
+    </div>
 @endsection
