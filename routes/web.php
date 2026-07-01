@@ -30,6 +30,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DownloadController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\InstallController;
+use App\Http\Controllers\InvoiceController;
 use App\Http\Controllers\PageController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProfileController;
@@ -143,6 +144,9 @@ Route::middleware('auth')->group(function () {
     // Secure download of a purchased product.
     Route::get('/download/{orderItem}', [DownloadController::class, 'download'])->name('download');
     Route::get('/free-download/{product}', [DownloadController::class, 'free'])->name('products.free');
+
+    // Order invoice PDF download.
+    Route::get('/orders/{order}/invoice', [InvoiceController::class, 'download'])->name('orders.invoice');
 
     // Reviews & reports.
     Route::post('/products/{product}/reviews', [ReviewController::class, 'store'])->name('reviews.store');
