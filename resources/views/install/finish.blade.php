@@ -51,7 +51,7 @@
         @endif
 
         <div class="mt-7 grid gap-3 sm:grid-cols-2">
-            <a href="{{ url('/admin') }}" class="btn-primary btn-lg">Login to admin dashboard</a>
+            <a href="{{ url('/admin') }}" class="btn-primary btn-lg">Go to admin dashboard</a>
             <a href="{{ url('/') }}" class="btn-ghost btn-lg border border-slate-200">Visit website</a>
         </div>
 

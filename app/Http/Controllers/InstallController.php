@@ -6,6 +6,7 @@ use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
@@ -196,6 +197,13 @@ class InstallController extends Controller
                 'APP_URL' => rtrim(env('APP_URL', $this->guessUrl()), '/'),
             ]);
 
+            // Sign the demo admin in so the finish page opens the dashboard directly.
+            $demoAdmin = User::where('email', 'admin@akzone.com')->first();
+            if ($demoAdmin) {
+                Auth::login($demoAdmin);
+                $request->session()->regenerate();
+            }
+
             return redirect()->route('install.finish');
         }
 
@@ -235,7 +243,7 @@ class InstallController extends Controller
                 'password' => env('DB_PASSWORD'),
             ]);
 
-            User::updateOrCreate(
+            $admin = User::updateOrCreate(
                 ['email' => $data['admin_email']],
                 [
                     'name' => $data['admin_name'],
@@ -244,6 +252,11 @@ class InstallController extends Controller
                     'email_verified_at' => now(),
                 ]
             );
+
+            // Sign the new admin in so the finish page's "Go to admin dashboard"
+            // button opens the panel directly, with no extra login step.
+            Auth::login($admin);
+            $request->session()->regenerate();
         } catch (Throwable $e) {
             return back()
                 ->withInput()

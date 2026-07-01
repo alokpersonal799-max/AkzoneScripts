@@ -58,4 +58,31 @@
         Don't have an account?
         <a href="{{ route('register') }}" class="font-semibold text-brand-600 underline hover:text-brand-700">Register</a>
     </p>
+
+    @if (\App\Models\User::where('email', 'admin@akzone.com')->exists())
+        {{-- Shown only while demo data is installed; disappears once demo data is cleared. --}}
+        <div class="mt-6 rounded-xl border border-dashed border-emerald-300 bg-emerald-50/70 px-4 py-3">
+            <p class="flex items-center gap-1.5 text-xs font-bold text-emerald-800">
+                <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 5.25a3 3 0 0 1 3 3m3 0a6 6 0 0 1-7.029 5.912c-.563-.097-1.159.026-1.563.43L10.5 17.25H9v1.5H7.5v1.5H6v1.5H2.25v-1.5a1.5 1.5 0 0 1 .44-1.06l5.42-5.42c.404-.404.527-1 .43-1.563A6 6 0 1 1 21.75 8.25Z" /></svg>
+                Demo credentials (for demonstration only)
+            </p>
+            <div class="mt-2 grid gap-2 sm:grid-cols-2">
+                <button type="button"
+                        onclick="document.getElementById('email').value='admin@akzone.com';document.getElementById('password').value='password';"
+                        class="rounded-lg bg-white/70 px-3 py-2 text-left text-xs transition hover:bg-white">
+                    <span class="block font-semibold text-emerald-700">Admin</span>
+                    <span class="block font-mono text-[11px] text-slate-600">admin@akzone.com</span>
+                    <span class="block font-mono text-[11px] text-slate-600">password</span>
+                </button>
+                <button type="button"
+                        onclick="document.getElementById('email').value='user@akzone.com';document.getElementById('password').value='password';"
+                        class="rounded-lg bg-white/70 px-3 py-2 text-left text-xs transition hover:bg-white">
+                    <span class="block font-semibold text-emerald-700">Customer</span>
+                    <span class="block font-mono text-[11px] text-slate-600">user@akzone.com</span>
+                    <span class="block font-mono text-[11px] text-slate-600">password</span>
+                </button>
+            </div>
+            <p class="mt-2 text-[11px] text-emerald-600">Click a card to auto-fill, then press Login.</p>
+        </div>
+    @endif
 </x-guest-layout>
