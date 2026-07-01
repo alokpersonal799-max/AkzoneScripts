@@ -117,6 +117,10 @@ class DemoSeeder extends Seeder
      */
     protected function seedDemoSettings(): void
     {
+        // Marks the store as running in demonstration mode. Powers the demo
+        // credit badge, login-page demo credentials and the demo data tools.
+        // Cleared automatically when the admin clicks "Clear demo data".
+        \App\Models\Setting::put('demo_mode', '1', 'general');
         \App\Models\Setting::put('contact_whatsapp', '14155550123', 'general');
         \App\Models\Setting::put('contact_telegram', 'akzonescripts', 'general');
         \App\Models\Setting::put('manual_upi_id', 'akzonescripts@upi', 'manual');

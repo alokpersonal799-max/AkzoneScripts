@@ -21,6 +21,8 @@ class Review extends Model
         'user_id',
         'rating',
         'comment',
+        'admin_reply',
+        'replied_at',
         'is_approved',
         'is_testimonial',
     ];
@@ -36,6 +38,7 @@ class Review extends Model
             'rating' => 'integer',
             'is_approved' => 'boolean',
             'is_testimonial' => 'boolean',
+            'replied_at' => 'datetime',
         ];
     }
 

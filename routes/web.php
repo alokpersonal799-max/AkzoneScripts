@@ -249,6 +249,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::patch('/reviews/{review}/approve', [AdminReviewController::class, 'approve'])->name('reviews.approve');
     Route::patch('/reviews/{review}/unapprove', [AdminReviewController::class, 'unapprove'])->name('reviews.unapprove');
     Route::patch('/reviews/{review}/testimonial', [AdminReviewController::class, 'toggleTestimonial'])->name('reviews.testimonial');
+    Route::patch('/reviews/{review}/reply', [AdminReviewController::class, 'reply'])->name('reviews.reply');
     Route::delete('/reviews/{review}', [AdminReviewController::class, 'destroy'])->name('reviews.destroy');
 
     // Site settings (section-based).
@@ -281,6 +282,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     // Demonstration data tool (limited-use import / clear from the dashboard).
     Route::post('/demo-data/import', [AdminDemoDataController::class, 'import'])->name('demo.import');
     Route::post('/demo-data/clear', [AdminDemoDataController::class, 'clear'])->name('demo.clear');
+    Route::post('/demo-data/hide', [AdminDemoDataController::class, 'hide'])->name('demo.hide');
 
     // Activity log (audit trail).
     Route::get('/activity', [AdminActivityLogController::class, 'index'])->name('activity.index');

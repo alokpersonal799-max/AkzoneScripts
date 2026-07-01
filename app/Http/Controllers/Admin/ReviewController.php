@@ -77,6 +77,25 @@ class ReviewController extends Controller
             : 'Review removed from testimonials.');
     }
 
+    /**
+     * Save (or update/remove) the admin's public reply to a review.
+     */
+    public function reply(Request $request, Review $review): RedirectResponse
+    {
+        $data = $request->validate([
+            'admin_reply' => ['nullable', 'string', 'max:1000'],
+        ]);
+
+        $reply = trim((string) ($data['admin_reply'] ?? ''));
+
+        $review->update([
+            'admin_reply' => $reply !== '' ? $reply : null,
+            'replied_at' => $reply !== '' ? now() : null,
+        ]);
+
+        return back()->with('success', $reply !== '' ? 'Reply saved.' : 'Reply removed.');
+    }
+
     public function destroy(Review $review): RedirectResponse
     {
         $review->delete();

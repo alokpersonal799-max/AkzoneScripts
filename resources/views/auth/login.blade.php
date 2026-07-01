@@ -59,7 +59,7 @@
         <a href="{{ route('register') }}" class="font-semibold text-brand-600 underline hover:text-brand-700">Register</a>
     </p>
 
-    @if (\App\Models\User::where('email', 'admin@akzone.com')->exists())
+    @if (setting('demo_mode', '0') === '1')
         {{-- Shown only while demo data is installed; disappears once demo data is cleared. --}}
         <div class="mt-6 rounded-xl border border-dashed border-emerald-300 bg-emerald-50/70 px-4 py-3">
             <p class="flex items-center gap-1.5 text-xs font-bold text-emerald-800">

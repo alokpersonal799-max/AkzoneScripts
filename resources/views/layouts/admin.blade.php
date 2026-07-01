@@ -76,7 +76,8 @@
             </form>
         </nav>
 
-        {{-- Credit --}}
+        {{-- Credit (demo mode only) --}}
+        @if (setting('demo_mode', '0') === '1')
         <div class="nav-label flex-shrink-0 border-t border-slate-100 p-4">
             <a href="https://instagram.com/i_am2_black" target="_blank" rel="noopener"
                class="block rounded-xl bg-gradient-to-br from-brand-500 to-indigo-500 p-3 text-center text-white shadow-soft transition hover:opacity-95">
@@ -88,6 +89,7 @@
                 <p class="mt-1 text-[11px] text-white/80">Custom PHP scripts &middot; DM for orders</p>
             </a>
         </div>
+        @endif
     </aside>
 
     {{-- Overlay for mobile --}}
@@ -160,6 +162,7 @@
                 <p class="text-sm text-slate-500">
                     &copy; {{ date('Y') }} {{ setting('site_name', config('app.name')) }}. All rights reserved.
                 </p>
+                @if (setting('demo_mode', '0') === '1')
                 <p class="flex items-center gap-1.5 text-sm text-slate-500">
                     This complete PHP script platform was created by
                     <a href="https://instagram.com/i_am2_black" target="_blank" rel="noopener" class="inline-flex items-center gap-1 font-semibold text-brand-600 hover:text-brand-700">
@@ -168,6 +171,7 @@
                     </a>
                     &middot; feel free to contact for orders.
                 </p>
+                @endif
             </div>
         </footer>
     </div>

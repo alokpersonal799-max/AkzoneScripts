@@ -5,70 +5,6 @@
 @section('admin')
     @php $sym = base_symbol(); @endphp
 
-    @php
-        $demoUses = (int) setting('demo_tool_uses', 0);
-        $demoMax = \App\Http\Controllers\Admin\DemoDataController::MAX_USES;
-        $demoRemaining = max(0, $demoMax - $demoUses);
-    @endphp
-    @if ($demoUses < $demoMax)
-        <div x-data="{ show: null }" class="mb-6 rounded-2xl border border-dashed border-amber-300 bg-amber-50/70 p-5">
-            <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                <div class="flex items-start gap-3">
-                    <span class="flex h-10 w-10 flex-none items-center justify-center rounded-xl bg-amber-100 text-amber-600">
-                        <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke-width="1.7" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M20.25 6.375c0 2.278-3.694 4.125-8.25 4.125S3.75 8.653 3.75 6.375m16.5 0c0-2.278-3.694-4.125-8.25-4.125S3.75 4.097 3.75 6.375m16.5 0v11.25c0 2.278-3.694 4.125-8.25 4.125s-8.25-1.847-8.25-4.125V6.375m16.5 0v3.75m-16.5-3.75v3.75m16.5 0v3.75C20.25 16.153 16.556 18 12 18s-8.25-1.847-8.25-4.125v-3.75m16.5 0c0 2.278-3.694 4.125-8.25 4.125s-8.25-1.847-8.25-4.125" /></svg>
-                    </span>
-                    <div>
-                        <p class="text-sm font-bold text-ink-900">Demonstration data tool</p>
-                        <p class="mt-0.5 text-xs text-amber-700">Import sample content to explore features, then clear it. <strong>For demonstration only</strong> — this tool works a total of {{ $demoMax }} times and then disappears. <strong>{{ $demoRemaining }} use(s) left.</strong></p>
-                    </div>
-                </div>
-                <div class="flex flex-none gap-2">
-                    <button type="button" @click="show = 'import'" class="btn-primary btn-sm">Import demo data</button>
-                    <button type="button" @click="show = 'clear'" class="btn-ghost btn-sm border border-rose-200 text-rose-600 hover:bg-rose-50">Clear demo data</button>
-                </div>
-            </div>
-
-            {{-- Confirmation modal --}}
-            <div x-show="show" x-cloak class="fixed inset-0 z-50 flex items-center justify-center p-4" style="display:none;">
-                <div class="absolute inset-0 bg-ink-900/50" @click="show = null"></div>
-                <div class="relative w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl" @keydown.escape.window="show = null">
-                    {{-- Import confirm --}}
-                    <div x-show="show === 'import'">
-                        <h3 class="font-display text-lg font-bold text-ink-900">Import demo data?</h3>
-                        <div class="mt-3 rounded-xl bg-amber-50 px-4 py-3 text-sm text-amber-700">
-                            <p class="font-semibold">Please note</p>
-                            <p class="mt-1">This adds sample categories, products, gallery images, reviews and demo accounts (including <code class="font-mono">admin@akzone.com</code> / <code class="font-mono">password</code>).</p>
-                            <p class="mt-1">This tool is <strong>for demonstration only</strong> and can be used a total of {{ $demoMax }} times. You have <strong>{{ $demoRemaining }} use(s) left</strong>; after that it disappears.</p>
-                        </div>
-                        <div class="mt-5 flex justify-end gap-2">
-                            <button type="button" @click="show = null" class="btn-ghost btn-md">Cancel</button>
-                            <form method="POST" action="{{ route('admin.demo.import') }}">
-                                @csrf
-                                <button type="submit" class="btn-primary btn-md">Yes, import demo data</button>
-                            </form>
-                        </div>
-                    </div>
-                    {{-- Clear confirm --}}
-                    <div x-show="show === 'clear'">
-                        <h3 class="font-display text-lg font-bold text-ink-900">Clear demo data?</h3>
-                        <div class="mt-3 rounded-xl bg-rose-50 px-4 py-3 text-sm text-rose-700">
-                            <p class="font-semibold">Warning — this cannot be undone</p>
-                            <p class="mt-1">This permanently removes all sample products, categories, reviews, services, pages, adverts and demo accounts. Your own admin account is kept.</p>
-                            <p class="mt-1">This tool is <strong>for demonstration only</strong> and can be used a total of {{ $demoMax }} times. You have <strong>{{ $demoRemaining }} use(s) left</strong>; after that it disappears.</p>
-                        </div>
-                        <div class="mt-5 flex justify-end gap-2">
-                            <button type="button" @click="show = null" class="btn-ghost btn-md">Cancel</button>
-                            <form method="POST" action="{{ route('admin.demo.clear') }}">
-                                @csrf
-                                <button type="submit" class="btn-md rounded-xl bg-rose-600 font-semibold text-white hover:bg-rose-700">Yes, clear demo data</button>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    @endif
-
     {{-- Stats --}}
     <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         @php
@@ -289,4 +225,80 @@
             @endforeach
         </div>
     </div>
+
+    {{-- Demonstration data tool (kept at the bottom, below System Health) --}}
+    @php
+        $demoImports = (int) setting('demo_import_uses', 0);
+        $demoMaxImports = \App\Http\Controllers\Admin\DemoDataController::MAX_IMPORTS;
+        $demoImportsLeft = max(0, $demoMaxImports - $demoImports);
+        $demoHidden = setting('demo_tool_hidden', '0') === '1';
+    @endphp
+    @if (! $demoHidden)
+        <div x-data="{ show: null }" class="mt-6 rounded-2xl border border-dashed border-amber-300 bg-amber-50/70 p-5">
+            <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                <div class="flex items-start gap-3">
+                    <span class="flex h-10 w-10 flex-none items-center justify-center rounded-xl bg-amber-100 text-amber-600">
+                        <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke-width="1.7" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M20.25 6.375c0 2.278-3.694 4.125-8.25 4.125S3.75 8.653 3.75 6.375m16.5 0c0-2.278-3.694-4.125-8.25-4.125S3.75 4.097 3.75 6.375m16.5 0v11.25c0 2.278-3.694 4.125-8.25 4.125s-8.25-1.847-8.25-4.125V6.375m16.5 0v3.75m-16.5-3.75v3.75m16.5 0v3.75C20.25 16.153 16.556 18 12 18s-8.25-1.847-8.25-4.125v-3.75m16.5 0c0 2.278-3.694 4.125-8.25 4.125s-8.25-1.847-8.25-4.125" /></svg>
+                    </span>
+                    <div>
+                        <p class="text-sm font-bold text-ink-900">Demonstration data tool</p>
+                        <p class="mt-0.5 text-xs text-amber-700"><strong>For demonstration only.</strong> Import sample content to explore features (max {{ $demoMaxImports }} times — <strong>{{ $demoImportsLeft }} left</strong>), and clear it any time. Hide this tool permanently when you go live.</p>
+                    </div>
+                </div>
+                <div class="flex flex-none flex-wrap gap-2">
+                    @if ($demoImportsLeft > 0)
+                        <button type="button" @click="show = 'import'" class="btn-primary btn-sm">Import demo data</button>
+                    @else
+                        <span class="inline-flex items-center rounded-lg bg-slate-100 px-3 py-1.5 text-xs font-semibold text-slate-400">Import limit reached</span>
+                    @endif
+                    <button type="button" @click="show = 'clear'" class="btn-ghost btn-sm border border-rose-200 text-rose-600 hover:bg-rose-50">Clear demo data</button>
+                    <button type="button" @click="show = 'hide'" class="btn-ghost btn-sm border border-slate-200 text-slate-500 hover:bg-slate-100">Hide permanently</button>
+                </div>
+            </div>
+
+            {{-- Confirmation modal --}}
+            <div x-show="show" x-cloak class="fixed inset-0 z-50 flex items-center justify-center p-4" style="display:none;">
+                <div class="absolute inset-0 bg-ink-900/50" @click="show = null"></div>
+                <div class="relative w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl" @keydown.escape.window="show = null">
+                    {{-- Import confirm --}}
+                    <div x-show="show === 'import'">
+                        <h3 class="font-display text-lg font-bold text-ink-900">Import demo data?</h3>
+                        <div class="mt-3 rounded-xl bg-amber-50 px-4 py-3 text-sm text-amber-700">
+                            <p class="font-semibold">Please note</p>
+                            <p class="mt-1">This adds sample categories, products, gallery images, reviews and demo accounts (including <code class="font-mono">admin@akzone.com</code> / <code class="font-mono">password</code>).</p>
+                            <p class="mt-1"><strong>For demonstration only.</strong> Demo data can be imported a maximum of {{ $demoMaxImports }} times — you have <strong>{{ $demoImportsLeft }} left</strong>.</p>
+                        </div>
+                        <div class="mt-5 flex justify-end gap-2">
+                            <button type="button" @click="show = null" class="btn-ghost btn-md">Cancel</button>
+                            <form method="POST" action="{{ route('admin.demo.import') }}">@csrf<button type="submit" class="btn-primary btn-md">Yes, import demo data</button></form>
+                        </div>
+                    </div>
+                    {{-- Clear confirm --}}
+                    <div x-show="show === 'clear'">
+                        <h3 class="font-display text-lg font-bold text-ink-900">Clear demo data?</h3>
+                        <div class="mt-3 rounded-xl bg-rose-50 px-4 py-3 text-sm text-rose-700">
+                            <p class="font-semibold">This cannot be undone</p>
+                            <p class="mt-1">Removes all sample products, categories, reviews, services, pages, adverts and demo accounts. Your own admin account is kept. You can clear demo data as many times as you like.</p>
+                        </div>
+                        <div class="mt-5 flex justify-end gap-2">
+                            <button type="button" @click="show = null" class="btn-ghost btn-md">Cancel</button>
+                            <form method="POST" action="{{ route('admin.demo.clear') }}">@csrf<button type="submit" class="btn-md rounded-xl bg-rose-600 font-semibold text-white hover:bg-rose-700">Yes, clear demo data</button></form>
+                        </div>
+                    </div>
+                    {{-- Hide permanently confirm --}}
+                    <div x-show="show === 'hide'">
+                        <h3 class="font-display text-lg font-bold text-ink-900">Hide this tool permanently?</h3>
+                        <div class="mt-3 rounded-xl bg-slate-100 px-4 py-3 text-sm text-slate-600">
+                            <p class="font-semibold text-ink-900">Warning</p>
+                            <p class="mt-1">This removes the demo data tool for good. You will <strong>never be able to import or clear demo data again</strong> from the dashboard. If you need it back later, you'd have to <strong>reinstall the script</strong>.</p>
+                        </div>
+                        <div class="mt-5 flex justify-end gap-2">
+                            <button type="button" @click="show = null" class="btn-ghost btn-md">Cancel</button>
+                            <form method="POST" action="{{ route('admin.demo.hide') }}">@csrf<button type="submit" class="btn-md rounded-xl bg-slate-800 font-semibold text-white hover:bg-slate-900">Yes, hide it forever</button></form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    @endif
 @endsection

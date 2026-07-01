@@ -14,7 +14,7 @@
 
     <div class="space-y-4">
         @forelse ($reviews as $review)
-            <div class="card p-5">
+            <div class="card p-5" x-data="{ reply: false }">
                 <div class="flex flex-wrap items-start justify-between gap-3">
                     <div class="min-w-0">
                         <div class="flex flex-wrap items-center gap-2">
@@ -39,6 +39,12 @@
                         @if ($review->comment)
                             <p class="mt-2 rounded-lg bg-slate-50 px-3 py-2 text-sm text-slate-600">{{ $review->comment }}</p>
                         @endif
+                        @if ($review->admin_reply)
+                            <div class="mt-2 rounded-lg border-l-4 border-brand-300 bg-brand-50/60 px-3 py-2 text-sm">
+                                <p class="text-xs font-semibold text-brand-700">Store reply @if ($review->replied_at)· {{ $review->replied_at->diffForHumans() }}@endif</p>
+                                <p class="mt-0.5 text-slate-600">{{ $review->admin_reply }}</p>
+                            </div>
+                        @endif
                     </div>
                 </div>
 
@@ -52,9 +58,25 @@
                         @csrf @method('PATCH')
                         <button class="btn-ghost btn-sm">{{ $review->is_testimonial ? 'Remove from testimonials' : 'Mark as testimonial' }}</button>
                     </form>
+                    <button type="button" @click="reply = !reply" class="btn-ghost btn-sm border border-brand-200 text-brand-600 hover:bg-brand-50">{{ $review->admin_reply ? 'Edit reply' : 'Reply' }}</button>
                     <form method="POST" action="{{ route('admin.reviews.destroy', $review) }}" onsubmit="return confirm('Delete this review?');" class="ml-auto">
                         @csrf @method('DELETE')
                         <button class="text-sm font-semibold text-rose-600 hover:text-rose-700">Delete</button>
+                    </form>
+                </div>
+
+                {{-- Admin reply editor (optional) --}}
+                <div x-show="reply" x-cloak x-transition class="mt-4 border-t border-slate-100 pt-4">
+                    <form method="POST" action="{{ route('admin.reviews.reply', $review) }}">
+                        @csrf @method('PATCH')
+                        <label class="text-sm font-semibold text-ink-900">Public reply to this review</label>
+                        <textarea name="admin_reply" rows="2" placeholder="Thanks for your feedback! ..."
+                                  class="mt-2 w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 placeholder-slate-400 focus:border-brand-500 focus:outline-none focus:ring-4 focus:ring-brand-500/10">{{ $review->admin_reply }}</textarea>
+                        <div class="mt-2 flex items-center gap-2">
+                            <button type="submit" class="btn-primary btn-sm">Save reply</button>
+                            <button type="button" @click="reply = false" class="btn-ghost btn-sm">Cancel</button>
+                            <span class="text-xs text-slate-400">Shows publicly under the review. Leave empty and save to remove it.</span>
+                        </div>
                     </form>
                 </div>
             </div>

@@ -161,6 +161,15 @@
                                 <x-star-rating :rating="$review->rating" size="h-4 w-4" />
                             </div>
                             @if ($review->comment)<p class="mt-3 text-sm text-slate-600">{{ $review->comment }}</p>@endif
+                            @if ($review->admin_reply)
+                                <div class="mt-3 ml-6 rounded-xl border-l-4 border-brand-300 bg-brand-50/60 px-4 py-3">
+                                    <p class="flex items-center gap-1.5 text-xs font-bold text-brand-700">
+                                        <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 15 3 9m0 0 6-6M3 9h12a6 6 0 0 1 0 12h-3" /></svg>
+                                        {{ setting('site_name', 'Store') }} replied @if ($review->replied_at)· {{ $review->replied_at->diffForHumans() }}@endif
+                                    </p>
+                                    <p class="mt-1 text-sm text-slate-600">{{ $review->admin_reply }}</p>
+                                </div>
+                            @endif
                         </div>
                     @empty
                         <div class="flex flex-col items-center py-8 text-center">

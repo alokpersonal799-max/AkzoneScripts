@@ -22,10 +22,12 @@ use Throwable;
 
 class DemoDataController extends Controller
 {
-    /** Maximum number of times the demo tool (import + clear combined) may be used. */
-    public const MAX_USES = 2;
+    /** Maximum number of times demo data may be imported. */
+    public const MAX_IMPORTS = 5;
 
-    private const USES_KEY = 'demo_tool_uses';
+    private const IMPORTS_KEY = 'demo_import_uses';
+
+    private const HIDDEN_KEY = 'demo_tool_hidden';
 
     /** Emails created by the DemoSeeder (safe to remove when clearing demo data). */
     private const DEMO_EMAILS = [
@@ -37,11 +39,16 @@ class DemoDataController extends Controller
 
     /**
      * Import the demonstration dataset (sample products, reviews, etc.).
+     * Limited to MAX_IMPORTS uses.
      */
     public function import(): RedirectResponse
     {
-        if (! $this->hasUsesLeft()) {
-            return back()->with('error', 'The demo data tool has already been used '.self::MAX_USES.' times and is no longer available.');
+        if ($this->isHidden()) {
+            return back()->with('error', 'The demo data tool has been permanently hidden.');
+        }
+
+        if ($this->importsUsed() >= self::MAX_IMPORTS) {
+            return back()->with('error', 'Demo data can only be imported '.self::MAX_IMPORTS.' times, and that limit has been reached.');
         }
 
         try {
@@ -50,23 +57,22 @@ class DemoDataController extends Controller
             return back()->with('error', 'Could not import demo data: '.$e->getMessage());
         }
 
-        $this->recordUse();
+        Setting::put(self::IMPORTS_KEY, (string) ($this->importsUsed() + 1), 'general');
+        Setting::put('demo_mode', '1', 'general');
 
-        return back()->with('success', 'Demo data imported successfully. '.$this->remainingUses().' use(s) of the demo tool remaining.');
+        return back()->with('success', 'Demo data imported successfully. '.$this->importsLeft().' import(s) remaining.');
     }
 
     /**
-     * Remove the demonstration content from the store.
+     * Remove the demonstration content from the store. May be used any number of times.
      */
     public function clear(): RedirectResponse
     {
-        if (! $this->hasUsesLeft()) {
-            return back()->with('error', 'The demo data tool has already been used '.self::MAX_USES.' times and is no longer available.');
+        if ($this->isHidden()) {
+            return back()->with('error', 'The demo data tool has been permanently hidden.');
         }
 
         try {
-            // Delete content in dependency-safe order. Each guarded so a missing
-            // table never aborts the whole operation.
             $this->safeDelete(fn () => ProductChangelog::query()->delete(), 'product_changelogs');
             $this->safeDelete(fn () => Review::query()->delete(), 'reviews');
             $this->safeDelete(fn () => Product::query()->delete(), 'products');
@@ -84,17 +90,27 @@ class DemoDataController extends Controller
                     ->delete();
             }, 'users');
 
-            // Disable promo/popup that referenced now-deleted demo products.
+            // Turn off promo/popup that referenced now-deleted demo products, and
+            // leave demonstration mode so the credit/demo badges disappear.
             foreach (['hero_promo_enabled', 'popup_enabled', 'announcement_enabled'] as $flag) {
                 Setting::put($flag, '0', 'promotion');
             }
+            Setting::put('demo_mode', '0', 'general');
         } catch (Throwable $e) {
             return back()->with('error', 'Could not clear demo data: '.$e->getMessage());
         }
 
-        $this->recordUse();
+        return back()->with('success', 'Demo data cleared. Your store is now clean and ready for business.');
+    }
 
-        return back()->with('success', 'Demo data cleared. '.$this->remainingUses().' use(s) of the demo tool remaining.');
+    /**
+     * Permanently hide the demo data tool. Cannot be undone without reinstalling.
+     */
+    public function hide(): RedirectResponse
+    {
+        Setting::put(self::HIDDEN_KEY, '1', 'general');
+
+        return back()->with('success', 'The demo data tool has been permanently hidden.');
     }
 
     private function safeDelete(callable $fn, string $table): void
@@ -104,23 +120,18 @@ class DemoDataController extends Controller
         }
     }
 
-    private function usesSoFar(): int
+    private function importsUsed(): int
     {
-        return (int) setting(self::USES_KEY, 0);
+        return (int) setting(self::IMPORTS_KEY, 0);
     }
 
-    private function hasUsesLeft(): bool
+    private function importsLeft(): int
     {
-        return $this->usesSoFar() < self::MAX_USES;
+        return max(0, self::MAX_IMPORTS - $this->importsUsed());
     }
 
-    private function remainingUses(): int
+    private function isHidden(): bool
     {
-        return max(0, self::MAX_USES - $this->usesSoFar());
-    }
-
-    private function recordUse(): void
-    {
-        Setting::put(self::USES_KEY, (string) ($this->usesSoFar() + 1), 'general');
+        return setting(self::HIDDEN_KEY, '0') === '1';
     }
 }
