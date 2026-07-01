@@ -1,0 +1,35 @@
+{
+  "id": "FEAT-004",
+  "type": "feat",
+  "description": "Promotional Popup System - Add a configurable popup card that shows when visitors land on the site with multiple modes (custom message + link button, selected product + view button, product offer with countdown timer), auto-close after configurable seconds or manual close, display frequency (once via localStorage or every visit), managed from the existing Promotions admin page.",
+  "status": "completed",
+  "steps": [
+    "Update app/Http/Controllers/Admin/PromotionController.php: Add popup settings to the index() method view data: popup_enabled, popup_mode (message/product/offer), popup_product_id, popup_message, popup_heading, popup_link, popup_link_text, popup_timer_until, popup_auto_close_seconds, popup_frequency (once/always), popup_image. Add popup settings to the update() method with validation and Setting::put calls.",
+    "Update resources/views/admin/promotions/index.blade.php: Add a new 'Promotional Popup' card section (after the Announcement bar section) with: (a) Enable/disable toggle. (b) Mode selector: 'Custom Message' (heading + message + link button), 'Featured Product' (select a product, shows product card with view button), 'Product Offer' (select a product + countdown timer + urgency). (c) Fields per mode: message fields (heading, message, link URL, link button text), product fields (product dropdown), offer fields (product dropdown, timer end datetime). (d) Auto-close seconds input (0 = no auto-close). (e) Display frequency radio: 'Once per visitor' or 'Every page load'. (f) All wired with Alpine.js x-show for conditional display.",
+    "Update the PromotionController update() method validation to include all new popup_* fields with appropriate rules.",
+    "Create resources/views/partials/popup.blade.php: A beautiful popup component that: (a) Uses Alpine.js for show/hide logic, localStorage check for 'once' frequency, auto-close timer. (b) Renders differently based on popup_mode from settings. (c) Message mode: shows heading, message text, and a CTA button with configurable link. (d) Product mode: shows product thumbnail, title, price, and a 'View Product' button linking to the product page. (e) Offer mode: shows product info plus a countdown timer (days/hours/minutes/seconds), urgency styling. (f) Has a close (x) button in the corner. (g) Overlay background that can also be clicked to close. (h) Smooth entrance animation. (i) Auto-closes after popup_auto_close_seconds if set > 0. (j) Styled with Tailwind - modern glassmorphism or card style.",
+    "Include the popup partial in resources/views/layouts/app.blade.php - add @include('partials.popup') before the closing </body> tag (after the Tawk.to section), wrapped in a check for popup_enabled setting.",
+    "Update DemoSeeder to seed some popup settings so the feature works out of the box for testing (popup_enabled=1, popup_mode=message, popup_message='Welcome! Check out our latest products.', popup_heading='Hello!', popup_link=route to products, popup_link_text='Browse Now', popup_auto_close_seconds=8, popup_frequency=once)."
+  ],
+  "acceptance_criteria": [
+    "Promotions admin page has a Popup section with enable toggle, mode selector, and all relevant fields",
+    "Popup renders on the public storefront when enabled",
+    "Message mode shows heading + message + link button",
+    "Product mode shows product card with view button",
+    "Offer mode shows product + countdown timer",
+    "Auto-close works after configured seconds",
+    "Close (x) button dismisses popup",
+    "Once frequency uses localStorage to not show again",
+    "Always frequency shows on every page load",
+    "All PHP files pass php -l",
+    "All Blade views have balanced directives"
+  ],
+  "verification": [
+    "Run php -l on PromotionController.php",
+    "Verify Blade directive balance in admin/promotions/index.blade.php, partials/popup.blade.php, layouts/app.blade.php",
+    "Grep layouts/app.blade.php for popup include",
+    "Grep admin/promotions/index.blade.php for popup_enabled"
+  ],
+  "blocked_reason": null,
+  "findings": "All PHP files pass php -l. Blade directives balanced in all views. Popup partial uses Alpine.js x-data for show/hide logic, localStorage for once-per-visitor frequency, and auto-close countdown. Three modes implemented: message (heading + text + CTA button), product (thumbnail + title + price + view button), and offer (product card + live countdown timer). The @section('page-title', 'Promotions') inline section does not need @endsection - this is correct Laravel syntax. Admin form uses shared popup_message/popup_heading/popup_product name attributes across modes (only the visible mode fields submit). DemoSeeder seeds popup with message mode for immediate testing."
+}

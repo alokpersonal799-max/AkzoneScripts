@@ -31,6 +31,16 @@
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
 <script src="https://cdn.tailwindcss.com"></script>
+@php
+    $themePalettes = [
+        'default'  => ['50'=>'#eff5ff','100'=>'#dbe8fe','200'=>'#bfd7fe','300'=>'#93bbfd','400'=>'#609afa','500'=>'#3b82f6','600'=>'#2563eb','700'=>'#1d4ed8','800'=>'#1e40af','900'=>'#1e3a8a'],
+        'festival' => ['50'=>'#fdf4ff','100'=>'#fae8ff','200'=>'#f5d0fe','300'=>'#f0abfc','400'=>'#e879f9','500'=>'#d946ef','600'=>'#c026d3','700'=>'#a21caf','800'=>'#86198f','900'=>'#701a75'],
+        'prime'    => ['50'=>'#fff7ed','100'=>'#ffedd5','200'=>'#fed7aa','300'=>'#fdba74','400'=>'#fb923c','500'=>'#f97316','600'=>'#ea580c','700'=>'#c2410c','800'=>'#9a3412','900'=>'#7c2d12'],
+    ];
+    $activeTheme = setting('active_theme', 'default');
+    $brandPalette = $themePalettes[$activeTheme] ?? $themePalettes['default'];
+@endphp
+<script>document.documentElement.setAttribute('data-theme', @json($activeTheme));</script>
 <script>
     tailwind.config = {
         theme: {
@@ -40,11 +50,7 @@
                     display: ['"Plus Jakarta Sans"', 'Inter', 'ui-sans-serif'],
                 },
                 colors: {
-                    brand: {
-                        50: '#eff5ff', 100: '#dbe8fe', 200: '#bfd7fe', 300: '#93bbfd',
-                        400: '#609afa', 500: '#3b82f6', 600: '#2563eb', 700: '#1d4ed8',
-                        800: '#1e40af', 900: '#1e3a8a',
-                    },
+                    brand: {!! json_encode($brandPalette) !!},
                     ink: {
                         700: '#1b2540', 800: '#111a2e', 900: '#0b1120', 950: '#070b16',
                     },
@@ -104,6 +110,18 @@
     ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 9999px; border: 3px solid #f1f5f9; }
     ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
 </style>
+
+@if ($activeTheme === 'festival')
+<style>
+    html[data-theme="festival"] body { background-color: #fdf4ff; }
+    html[data-theme="festival"] .shadow-lift { box-shadow: 0 12px 40px -12px rgba(192,38,211,.30) !important; }
+</style>
+@elseif ($activeTheme === 'prime')
+<style>
+    html[data-theme="prime"] body { background-color: #fff7ed; }
+    html[data-theme="prime"] .shadow-lift { box-shadow: 0 12px 40px -12px rgba(234,88,12,.30) !important; }
+</style>
+@endif
 
 <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 <script>

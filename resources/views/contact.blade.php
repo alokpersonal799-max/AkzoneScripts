@@ -75,5 +75,7 @@
             </form>
         </div>
     </div>
+
+    @include('partials.ads', ['page' => 'contact'])
 </div>
 @endsection

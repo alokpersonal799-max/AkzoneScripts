@@ -57,11 +57,11 @@
             <div class="max-w-xs">
                 <label for="ads_layout" class="label">Ads per row (manual banners)</label>
                 <select id="ads_layout" name="ads_layout" class="input">
-                    @foreach ([4, 6, 8] as $opt)
-                        <option value="{{ $opt }}" {{ (int) old('ads_layout', $layout) === $opt ? 'selected' : '' }}>{{ $opt }} per row</option>
+                    @foreach ([1 => '1 — Full-width banner', 2 => '2 per row', 3 => '3 per row', 4 => '4 per row', 6 => '6 per row', 8 => '8 per row'] as $opt => $optLabel)
+                        <option value="{{ $opt }}" {{ (int) old('ads_layout', $layout) === $opt ? 'selected' : '' }}>{{ $optLabel }}</option>
                     @endforeach
                 </select>
-                <p class="mt-1 text-xs text-slate-400">Controls the grid columns on large screens (4 / 6 / 8 layout styles).</p>
+                <p class="mt-1 text-xs text-slate-400">Choose a grid style — from a single full-width banner up to 8 compact tiles per row.</p>
             </div>
 
             {{-- Per-page toggles --}}
@@ -77,6 +77,10 @@
                             'purchases' => 'My Purchases',
                             'wishlist' => 'Wishlist',
                             'support' => 'Support',
+                            'home_free' => 'Home — Free section',
+                            'home_reviews' => 'Home — Below reviews',
+                            'pages' => 'Custom pages',
+                            'contact' => 'Contact us',
                         ];
                     @endphp
                     @foreach ($pageLabels as $key => $label)

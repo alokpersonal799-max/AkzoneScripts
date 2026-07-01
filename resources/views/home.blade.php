@@ -248,6 +248,8 @@
         </section>
     @endif
 
+    @include('partials.ads', ['page' => 'home_free'])
+
     {{-- Free items band (pastel gradient) --}}
     @if ($freeItems->isNotEmpty() && setting('home_show_free', '1') !== '0')
         <section class="reveal bg-gradient-to-br from-brand-600 to-indigo-600 py-14">
@@ -355,6 +357,8 @@
             </div>
         </section>
         @endif
+
+        @include('partials.ads', ['page' => 'home_reviews'])
 
         {{-- CTA --}}
         <section class="reveal pb-16">

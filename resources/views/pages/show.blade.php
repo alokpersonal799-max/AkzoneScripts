@@ -32,5 +32,7 @@
             </div>
         @endif
     </div>
+
+    @include('partials.ads', ['page' => 'pages'])
 </div>
 @endsection

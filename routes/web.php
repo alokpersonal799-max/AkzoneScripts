@@ -14,6 +14,7 @@ use App\Http\Controllers\Admin\SettingController as AdminSettingController;
 use App\Http\Controllers\Admin\StorageController as AdminStorageController;
 use App\Http\Controllers\Admin\PromotionController as AdminPromotionController;
 use App\Http\Controllers\Admin\SystemController as AdminSystemController;
+use App\Http\Controllers\Admin\ThemeController as AdminThemeController;
 use App\Http\Controllers\Admin\TelegramController as AdminTelegramController;
 use App\Http\Controllers\Admin\TicketController as AdminTicketController;
 use App\Http\Controllers\Admin\ContactController as AdminContactController;
@@ -269,6 +270,10 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::post('/advertisements', [AdminAdvertisementController::class, 'store'])->name('ads.store');
     Route::put('/advertisements/{ad}', [AdminAdvertisementController::class, 'update'])->name('ads.update');
     Route::delete('/advertisements/{ad}', [AdminAdvertisementController::class, 'destroy'])->name('ads.destroy');
+
+    // Store theme.
+    Route::get('/theme', [AdminThemeController::class, 'index'])->name('theme.index');
+    Route::put('/theme', [AdminThemeController::class, 'update'])->name('theme.update');
 
     // Contact messages.
     Route::get('/contacts', [AdminContactController::class, 'index'])->name('contacts.index');

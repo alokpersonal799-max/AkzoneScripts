@@ -19,6 +19,7 @@ class AdvertisementController extends Controller
      */
     protected array $pageKeys = [
         'marketplace', 'cart', 'checkout', 'dashboard', 'purchases', 'wishlist', 'support',
+        'home_free', 'home_reviews', 'pages', 'contact',
     ];
 
     /**
@@ -49,7 +50,7 @@ class AdvertisementController extends Controller
         $data = $request->validate([
             'ads_adsense_code' => ['nullable', 'string', 'max:5000'],
             'ads_meta_code' => ['nullable', 'string', 'max:5000'],
-            'ads_layout' => ['nullable', 'in:4,6,8'],
+            'ads_layout' => ['nullable', 'in:1,2,3,4,6,8'],
         ]);
 
         Setting::put('ads_enabled', $request->boolean('ads_enabled') ? '1' : '0', 'ads');

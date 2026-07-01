@@ -1,0 +1,31 @@
+{
+  "id": "FEAT-001",
+  "type": "feat",
+  "description": "PDF Invoice system - Add barryvdh/laravel-dompdf to composer.json, create an invoice Blade template with site branding/logo/thank-you message, create InvoiceController with download method, add routes, add Download Invoice button to order confirmation page (checkout/show.blade.php) and My Purchases page (dashboard/purchases.blade.php).",
+  "status": "completed",
+  "steps": [
+    "Add 'barryvdh/laravel-dompdf': '^3.0' to the require section of composer.json",
+    "Create app/Http/Controllers/InvoiceController.php with a download(Order $order) method that: verifies ownership (abort_unless order->user_id === auth()->id()), loads order items with product, renders a Blade view to PDF using Barryvdh\\DomPDF\\Facade\\Pdf::loadView(), and streams/downloads it as 'Invoice-{order_number}.pdf'",
+    "Create resources/views/invoices/order.blade.php - a self-contained HTML invoice template (inline CSS for PDF rendering) with: site logo/name from settings, order number, date, billing info, items table with product title and price, subtotal/discount/total, payment method, a thank-you message with branding, and footer with support email",
+    "Add route in routes/web.php under the authenticated middleware group: GET /orders/{order}/invoice -> InvoiceController@download named 'orders.invoice'",
+    "Add a 'Download Invoice' button/link to resources/views/checkout/show.blade.php (only shown when order is completed) - place it in the actions area at the bottom alongside existing buttons",
+    "Add a 'Download Invoice' link/button to resources/views/dashboard/purchases.blade.php for each order item - small invoice icon link that goes to route('orders.invoice', $item->order)"
+  ],
+  "acceptance_criteria": [
+    "composer.json includes barryvdh/laravel-dompdf in require section",
+    "InvoiceController.php passes php -l syntax check",
+    "invoices/order.blade.php has balanced Blade directives and renders order details",
+    "Route is defined and named orders.invoice",
+    "checkout/show.blade.php has Download Invoice button visible for completed orders",
+    "dashboard/purchases.blade.php has invoice download link per item"
+  ],
+  "verification": [
+    "Run php -l app/Http/Controllers/InvoiceController.php",
+    "Verify Blade directive balance in resources/views/invoices/order.blade.php",
+    "Grep routes/web.php for 'orders.invoice' route definition",
+    "Grep checkout/show.blade.php for invoice link",
+    "Grep dashboard/purchases.blade.php for invoice link"
+  ],
+  "blocked_reason": null,
+  "findings": "All files pass php -l syntax validation. Blade directives balanced across all templates. Route added inside the existing auth middleware group. Used btn-dark style for invoice button on checkout page to differentiate from primary action. Used btn-ghost style with inline icon on purchases page for compact display. The Order model does not include discount in fillable but the migration confirms the column exists."
+}

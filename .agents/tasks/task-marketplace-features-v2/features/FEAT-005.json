@@ -1,0 +1,26 @@
+{
+  "id": "FEAT-005",
+  "type": "fix",
+  "description": "Fix issues from code review: (1) Duplicate popup_message/popup_product form field names causing data loss, (2) Popup DB query on every page load without caching, (3) Add throttle middleware to invoice route.",
+  "status": "completed",
+  "steps": [
+    "Fix duplicate form field names in resources/views/admin/promotions/index.blade.php by using x-bind:name to conditionally set field names only on the active mode's fields",
+    "Wrap the Product::where() query in resources/views/partials/popup.blade.php with Cache::remember() using a 5 minute TTL",
+    "Add throttle middleware to the invoice route in routes/web.php"
+  ],
+  "acceptance_criteria": [
+    "No duplicate name attributes exist in the DOM for popup_message and popup_product fields - only the active mode's fields have the name set",
+    "The popup partial caches the product query with a short TTL",
+    "The invoice route has rate limiting applied",
+    "All modified PHP files pass php -l",
+    "All modified Blade views have balanced directives"
+  ],
+  "verification": [
+    "Run php -l on routes/web.php",
+    "Verify Blade directive balance in admin/promotions/index.blade.php and partials/popup.blade.php",
+    "Grep for Cache::remember in partials/popup.blade.php",
+    "Grep for throttle in routes/web.php on the invoice route"
+  ],
+  "blocked_reason": null,
+  "findings": "All three review issues fixed. Used Alpine.js x-bind:name (`:name`) with ternary expressions to conditionally set the name attribute only on the active popup mode's form fields - when the mode is not active, name resolves to null so the field is excluded from form submission. Wrapped Product::where() in Cache::remember() with a 300 second (5 min) TTL keyed by product ID. Added throttle:10,1 middleware to the invoice route for 10 requests per minute rate limit. All files pass php -l syntax check and Blade directives are balanced."
+}

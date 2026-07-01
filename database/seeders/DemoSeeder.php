@@ -436,9 +436,12 @@ class DemoSeeder extends Seeder
         \App\Models\Setting::put('ads_adsense_code', '', 'ads');
         \App\Models\Setting::put('ads_meta_code', '', 'ads');
 
-        foreach (['marketplace', 'cart', 'checkout', 'dashboard', 'purchases', 'wishlist', 'support'] as $page) {
+        foreach (['marketplace', 'cart', 'checkout', 'dashboard', 'purchases', 'wishlist', 'support', 'home_free', 'home_reviews', 'pages', 'contact'] as $page) {
             \App\Models\Setting::put('ads_page_'.$page, '1', 'ads');
         }
+
+        // Default store theme.
+        \App\Models\Setting::put('active_theme', 'default', 'theme');
 
         $banners = [
             ['title' => 'Your Ad Here', 'image' => 'https://placehold.co/600x300/2563eb/ffffff?text=Your+Ad+Here'],
