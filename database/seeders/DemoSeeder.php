@@ -187,18 +187,24 @@ class DemoSeeder extends Seeder
         $bySlug = $categories->keyBy('slug');
 
         $products = [
-            ['cat' => 'php-scripts', 'title' => 'InvoiceFlow — Billing & Invoicing System', 'tagline' => 'Complete invoicing SaaS with PDF export and recurring billing.', 'price' => 49, 'sale' => 39, 'featured' => true, 'tags' => ['php', 'invoicing', 'saas', 'mysql']],
-            ['cat' => 'php-scripts', 'title' => 'SupportDesk — Helpdesk & Ticketing', 'tagline' => 'Multi-agent support ticket system with email piping.', 'price' => 39, 'featured' => false, 'tags' => ['php', 'support', 'tickets']],
-            ['cat' => 'laravel-packages', 'title' => 'LaraCommerce Starter Kit', 'tagline' => 'Headless e-commerce starter built on Laravel 12.', 'price' => 79, 'sale' => 59, 'featured' => true, 'tags' => ['laravel', 'ecommerce', 'api']],
-            ['cat' => 'laravel-packages', 'title' => 'AuthGuard — Roles & Permissions', 'tagline' => 'Drop-in RBAC package with a polished admin UI.', 'price' => 0, 'featured' => false, 'tags' => ['laravel', 'auth', 'permissions']],
-            ['cat' => 'javascript', 'title' => 'VueDash — Analytics Dashboard', 'tagline' => 'Real-time analytics dashboard built with Vue 3 + Vite.', 'price' => 35, 'featured' => true, 'tags' => ['vue', 'dashboard', 'charts'], 'file_type' => 'external', 'external_url' => 'https://example.com/downloads/vuedash-v1.zip', 'download_limit' => 3, 'link_expiry' => 60, 'download_message' => 'Your link is valid for 60 minutes and can be used up to 3 times. Re-open My Purchases for a fresh link.'],
-            ['cat' => 'javascript', 'title' => 'DropZone Pro — File Uploader', 'tagline' => 'Chunked, resumable file uploads for any backend.', 'price' => 19, 'featured' => false, 'tags' => ['javascript', 'uploads']],
-            ['cat' => 'ui-kits-templates', 'title' => 'Nebula — SaaS Landing Template', 'tagline' => 'Modern, animated SaaS landing page in Tailwind CSS.', 'price' => 24, 'sale' => 18, 'featured' => true, 'tags' => ['tailwind', 'landing', 'html'], 'file_type' => 'external', 'external_url' => 'https://example.com/downloads/nebula-template.zip', 'download_limit' => 0, 'download_message' => 'Unlimited lifetime downloads. Thank you for your purchase!'],
-            ['cat' => 'ui-kits-templates', 'title' => 'Orbit Admin — Dashboard UI Kit', 'tagline' => '120+ components and 30 pages for admin panels.', 'price' => 45, 'featured' => false, 'tags' => ['ui-kit', 'admin', 'tailwind']],
-            ['cat' => 'mobile-apps', 'title' => 'FoodieGo — Food Delivery App', 'tagline' => 'Full Flutter food delivery app with backend API.', 'price' => 89, 'featured' => true, 'tags' => ['flutter', 'mobile', 'delivery'], 'sellable' => false],
-            ['cat' => 'mobile-apps', 'title' => 'FitTrack — Workout Tracker', 'tagline' => 'React Native fitness tracking app source code.', 'price' => 55, 'featured' => false, 'tags' => ['react-native', 'fitness'], 'sellable' => false],
-            ['cat' => 'design-assets', 'title' => 'Lumina Icon Pack — 2,400 Icons', 'tagline' => 'Pixel-perfect line and solid icons in SVG & Figma.', 'price' => 15, 'featured' => false, 'tags' => ['icons', 'svg', 'figma']],
-            ['cat' => 'design-assets', 'title' => 'Gradient Mesh Backgrounds Vol. 1', 'tagline' => '60 high-res abstract gradient backgrounds.', 'price' => 9, 'sale' => 5, 'featured' => false, 'tags' => ['backgrounds', 'design']],
+            ['cat' => 'php-scripts', 'title' => 'InvoiceFlow — Billing & Invoicing System', 'tagline' => 'Complete invoicing SaaS with PDF export and recurring billing.', 'price' => 49, 'sale' => 39, 'featured' => true, 'tags' => ['php', 'invoicing', 'saas', 'mysql'], 'shots' => ['Dashboard', 'Invoice+Editor', 'Client+List', 'PDF+Export']],
+            ['cat' => 'php-scripts', 'title' => 'SupportDesk — Helpdesk & Ticketing', 'tagline' => 'Multi-agent support ticket system with email piping.', 'price' => 39, 'featured' => false, 'tags' => ['php', 'support', 'tickets'], 'shots' => ['Inbox', 'Ticket+View', 'Agent+Panel']],
+            ['cat' => 'laravel-packages', 'title' => 'LaraCommerce Starter Kit', 'tagline' => 'Headless e-commerce starter built on Laravel 12.', 'price' => 79, 'sale' => 59, 'featured' => true, 'tags' => ['laravel', 'ecommerce', 'api'], 'shots' => ['Storefront', 'Product+Page', 'Checkout', 'Admin+Panel']],
+            ['cat' => 'laravel-packages', 'title' => 'AuthGuard — Roles & Permissions', 'tagline' => 'Drop-in RBAC package with a polished admin UI.', 'price' => 0, 'featured' => false, 'tags' => ['laravel', 'auth', 'permissions'], 'shots' => ['Roles', 'Permissions', 'User+Matrix']],
+            ['cat' => 'javascript', 'title' => 'VueDash — Analytics Dashboard', 'tagline' => 'Real-time analytics dashboard built with Vue 3 + Vite.', 'price' => 35, 'featured' => true, 'tags' => ['vue', 'dashboard', 'charts'], 'shots' => ['Overview', 'Charts', 'Reports', 'Dark+Mode'], 'file_type' => 'external', 'external_url' => 'https://example.com/downloads/vuedash-v1.zip', 'download_limit' => 3, 'link_expiry' => 60, 'download_message' => 'Your link is valid for 60 minutes and can be used up to 3 times. Re-open My Purchases for a fresh link.'],
+            ['cat' => 'javascript', 'title' => 'DropZone Pro — File Uploader', 'tagline' => 'Chunked, resumable file uploads for any backend.', 'price' => 19, 'featured' => false, 'tags' => ['javascript', 'uploads'], 'shots' => ['Uploader', 'Progress', 'Gallery']],
+            ['cat' => 'ui-kits-templates', 'title' => 'Nebula — SaaS Landing Template', 'tagline' => 'Modern, animated SaaS landing page in Tailwind CSS.', 'price' => 24, 'sale' => 18, 'featured' => true, 'tags' => ['tailwind', 'landing', 'html'], 'shots' => ['Hero', 'Features', 'Pricing', 'Footer'], 'file_type' => 'external', 'external_url' => 'https://example.com/downloads/nebula-template.zip', 'download_limit' => 0, 'download_message' => 'Unlimited lifetime downloads. Thank you for your purchase!'],
+            ['cat' => 'ui-kits-templates', 'title' => 'Orbit Admin — Dashboard UI Kit', 'tagline' => '120+ components and 30 pages for admin panels.', 'price' => 45, 'featured' => false, 'tags' => ['ui-kit', 'admin', 'tailwind'], 'shots' => ['Components', 'Pages', 'Forms', 'Tables']],
+            ['cat' => 'mobile-apps', 'title' => 'FoodieGo — Food Delivery App', 'tagline' => 'Full Flutter food delivery app with backend API.', 'price' => 89, 'featured' => true, 'tags' => ['flutter', 'mobile', 'delivery'], 'shots' => ['Home', 'Menu', 'Cart', 'Tracking'], 'sellable' => false],
+            ['cat' => 'mobile-apps', 'title' => 'FitTrack — Workout Tracker', 'tagline' => 'React Native fitness tracking app source code.', 'price' => 55, 'featured' => false, 'tags' => ['react-native', 'fitness'], 'shots' => ['Dashboard', 'Workouts', 'Progress'], 'sellable' => false],
+            ['cat' => 'design-assets', 'title' => 'Lumina Icon Pack — 2,400 Icons', 'tagline' => 'Pixel-perfect line and solid icons in SVG & Figma.', 'price' => 15, 'featured' => false, 'tags' => ['icons', 'svg', 'figma'], 'shots' => ['Line+Icons', 'Solid+Icons', 'Figma+File']],
+            ['cat' => 'design-assets', 'title' => 'Gradient Mesh Backgrounds Vol. 1', 'tagline' => '60 high-res abstract gradient backgrounds.', 'price' => 9, 'sale' => 5, 'featured' => false, 'tags' => ['backgrounds', 'design'], 'shots' => ['Pack+Preview', 'Sample+1', 'Sample+2']],
+        ];
+
+        // Palette of background/foreground colour pairs cycled per screenshot for lively demo galleries.
+        $palette = [
+            ['2563eb', 'ffffff'], ['7c3aed', 'ffffff'], ['0891b2', 'ffffff'],
+            ['db2777', 'ffffff'], ['059669', 'ffffff'], ['ea580c', 'ffffff'],
         ];
 
         foreach ($products as $p) {
@@ -207,6 +213,16 @@ class DemoSeeder extends Seeder
             if (! $category) {
                 continue;
             }
+
+            // Build a demo gallery of hosted placeholder screenshots so the product
+            // slideshow can be tested without uploading real images.
+            $shots = $p['shots'] ?? [];
+            $gallery = [];
+            foreach (array_values($shots) as $i => $label) {
+                [$bg, $fg] = $palette[$i % count($palette)];
+                $gallery[] = "https://placehold.co/1000x625/{$bg}/{$fg}?text=".rawurlencode(str_replace('+', ' ', $label));
+            }
+            $thumbnail = $gallery[0] ?? null;
 
             Product::updateOrCreate(
                 ['slug' => Str::slug($p['title'])],
@@ -217,6 +233,8 @@ class DemoSeeder extends Seeder
                     'description' => $this->description($p['title'], $p['tagline']),
                     'price' => $p['price'],
                     'sale_price' => $p['sale'] ?? null,
+                    'thumbnail' => $thumbnail,
+                    'gallery' => $gallery ?: null,
                     'version' => '1.'.rand(0, 9).'.'.rand(0, 9),
                     'demo_url' => 'https://example.com/demo',
                     'tags' => $p['tags'],

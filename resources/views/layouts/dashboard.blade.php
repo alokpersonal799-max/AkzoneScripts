@@ -14,16 +14,23 @@
 <div class="mx-auto max-w-7xl px-4 pb-16 sm:px-6 lg:px-8">
     <div class="grid gap-8 lg:grid-cols-[240px_1fr]">
         {{-- Sidebar --}}
-        <aside class="lg:sticky lg:top-24 lg:self-start">
+        <aside class="lg:sticky lg:top-24 lg:self-start" x-data="{ open: window.matchMedia('(min-width: 1024px)').matches }" @resize.window="if (window.matchMedia('(min-width: 1024px)').matches) open = true">
             <div class="card p-3">
                 <div class="flex items-center gap-3 px-3 py-3">
                     <span class="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-brand-500 to-indigo-500 font-bold text-white">{{ strtoupper(substr(auth()->user()->name, 0, 1)) }}</span>
-                    <div class="min-w-0">
+                    <div class="min-w-0 flex-1">
                         <p class="truncate text-sm font-bold text-ink-900">{{ auth()->user()->name }}</p>
                         <p class="truncate text-xs text-slate-400">{{ auth()->user()->email }}</p>
                     </div>
+                    {{-- Mobile fold/unfold toggle --}}
+                    <button type="button" @click="open = !open"
+                            class="flex h-9 w-9 flex-none items-center justify-center rounded-lg bg-slate-100 text-slate-600 transition hover:bg-slate-200 lg:hidden"
+                            :aria-expanded="open" aria-label="Toggle menu">
+                        <svg x-show="!open" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" /></svg>
+                        <svg x-show="open" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" /></svg>
+                    </button>
                 </div>
-                <nav class="mt-2 space-y-1">
+                <nav x-show="open" x-transition class="mt-2 space-y-1">
                     @foreach ($navItems as $item)
                         @php $active = request()->routeIs($item['route']); @endphp
                         <a href="{{ route($item['route']) }}"

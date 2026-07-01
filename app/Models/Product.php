@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class Product extends Model
 {
@@ -208,6 +209,11 @@ class Product extends Model
      */
     public function getThumbnailUrlAttribute(): string
     {
+        // Allow full external URLs (e.g. seeded demo placeholders) to pass through directly.
+        if ($this->thumbnail && Str::startsWith($this->thumbnail, ['http://', 'https://'])) {
+            return $this->thumbnail;
+        }
+
         if ($this->thumbnail && Storage::disk('public')->exists($this->thumbnail)) {
             return Storage::disk('public')->url($this->thumbnail);
         }
@@ -228,7 +234,14 @@ class Product extends Model
         $urls = [$this->thumbnail_url];
 
         foreach ((array) $this->gallery as $path) {
-            if ($path && Storage::disk('public')->exists($path)) {
+            if (! $path) {
+                continue;
+            }
+
+            // Full external URLs (e.g. seeded demo placeholders) pass through directly.
+            if (Str::startsWith($path, ['http://', 'https://'])) {
+                $urls[] = $path;
+            } elseif (Storage::disk('public')->exists($path)) {
                 $urls[] = Storage::disk('public')->url($path);
             }
         }

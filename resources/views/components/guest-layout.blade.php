@@ -4,17 +4,40 @@
     @include('partials.head')
 </head>
 <body class="min-h-screen bg-slate-100 font-sans text-slate-600 antialiased">
-    {{-- Animated gradient background (large screens only, decorative) --}}
+    {{-- Animated falling marketplace icons (large screens only, purely decorative) --}}
     <style>
-        @keyframes authdrift1 { 0%,100% { transform: translate(0,0) scale(1); } 50% { transform: translate(60px,-40px) scale(1.15); } }
-        @keyframes authdrift2 { 0%,100% { transform: translate(0,0) scale(1); } 50% { transform: translate(-50px,50px) scale(1.1); } }
-        @keyframes authdrift3 { 0%,100% { transform: translate(0,0) scale(1); } 50% { transform: translate(40px,60px) scale(1.2); } }
-        .auth-orb { position: absolute; border-radius: 9999px; filter: blur(70px); opacity: .55; }
+        @keyframes authfall {
+            0%   { transform: translateY(-12vh) rotate(0deg); opacity: 0; }
+            10%  { opacity: .85; }
+            90%  { opacity: .85; }
+            100% { transform: translateY(112vh) rotate(360deg); opacity: 0; }
+        }
+        @keyframes authglow { 0%,100% { transform: translate(0,0) scale(1); } 50% { transform: translate(40px,30px) scale(1.15); } }
+        .auth-bg-glow { position: absolute; border-radius: 9999px; filter: blur(90px); opacity: .5; }
+        .auth-fall-item {
+            position: absolute;
+            top: -10vh;
+            user-select: none;
+            will-change: transform, opacity;
+            animation-name: authfall;
+            animation-timing-function: linear;
+            animation-iteration-count: infinite;
+        }
     </style>
     <div class="pointer-events-none fixed inset-0 hidden overflow-hidden lg:block" aria-hidden="true">
-        <div class="auth-orb" style="width:420px;height:420px;top:-80px;left:-60px;background:#93bbfd;animation:authdrift1 16s ease-in-out infinite;"></div>
-        <div class="auth-orb" style="width:380px;height:380px;bottom:-90px;right:-40px;background:#c4b5fd;animation:authdrift2 20s ease-in-out infinite;"></div>
-        <div class="auth-orb" style="width:300px;height:300px;top:40%;right:12%;background:#f9a8d4;animation:authdrift3 24s ease-in-out infinite;"></div>
+        {{-- soft colour wash behind the falling icons --}}
+        <div class="auth-bg-glow" style="width:460px;height:460px;top:-90px;left:-70px;background:#93bbfd;animation:authglow 18s ease-in-out infinite;"></div>
+        <div class="auth-bg-glow" style="width:400px;height:400px;bottom:-100px;right:-50px;background:#c4b5fd;animation:authglow 22s ease-in-out infinite reverse;"></div>
+        @php
+            $authGlyphs = ['🛒', '💻', '⭐', '🎨', '📦', '🚀', '💎', '🧩', '⚡', '🔧', '📱', '🖥️', '🎯', '🛍️', '💡', '📊'];
+        @endphp
+        @for ($i = 0; $i < 22; $i++)
+            <span class="auth-fall-item"
+                  style="left: {{ random_int(0, 98) }}%;
+                         font-size: {{ random_int(18, 40) }}px;
+                         animation-duration: {{ random_int(9, 20) }}s;
+                         animation-delay: -{{ random_int(0, 18) }}s;">{{ $authGlyphs[array_rand($authGlyphs)] }}</span>
+        @endfor
     </div>
 
     <div class="relative flex min-h-screen items-center justify-center px-4 py-12">

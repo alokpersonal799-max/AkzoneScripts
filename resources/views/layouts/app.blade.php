@@ -134,25 +134,97 @@
         </nav>
 
         {{-- Mobile menu --}}
-        <div x-show="open" x-cloak x-transition class="border-t border-slate-100 bg-white md:hidden">
-            <div class="space-y-1 px-4 py-3">
-                <a href="{{ route('home') }}" class="block rounded-lg px-3 py-2 text-base font-medium text-slate-700 hover:bg-slate-50">Home</a>
-                <a href="{{ route('products.index') }}" class="block rounded-lg px-3 py-2 text-base font-medium text-slate-700 hover:bg-slate-50">Marketplace</a>
-                @if (setting('services_enabled', '1') === '1')
-                <a href="{{ route('services.index') }}" class="block rounded-lg px-3 py-2 text-base font-medium text-slate-700 hover:bg-slate-50">Services</a>
-                @endif
-                @auth
-                    <a href="{{ route('dashboard') }}" class="block rounded-lg px-3 py-2 text-base font-medium text-slate-700 hover:bg-slate-50">Dashboard</a>
-                    @if (auth()->user()->isAdmin())
-                        <a href="{{ route('admin.dashboard') }}" class="block rounded-lg px-3 py-2 text-base font-semibold text-brand-600 hover:bg-slate-50">Admin Panel</a>
+        <div x-show="open" x-cloak x-transition.origin.top class="border-t border-slate-100 bg-white md:hidden">
+            <div class="px-4 py-4">
+                {{-- Mobile search --}}
+                <form action="{{ route('products.index') }}" method="GET" class="relative mb-4">
+                    <svg class="pointer-events-none absolute left-3.5 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400" fill="none" viewBox="0 0 24 24" stroke-width="1.6" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" /></svg>
+                    <input type="text" name="q" placeholder="Search products..." class="w-full rounded-xl border border-slate-200 bg-slate-50 py-2.5 pl-11 pr-4 text-sm text-slate-700 placeholder-slate-400 focus:border-brand-500 focus:bg-white focus:outline-none focus:ring-4 focus:ring-brand-500/10">
+                </form>
+
+                {{-- Primary navigation --}}
+                @php
+                    $mobileNav = [
+                        ['route' => 'home', 'label' => 'Home', 'icon' => 'm2.25 12 8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25'],
+                        ['route' => 'products.index', 'label' => 'Marketplace', 'icon' => 'M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 0 0-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 0 0-16.536-1.84M7.5 14.25 5.106 5.272M6 20.25a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Zm12.75 0a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z'],
+                    ];
+                @endphp
+                <div class="space-y-1">
+                    @foreach ($mobileNav as $item)
+                        @php $mActive = request()->routeIs($item['route']); @endphp
+                        <a href="{{ route($item['route']) }}"
+                           class="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold transition {{ $mActive ? 'bg-brand-50 text-brand-700' : 'text-slate-700 hover:bg-slate-50' }}">
+                            <span class="flex h-9 w-9 flex-none items-center justify-center rounded-lg {{ $mActive ? 'bg-brand-100 text-brand-600' : 'bg-slate-100 text-slate-500' }}">
+                                <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke-width="1.7" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="{{ $item['icon'] }}" /></svg>
+                            </span>
+                            {{ $item['label'] }}
+                        </a>
+                    @endforeach
+                    @if (setting('services_enabled', '1') === '1')
+                        @php $mSvc = request()->routeIs('services.index'); @endphp
+                        <a href="{{ route('services.index') }}"
+                           class="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold transition {{ $mSvc ? 'bg-brand-50 text-brand-700' : 'text-slate-700 hover:bg-slate-50' }}">
+                            <span class="flex h-9 w-9 flex-none items-center justify-center rounded-lg {{ $mSvc ? 'bg-brand-100 text-brand-600' : 'bg-slate-100 text-slate-500' }}">
+                                <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke-width="1.7" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M11.42 15.17 17.25 21A2.652 2.652 0 0 0 21 17.25l-5.877-5.877M11.42 15.17l2.496-3.03c.317-.384.74-.626 1.208-.766M11.42 15.17l-4.655 5.653a2.548 2.548 0 1 1-3.586-3.586l6.837-5.63m5.108-.233c.55-.164 1.163-.188 1.743-.14a4.5 4.5 0 0 0 4.486-6.336l-3.276 3.277a3.004 3.004 0 0 1-2.25-2.25l3.276-3.276a4.5 4.5 0 0 0-6.336 4.486c.091 1.076-.071 2.264-.904 2.95l-.102.085m-1.745 1.437L5.909 7.5H4.5L2.25 3.75l1.5-1.5L7.5 4.5v1.409l4.26 4.26m-1.745 1.437 1.745-1.437m6.615 8.206L15.75 15.75M4.867 19.125h.008v.008h-.008v-.008Z" /></svg>
+                            </span>
+                            Services
+                        </a>
                     @endif
-                    <form method="POST" action="{{ route('logout') }}">
-                        @csrf
-                        <button type="submit" class="block w-full rounded-lg px-3 py-2 text-left text-base font-medium text-rose-600 hover:bg-slate-50">Log out</button>
-                    </form>
+                    <a href="{{ route('cart.index') }}"
+                       class="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold text-slate-700 transition hover:bg-slate-50">
+                        <span class="flex h-9 w-9 flex-none items-center justify-center rounded-lg bg-slate-100 text-slate-500">
+                            <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke-width="1.7" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 0 0-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 0 0-16.536-1.84M7.5 14.25 5.106 5.272M6 20.25a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Zm12.75 0a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z" /></svg>
+                        </span>
+                        <span class="flex-1">Cart</span>
+                        @if (($cartItemCount ?? 0) > 0)
+                            <span class="flex h-5 min-w-[20px] items-center justify-center rounded-full bg-brand-600 px-1.5 text-xs font-bold text-white">{{ $cartItemCount }}</span>
+                        @endif
+                    </a>
+                </div>
+
+                @auth
+                    <div class="my-3 border-t border-slate-100"></div>
+                    {{-- Signed-in account block --}}
+                    <div class="mb-2 flex items-center gap-3 rounded-xl bg-slate-50 px-3 py-2.5">
+                        <span class="flex h-9 w-9 flex-none items-center justify-center rounded-lg bg-gradient-to-br from-brand-500 to-indigo-500 text-sm font-bold text-white">{{ strtoupper(substr(auth()->user()->name, 0, 1)) }}</span>
+                        <div class="min-w-0">
+                            <p class="truncate text-sm font-bold text-ink-900">{{ auth()->user()->name }}</p>
+                            <p class="truncate text-xs text-slate-400">{{ auth()->user()->email }}</p>
+                        </div>
+                    </div>
+                    <div class="space-y-1">
+                        <a href="{{ route('dashboard') }}" class="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold text-slate-700 transition hover:bg-slate-50">
+                            <span class="flex h-9 w-9 flex-none items-center justify-center rounded-lg bg-slate-100 text-slate-500"><svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke-width="1.7" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6A2.25 2.25 0 0 1 6 3.75h2.25A2.25 2.25 0 0 1 10.5 6v2.25a2.25 2.25 0 0 1-2.25 2.25H6a2.25 2.25 0 0 1-2.25-2.25V6ZM3.75 15.75A2.25 2.25 0 0 1 6 13.5h2.25a2.25 2.25 0 0 1 2.25 2.25V18a2.25 2.25 0 0 1-2.25 2.25H6A2.25 2.25 0 0 1 3.75 18v-2.25ZM13.5 6a2.25 2.25 0 0 1 2.25-2.25H18A2.25 2.25 0 0 1 20.25 6v2.25A2.25 2.25 0 0 1 18 10.5h-2.25a2.25 2.25 0 0 1-2.25-2.25V6ZM13.5 15.75a2.25 2.25 0 0 1 2.25-2.25H18a2.25 2.25 0 0 1 2.25 2.25V18A2.25 2.25 0 0 1 18 20.25h-2.25a2.25 2.25 0 0 1-2.25-2.25v-2.25Z" /></svg></span>
+                            Dashboard
+                        </a>
+                        <a href="{{ route('dashboard.purchases') }}" class="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold text-slate-700 transition hover:bg-slate-50">
+                            <span class="flex h-9 w-9 flex-none items-center justify-center rounded-lg bg-slate-100 text-slate-500"><svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke-width="1.7" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3" /></svg></span>
+                            My Purchases
+                        </a>
+                        <a href="{{ route('profile.edit') }}" class="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold text-slate-700 transition hover:bg-slate-50">
+                            <span class="flex h-9 w-9 flex-none items-center justify-center rounded-lg bg-slate-100 text-slate-500"><svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke-width="1.7" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" /></svg></span>
+                            Settings
+                        </a>
+                        @if (auth()->user()->isAdmin())
+                            <a href="{{ route('admin.dashboard') }}" class="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold text-brand-600 transition hover:bg-brand-50">
+                                <span class="flex h-9 w-9 flex-none items-center justify-center rounded-lg bg-brand-100 text-brand-600"><svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke-width="1.7" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75m-3-7.036A11.959 11.959 0 0 1 3.598 6 11.99 11.99 0 0 0 3 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285Z" /></svg></span>
+                                Admin Panel
+                            </a>
+                        @endif
+                        <form method="POST" action="{{ route('logout') }}">
+                            @csrf
+                            <button type="submit" class="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-sm font-semibold text-rose-600 transition hover:bg-rose-50">
+                                <span class="flex h-9 w-9 flex-none items-center justify-center rounded-lg bg-rose-50 text-rose-500"><svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke-width="1.7" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15m3 0 3-3m0 0-3-3m3 3H9" /></svg></span>
+                                Log out
+                            </button>
+                        </form>
+                    </div>
                 @else
-                    <a href="{{ route('login') }}" class="block rounded-lg px-3 py-2 text-base font-medium text-slate-700 hover:bg-slate-50">Sign in</a>
-                    <a href="{{ route('register') }}" class="btn-primary btn-md mt-2 w-full">Get started</a>
+                    <div class="my-3 border-t border-slate-100"></div>
+                    <div class="grid grid-cols-2 gap-2">
+                        <a href="{{ route('login') }}" class="btn-ghost btn-md w-full justify-center">Sign in</a>
+                        <a href="{{ route('register') }}" class="btn-primary btn-md w-full justify-center">Get started</a>
+                    </div>
                 @endauth
             </div>
         </div>
