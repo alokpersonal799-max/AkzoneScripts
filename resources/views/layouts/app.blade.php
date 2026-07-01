@@ -229,7 +229,6 @@
                         @endauth
                         <li><a href="{{ route('cart.index') }}" class="hover:text-brand-600">Cart</a></li>
                         <li><a href="{{ route('contact.show') }}" class="hover:text-brand-600">Contact us</a></li>
-                        <li><a href="mailto:{{ config('marketplace.support_email') }}" class="hover:text-brand-600">Support</a></li>
                     </ul>
                 </div>
                 <div class="md:col-span-2">

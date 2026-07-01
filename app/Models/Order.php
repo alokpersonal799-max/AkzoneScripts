@@ -23,6 +23,8 @@ class Order extends Model
         'user_id',
         'subtotal',
         'tax',
+        'discount',
+        'coupon_code',
         'total',
         'status',
         'payment_method',
@@ -44,6 +46,7 @@ class Order extends Model
         return [
             'subtotal' => 'decimal:2',
             'tax' => 'decimal:2',
+            'discount' => 'decimal:2',
             'total' => 'decimal:2',
             'paid_at' => 'datetime',
         ];
