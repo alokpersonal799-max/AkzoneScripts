@@ -1,183 +1,249 @@
-# AkzoneScripts — Single-Vendor Digital Marketplace
+# AkzoneScripts — Digital Marketplace Platform
 
-A complete, production-ready **Laravel 12** marketplace for selling digital products such as
-scripts, source code, UI kits and design assets. It ships with a modern landing page, a full
-storefront, customer and admin dashboards, a session cart, checkout, and secure digital downloads.
+A complete, production-ready **single-vendor digital marketplace** built with **Laravel 12** for selling scripts, templates, UI kits, and design assets. Modern UI, instant delivery, and a powerful admin dashboard.
 
-> Built with PHP 8.2+, Laravel 12, Tailwind CSS and Alpine.js.
+> **Created by [@i_am2_black](https://instagram.com/i_am2_black)** — DM for custom orders.
 
 ---
 
-## ✨ Features
+## Features
 
 ### Storefront
-- Modern, responsive **landing page** with hero, categories, featured & latest products
-- **Product catalog** with full-text search, category filter, price filter and sorting
-- **Product detail** pages with gallery, reviews, related products and a live demo link
-- **Session-based cart** available to guests and members
-- **Checkout** with billing details and pluggable payment methods (manual / Stripe / PayPal)
-- **Verified-buyer reviews & ratings** (auto-recalculated averages)
-- **Wishlist**
-
-### Customer Dashboard
-- Account overview with spend / orders / downloads stats
-- **My Purchases** with secure, access-controlled download links
-- Wishlist management
-- Profile settings (avatar, bio) and password change
+- Beautiful, responsive landing page with animated hero section
+- Product catalog with category filtering, search, and sorting
+- Product detail pages with gallery, reviews, changelog, and related products
+- Shopping cart + multi-gateway checkout (Stripe, PayPal, Razorpay, Manual)
+- Free product downloads (login required)
+- User dashboard (purchases, downloads, wishlist, tickets)
+- Multi-currency support with visitor currency switching
+- Contact form (works for guests and members)
+- Custom pages (About, Terms, Privacy, Refund — fully editable HTML)
 
 ### Admin Dashboard
-- KPI cards (revenue, products, customers, downloads) and a 7-day revenue chart
-- **Products** — full CRUD with thumbnail + private package upload, tags, sale pricing, featured flag
-- **Categories** — full CRUD with auto-slugging
-- **Orders** — list, filter, view and update status
-- **Customers** — list, view order history, change roles, delete accounts
+- Revenue analytics, sales charts, top products, recent activity
+- Health monitoring (PHP, DB, storage, cache, SMTP, disk, errors)
+- System information + cache clear tools
+- Error log viewer with clear button
 
-### Security
-- Role-based access control (`user` / `admin`) via the `admin` route middleware
-- Purchased files stored on a **private disk** and streamed only to verified buyers
-- CSRF protection, hashed passwords, validated requests throughout
+### Product Management
+- Rich product editor with gallery, tags, versioning
+- **Delivery options**: file upload OR external hosted link
+- Per-buyer download limits + link expiry (signed URLs)
+- Product changelog/versions (public timeline)
+- Sale availability toggle + WhatsApp/Telegram contact per product
+- Live preview link support
+
+### Storage Providers
+- Local, Amazon S3, DigitalOcean Spaces, Cloudflare R2
+- Runtime disk switching (no code changes needed)
+- Admin credentials page with provider-specific hints
+
+### Promotions & Marketing
+- **Announcement bar** — 5 priority styles (offer/info/success/warning/alert), dismissible, custom link
+- **Hero promotion** — featured products / custom message / countdown offers (up to 2)
+- **Popup system** — custom message, product card, or countdown offer with auto-close timer
+- **Telegram bot integration** — multi-bot, per-event toggles, auto product promotion scheduler
+
+### Telegram Bot
+- Post beautiful updates: new users, products, categories, purchases, reviews, free downloads
+- Auto product promotion on a schedule (minutes/hours/days)
+- Custom broadcast messages
+- Message previews in admin
+- Multiple bots with per-event control
+
+### Orders & Payments
+- Stripe, PayPal, Razorpay (enable/disable per gateway)
+- Manual payment (UPI, bank, crypto, QR) with screenshot verification
+- PDF invoice download with site branding
+- Order status management + email receipts
+
+### Users & Communication
+- Email verification (toggle on/off)
+- Forgot password flow
+- Google/Firebase captcha on login/registration
+- Support tickets with file attachments
+- Contact messages with auto-delete retention
+- Admin notifications bell (all user activity)
+
+### Settings
+- General (branding, logo, timezone, socials)
+- Homepage section toggles
+- Hero section content
+- Footer customization
+- SEO (title, description, OG image, analytics)
+- Payment gateways
+- Manual payment methods
+- Email/SMTP
+- Login & captcha
+- Integrations (Tawk.to)
+- Maintenance mode
+- Currencies (multi-currency with exchange rates)
+- Custom pages (HTML/CSS/JS editor with templates)
 
 ---
 
-## 🧰 Requirements
+## Requirements
 
-- PHP **8.2+** (8.3 / 8.4 supported)
-- Composer 2
-- One of: SQLite (default, zero-config), MySQL 8, MariaDB, or PostgreSQL
-- Node.js 18+ **only if** you want to swap the Tailwind CDN for a compiled build (optional)
+- PHP 8.2+
+- MySQL 5.7+ / MariaDB 10.3+
+- Composer 2.x
+- Apache or Nginx (mod_rewrite enabled)
+- XAMPP / Laragon / any PHP hosting (Hostinger, Namecheap, etc.)
 
 ---
 
-## 🚀 Installation
+## Installation
 
-```bash
-# 1. Install PHP dependencies
+### Local (XAMPP / Windows)
+
+```powershell
+cd C:\xampp\htdocs
+git clone https://github.com/alokpersonal799-max/AkzoneScripts.git
+cd AkzoneScripts
 composer install
-
-# 2. Create your environment file and generate an app key
-cp .env.example .env
-php artisan key:generate
-
-# 3. (SQLite default) create the database file
-touch database/database.sqlite
-
-# 4. Run migrations and seed demo data
-php artisan migrate --seed
-
-# 5. Link the storage directory (for thumbnails / avatars)
+composer require barryvdh/laravel-dompdf
+php artisan migrate
+php artisan db:seed --class=DemoSeeder
 php artisan storage:link
-
-# 6. Start the development server
-php artisan serve
+php artisan view:clear
+php artisan config:clear
 ```
 
-Now visit **http://localhost:8000**.
+Then visit: `http://localhost/AkzoneScripts/public/`
 
-### Using MySQL / PostgreSQL instead of SQLite
+### Hosting (Hostinger, Namecheap, etc.)
 
-Edit `.env` and set the connection, then run `php artisan migrate --seed`:
+1. Upload the project files to your hosting
+2. Point your domain to the `public/` directory
+3. Create a MySQL database and update `.env`
+4. Run via SSH:
+   ```bash
+   composer install
+   composer require barryvdh/laravel-dompdf
+   php artisan migrate
+   php artisan db:seed --class=DemoSeeder
+   php artisan storage:link
+   ```
+5. For auto Telegram promotion, add cron:
+   ```
+   * * * * * cd /path/to/AkzoneScripts && php artisan schedule:run >> /dev/null 2>&1
+   ```
 
-```dotenv
-DB_CONNECTION=mysql
-DB_HOST=127.0.0.1
-DB_PORT=3306
-DB_DATABASE=akzonescripts
-DB_USERNAME=root
-DB_PASSWORD=secret
-```
+### Web Installer
 
----
-
-## 🔑 Demo Accounts
-
-After seeding, log in with:
-
-| Role     | Email                          | Password   |
-|----------|--------------------------------|------------|
-| Admin    | `admin@akzonescripts.test`     | `password` |
-| Customer | `customer@akzonescripts.test`  | `password` |
-
-The admin panel lives at **`/admin`**.
-
-> **Note:** Seeded products do **not** include downloadable files. To enable real downloads,
-> open the admin panel → Products → edit a product → upload a `.zip` package. Files are stored
-> privately in `storage/app/private/products` and are only served to verified buyers.
+The script includes a built-in 6-step web installer at `/install` that handles:
+- Environment check
+- Database configuration
+- Admin account creation
+- Site settings
+- Demo data (optional)
+- Finalization
 
 ---
 
-## 💳 Enabling Live Payments
+## Demo Accounts
 
-The checkout runs in **manual mode** out of the box so the full purchase flow works without any
-external credentials. To accept real payments, add your keys in `.env` and wire the chosen gateway
-into `App\Http\Controllers\CheckoutController@store`:
-
-```dotenv
-STRIPE_KEY=pk_live_xxx
-STRIPE_SECRET=sk_live_xxx
-
-PAYPAL_CLIENT_ID=xxx
-PAYPAL_SECRET=xxx
-PAYPAL_MODE=live
-```
-
-These are read in `config/services.php`.
+| Role | Email | Password |
+|------|-------|----------|
+| Admin | admin@akzone.com | password |
+| Customer | user@akzone.com | password |
 
 ---
 
-## 🎨 Styling
+## Admin Panel
 
-The UI uses **Tailwind CSS via the Play CDN** plus **Alpine.js** (both loaded in
-`resources/views/partials/head.blade.php`). This means the interface works instantly with **no
-build step**.
+Access at `/admin` after logging in with an admin account.
 
-For production you may prefer a compiled Tailwind bundle. To do that, install Tailwind with npm,
-add a `resources/css/app.css`, configure `tailwind.config.js` with the same `brand`/`ink` palette,
-and replace the CDN `<script>` with `@vite(['resources/css/app.css', 'resources/js/app.js'])`.
-
----
-
-## ⚙️ Configuration
-
-Marketplace-wide settings live in **`config/marketplace.php`** (also configurable via `.env`):
-
-| Key                | Description                                  |
-|--------------------|----------------------------------------------|
-| `name` / `tagline` | Brand name and headline                      |
-| `currency` / `currency_symbol` | Display currency                 |
-| `per_page`         | Products per catalog page                    |
-| `allowed_file_types` | Permitted package extensions               |
-| `max_file_size`    | Max upload size (KB)                          |
-| `support_email`    | Footer / contact email                        |
+### Navigation
+- Dashboard (with health monitoring)
+- Products
+- Categories
+- Orders
+- Customers
+- Coupons
+- Reviews
+- Support (tickets)
+- Reports
+- Messages (contact form)
+- TG Connection (Telegram bots)
+- Promotions
+- Storage
+- Currencies
+- Settings
+- System Information
+- Log out
 
 ---
 
-## 🗂️ Project Structure
+## Tech Stack
+
+| Layer | Technology |
+|-------|-----------|
+| Backend | Laravel 12 (PHP 8.2+) |
+| Frontend | Tailwind CSS (CDN) + Alpine.js |
+| Database | MySQL / MariaDB |
+| PDF | barryvdh/laravel-dompdf |
+| Cloud Storage | league/flysystem-aws-s3-v3 (optional) |
+| Fonts | Plus Jakarta Sans + Inter (Google Fonts) |
+
+---
+
+## File Structure
 
 ```
 app/
-├── Http/
-│   ├── Controllers/        # Storefront, auth, cart, checkout, dashboard
-│   │   └── Admin/          # Admin CRUD controllers
-│   └── Middleware/         # EnsureUserIsAdmin
-├── Models/                 # User, Category, Product, Order, OrderItem, Review, Wishlist
-├── Observers/              # ProductObserver (auto-slug)
-└── Services/               # CartService (session cart)
-config/marketplace.php      # Marketplace settings
+├── Http/Controllers/       # 40 controllers (admin + public)
+├── Models/                 # 18 Eloquent models
+├── Services/               # TelegramService, CartService, CurrencyService
+├── Support/                # TelegramMessages builder
+├── Mail/                   # OrderReceiptMail
+├── Providers/              # AppServiceProvider (runtime config)
+config/
+├── marketplace.php         # Platform settings
 database/
-├── migrations/             # Full schema
-└── seeders/                # Demo data
-resources/views/
-├── layouts/                # app, dashboard, admin
-├── components/             # product-card, price, star-rating, status-badge, ...
-├── partials/               # head, flash
-├── admin/                  # Admin panel views
-├── dashboard/              # Customer dashboard views
-└── products/, cart/, checkout/, auth/, home.blade.php
-routes/web.php              # All routes
+├── migrations/             # 29 migrations (full schema)
+├── seeders/                # CoreSeeder + DemoSeeder
+resources/views/            # 95 Blade templates
+routes/
+├── web.php                 # All web routes
+├── console.php             # Scheduler (auto TG promo)
 ```
 
 ---
 
-## 📜 License
+## Configuration
 
-MIT — free for personal and commercial use.
+All settings are manageable from the admin panel. Key `.env` values:
+
+| Key | Description |
+|-----|-------------|
+| APP_NAME | Site name |
+| DB_CONNECTION | mysql |
+| DB_DATABASE | Your database name |
+| MAIL_* | SMTP settings (also configurable in admin) |
+
+---
+
+## Troubleshooting
+
+| Issue | Solution |
+|-------|----------|
+| `storage:link already exists` | Safe to ignore — the link is working |
+| `&&` not working in PowerShell | Run commands one per line, or use `;` |
+| Blank page after pull | Run `php artisan view:clear; php artisan config:clear` |
+| Telegram not sending | Check token + bot is admin of channel + chat ID format |
+| PDF not generating | Run `composer require barryvdh/laravel-dompdf` |
+| S3 not working | Run `composer require league/flysystem-aws-s3-v3` |
+
+---
+
+## License
+
+This is a commercial script. All rights reserved.
+
+---
+
+## Support
+
+- Instagram: [@i_am2_black](https://instagram.com/i_am2_black)
+- Email: Configure in Admin → Settings → General
