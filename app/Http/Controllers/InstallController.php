@@ -152,6 +152,8 @@ class InstallController extends Controller
 
     public function runImport(Request $request): RedirectResponse
     {
+        $demo = $request->boolean('demo');
+
         try {
             $this->applyDatabaseConfig([
                 'host' => env('DB_HOST'),
@@ -170,8 +172,8 @@ class InstallController extends Controller
             // Always seed core settings + currencies.
             Artisan::call('db:seed', ['--class' => 'CoreSeeder', '--force' => true]);
 
-            // Optionally load sample categories & products.
-            if ($request->boolean('demo')) {
+            // Optionally load sample categories, products, reviews & demo accounts.
+            if ($demo) {
                 Artisan::call('db:seed', [
                     '--class' => 'DemoSeeder',
                     '--force' => true,
@@ -182,6 +184,22 @@ class InstallController extends Controller
                 ->with('error', 'Database setup failed: '.$e->getMessage());
         }
 
+        // Remember which path was chosen so the finish screen shows the right info.
+        session(['install_demo' => $demo]);
+
+        if ($demo) {
+            // The demo seeder already created an admin account
+            // (admin@akzone.com / password) and demo store settings, so we skip
+            // the manual account step and go straight to finish. Persist a sane
+            // APP_URL so storefront links resolve correctly.
+            $this->writeEnv([
+                'APP_URL' => rtrim(env('APP_URL', $this->guessUrl()), '/'),
+            ]);
+
+            return redirect()->route('install.finish');
+        }
+
+        // Fresh business install — collect the brand name + real admin account.
         return redirect()->route('install.account');
     }
 
@@ -258,9 +276,15 @@ class InstallController extends Controller
         // Drop the lock file so the installer can never run again.
         @file_put_contents(storage_path('installed'), 'Installed at '.now()->toDateTimeString().PHP_EOL);
 
+        $demo = (bool) session('install_demo', false);
+        session()->forget('install_demo');
+
         return view('install.finish', [
             'step' => 6,
             'appUrl' => env('APP_URL', $this->guessUrl()),
+            'demo' => $demo,
+            'demoEmail' => 'admin@akzone.com',
+            'demoPassword' => 'password',
         ]);
     }
 
