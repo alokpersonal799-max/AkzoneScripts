@@ -29,9 +29,10 @@ class ReviewController extends Controller
             'pendingCount' => Review::where('is_approved', false)->count(),
             'stats' => [
                 'total' => Review::count(),
-                'pending' => Review::where('is_approved', false)->count(),
-                'approved' => Review::where('is_approved', true)->count(),
                 'verified' => Review::where('is_verified', true)->count(),
+                'free' => Review::whereHas('product', fn ($q) => $q->whereRaw('COALESCE(sale_price, price) <= 0'))->count(),
+                'approved' => Review::where('is_approved', true)->count(),
+                'pending' => Review::where('is_approved', false)->count(),
                 'testimonials' => Review::where('is_testimonial', true)->count(),
             ],
         ]);

@@ -4,12 +4,13 @@
 
 @section('admin')
     {{-- Stats --}}
-    <div class="mb-6 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">
+    <div class="mb-6 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
         @foreach ([
             ['Total reviews', $stats['total'], 'slate'],
+            ['Verified (genuine)', $stats['verified'], 'emerald'],
+            ['Free product', $stats['free'], 'cyan'],
+            ['Approved', $stats['approved'], 'brand'],
             ['Pending', $stats['pending'], 'amber'],
-            ['Approved', $stats['approved'], 'emerald'],
-            ['Verified', $stats['verified'], 'brand'],
             ['Testimonials', $stats['testimonials'], 'indigo'],
         ] as $s)
             <div class="card p-4">
@@ -28,10 +29,13 @@
             </a>
         @endforeach
 
-        <label class="ml-auto flex items-center gap-2 text-sm text-slate-500">
-            <input type="checkbox" @change="selected = $event.target.checked ? [...allIds] : []" :checked="selected.length && selected.length === allIds.length" class="rounded border-slate-300 text-brand-600 focus:ring-brand-500">
-            Select all
-        </label>
+        <div class="ml-auto flex items-center gap-3">
+            <button type="button" @click="selected = allIds.slice(0, 10)" class="text-sm font-semibold text-brand-600 hover:text-brand-700">Select 10</button>
+            <label class="flex items-center gap-2 text-sm text-slate-500">
+                <input type="checkbox" @change="selected = $event.target.checked ? [...allIds] : []" :checked="selected.length && selected.length === allIds.length" class="rounded border-slate-300 text-brand-600 focus:ring-brand-500">
+                Select all
+            </label>
+        </div>
     </div>
 
     {{-- Bulk action bar --}}
@@ -58,7 +62,7 @@
     <div class="space-y-4">
         @forelse ($reviews as $review)
             @php $genuine = $review->product && ! $review->product->is_free && $review->user && $review->user->hasPurchased($review->product_id); @endphp
-            <div class="card p-5" x-data="{ reply: false }" :class="selected.includes({{ $review->id }}) && 'ring-2 ring-brand-500/40'">
+            <div class="card p-5 {{ $genuine ? 'border-l-4 border-l-emerald-400' : '' }}" x-data="{ reply: false }" :class="selected.includes({{ $review->id }}) && 'ring-2 ring-brand-500/40'">
                 <div class="flex flex-wrap items-start justify-between gap-3">
                     <div class="flex min-w-0 gap-3">
                         <input type="checkbox" value="{{ $review->id }}" x-model.number="selected" class="mt-1 h-4 w-4 flex-none rounded border-slate-300 text-brand-600 focus:ring-brand-500">
