@@ -125,6 +125,7 @@ class SettingController extends Controller
             'portfolio_url' => ['nullable', 'url', 'max:255'],
             'timezone' => ['nullable', 'string', 'max:64', 'timezone'],
             'logo' => ['nullable', 'image', 'max:2048'],
+            'remove_logo' => ['nullable', 'in:0,1'],
             'pwa_install_enabled' => ['nullable', 'in:0,1'],
             'pwa_install_mobile' => ['nullable', 'in:0,1'],
             'pwa_install_desktop' => ['nullable', 'in:0,1'],
@@ -136,6 +137,13 @@ class SettingController extends Controller
                 Storage::disk('public')->delete($existing);
             }
             Setting::put('site_logo', $request->file('logo')->store('branding', 'public'), 'general');
+        } elseif ($request->input('remove_logo') === '1') {
+            // Clear the logo and fall back to the text/initial brand.
+            $existing = Setting::get('site_logo');
+            if ($existing) {
+                Storage::disk('public')->delete($existing);
+            }
+            Setting::put('site_logo', '', 'general');
         }
 
         foreach (['site_name', 'support_email', 'social_twitter', 'social_github', 'social_discord', 'social_facebook', 'contact_whatsapp', 'contact_telegram', 'portfolio_url'] as $key) {

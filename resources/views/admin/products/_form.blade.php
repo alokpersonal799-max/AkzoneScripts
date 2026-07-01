@@ -37,11 +37,11 @@
             <h3 class="font-display text-base font-bold text-ink-900">Media &amp; files</h3>
             <div class="mt-4">
                 <label for="thumbnail" class="label">Thumbnail image</label>
-                @if ($product->thumbnail)
-                    <img src="{{ $product->thumbnail_url }}" alt="" class="mb-2 h-32 w-full max-w-xs rounded-lg object-cover">
-                @endif
+                <img id="thumbnail-preview" src="{{ $product->thumbnail ? $product->thumbnail_url : '' }}" alt="" class="mb-2 h-32 w-full max-w-xs rounded-lg object-cover {{ $product->thumbnail ? '' : 'hidden' }}">
                 <input id="thumbnail" name="thumbnail" type="file" accept="image/*"
+                       data-crop data-crop-ratio="1.6" data-crop-preview="#thumbnail-preview"
                        class="block w-full text-sm text-slate-500 file:mr-3 file:rounded-lg file:border-0 file:bg-brand-50 file:px-3 file:py-1.5 file:text-sm file:font-semibold file:text-brand-600 hover:file:bg-brand-100">
+                <p class="mt-1 text-xs text-slate-400">Suggested: <strong>1200&times;750&nbsp;px</strong> (16:10 landscape), JPG/PNG/WebP, max 4&nbsp;MB. You can crop after selecting.</p>
             </div>
 
             {{-- Gallery (max 6) --}}
@@ -60,7 +60,9 @@
                     </div>
                 @endif
                 <input id="gallery" name="gallery[]" type="file" accept="image/*" multiple
+                       data-crop data-crop-ratio="1.6"
                        class="block w-full text-sm text-slate-500 file:mr-3 file:rounded-lg file:border-0 file:bg-brand-50 file:px-3 file:py-1.5 file:text-sm file:font-semibold file:text-brand-600 hover:file:bg-brand-100">
+                <p class="mt-1 text-xs text-slate-400">Same size as the thumbnail works best: <strong>1200&times;750&nbsp;px</strong> (16:10). You'll be asked to crop each image.</p>
             </div>
             <div class="mt-5">
                 <label for="demo_url" class="label">Live demo URL</label>

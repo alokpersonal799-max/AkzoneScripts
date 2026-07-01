@@ -16,13 +16,14 @@
 
                 <div class="flex items-center gap-4">
                     <span class="h-16 w-16 flex-shrink-0 overflow-hidden rounded-2xl">
-                        <img src="{{ $user->avatar_url }}" alt="avatar" class="h-full w-full object-cover">
+                        <img id="avatar-preview" src="{{ $user->avatar_url }}" alt="avatar" class="h-full w-full object-cover">
                     </span>
                     <div>
                         <label for="avatar" class="label">Profile photo</label>
                         <input id="avatar" name="avatar" type="file" accept="image/*"
+                               data-crop data-crop-ratio="1" data-crop-preview="#avatar-preview"
                                class="block text-sm text-slate-500 file:mr-3 file:rounded-lg file:border-0 file:bg-brand-50 file:px-3 file:py-1.5 file:text-sm file:font-semibold file:text-brand-600 hover:file:bg-brand-100">
-                        <p class="mt-1 text-xs text-slate-400">Leave empty to use your auto-generated avatar.</p>
+                        <p class="mt-1 text-xs text-slate-400">Suggested: square <strong>400&times;400&nbsp;px</strong> (JPG/PNG). You can crop it after selecting. Leave empty to use your auto-generated avatar.</p>
                     </div>
                 </div>
 

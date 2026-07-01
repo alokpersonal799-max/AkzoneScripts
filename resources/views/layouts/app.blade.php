@@ -7,6 +7,8 @@
 
     @include('partials.page-loader')
 
+    @include('partials.image-cropper')
+
     @include('partials.theme-effects')
 
     <button id="akzone-install-btn" onclick="akzoneInstall()" style="display:none" class="fixed bottom-5 right-5 z-40 items-center gap-2 rounded-full bg-brand-600 px-4 py-2.5 text-sm font-semibold text-white shadow-lift transition hover:bg-brand-700">

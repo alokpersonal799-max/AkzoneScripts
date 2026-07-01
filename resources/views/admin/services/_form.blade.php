@@ -34,7 +34,7 @@
         {{-- Custom provider fields --}}
         <div x-show="ptype === 'custom'" x-cloak class="mt-4 space-y-4 border-t border-slate-100 pt-4">
             <div class="flex items-center gap-4">
-                <img src="{{ $service->avatar_url ?? '' }}" alt="" class="h-14 w-14 rounded-xl object-cover {{ $service->provider_avatar ?? false ? '' : 'hidden' }}">
+                <img id="provider-avatar-preview" src="{{ $service->avatar_url ?? '' }}" alt="" class="h-14 w-14 rounded-xl object-cover {{ $service->provider_avatar ?? false ? '' : 'hidden' }}">
                 <div>
                     <label for="provider_name" class="label">Provider name</label>
                     <input id="provider_name" name="provider_name" type="text" value="{{ old('provider_name', $service->provider_name) }}" class="input" placeholder="e.g. John Doe">
@@ -42,7 +42,8 @@
             </div>
             <div>
                 <label for="provider_avatar" class="label">Provider photo</label>
-                <input id="provider_avatar" name="provider_avatar" type="file" accept="image/*" class="block text-sm text-slate-500 file:mr-3 file:rounded-lg file:border-0 file:bg-brand-50 file:px-3 file:py-1.5 file:text-sm file:font-semibold file:text-brand-600">
+                <input id="provider_avatar" name="provider_avatar" type="file" accept="image/*" data-crop data-crop-ratio="1" data-crop-preview="#provider-avatar-preview" class="block text-sm text-slate-500 file:mr-3 file:rounded-lg file:border-0 file:bg-brand-50 file:px-3 file:py-1.5 file:text-sm file:font-semibold file:text-brand-600">
+                <p class="mt-1 text-xs text-slate-400">Suggested: square <strong>400&times;400&nbsp;px</strong>. You can crop after selecting.</p>
             </div>
         </div>
 

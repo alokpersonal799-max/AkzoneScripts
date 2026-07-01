@@ -3,17 +3,28 @@
         @csrf @method('PUT')
         <h2 class="font-display text-lg font-bold text-ink-900">Branding &amp; general</h2>
 
-        <div class="flex items-center gap-4">
+        <div class="flex items-center gap-4" x-data="{ removeLogo: false }">
             <span class="flex h-16 w-16 items-center justify-center overflow-hidden rounded-2xl bg-slate-100">
                 @if (setting('site_logo'))
-                    <img src="{{ \Illuminate\Support\Facades\Storage::disk('public')->url(setting('site_logo')) }}" alt="logo" class="h-full w-full object-contain">
+                    <img id="logo-preview" src="{{ \Illuminate\Support\Facades\Storage::disk('public')->url(setting('site_logo')) }}" alt="logo" class="h-full w-full object-contain" :class="removeLogo && 'opacity-30'">
                 @else
-                    <span class="font-display text-2xl font-extrabold text-brand-600">A</span>
+                    <img id="logo-preview" src="" alt="" class="hidden h-full w-full object-contain">
+                    <span class="font-display text-2xl font-extrabold text-brand-600">{{ strtoupper(substr(setting('site_name', config('app.name', 'A')), 0, 1)) }}</span>
                 @endif
             </span>
             <div>
                 <label for="logo" class="label">Site logo</label>
-                <input id="logo" name="logo" type="file" accept="image/*" class="block text-sm text-slate-500 file:mr-3 file:rounded-lg file:border-0 file:bg-brand-50 file:px-3 file:py-1.5 file:text-sm file:font-semibold file:text-brand-600 hover:file:bg-brand-100">
+                <input id="logo" name="logo" type="file" accept="image/png,image/jpeg,image/webp,image/svg+xml"
+                       data-crop data-crop-ratio="0" data-crop-preview="#logo-preview"
+                       class="block text-sm text-slate-500 file:mr-3 file:rounded-lg file:border-0 file:bg-brand-50 file:px-3 file:py-1.5 file:text-sm file:font-semibold file:text-brand-600 hover:file:bg-brand-100">
+                <p class="mt-1 text-xs text-slate-400">Recommended: transparent <strong>PNG</strong>, about <strong>240&times;80&nbsp;px</strong> (or a 512&times;512 square). Max 2&nbsp;MB.</p>
+                @if (setting('site_logo'))
+                    <input type="hidden" name="remove_logo" :value="removeLogo ? '1' : '0'">
+                    <label class="mt-2 inline-flex items-center gap-2 text-xs font-medium text-rose-600">
+                        <input type="checkbox" x-model="removeLogo" class="h-3.5 w-3.5 rounded border-slate-300 text-rose-600 focus:ring-rose-500">
+                        Remove current logo (use text brand)
+                    </label>
+                @endif
             </div>
         </div>
 
