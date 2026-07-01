@@ -187,6 +187,39 @@
         </div>
     @endif
 
+    {{-- Announcements snapshot --}}
+    @if ($announcementStats)
+        <div class="mt-6 card overflow-hidden">
+            <div class="flex items-center justify-between border-b border-slate-100 p-5">
+                <div class="flex items-center gap-2">
+                    <span class="flex h-9 w-9 items-center justify-center rounded-xl bg-brand-50 text-brand-600">
+                        <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke-width="1.6" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M10.34 15.84c-.688-.06-1.386-.09-2.09-.09H7.5a4.5 4.5 0 1 1 0-9h.75c.704 0 1.402-.03 2.09-.09m0 9.18a23.848 23.848 0 0 1 8.835 2.535M10.34 6.66a23.847 23.847 0 0 0 8.835-2.535" /></svg>
+                    </span>
+                    <h2 class="font-display text-lg font-bold text-ink-900">Announcements</h2>
+                </div>
+                <a href="{{ route('admin.announcements.index') }}" class="text-sm font-semibold text-brand-600 hover:text-brand-700">Manage</a>
+            </div>
+            <div class="grid grid-cols-2 gap-px bg-slate-100 sm:grid-cols-4">
+                @foreach ([['Total', $announcementStats['total']], ['Sent', $announcementStats['sent']], ['Scheduled', $announcementStats['scheduled']], ['User replies', $announcementStats['replies']]] as $st)
+                    <div class="bg-white p-4">
+                        <p class="text-xs text-slate-400">{{ $st[0] }}</p>
+                        <p class="font-display text-xl font-bold text-ink-900">{{ number_format($st[1]) }}</p>
+                    </div>
+                @endforeach
+            </div>
+            @if ($announcementStats['recent']->isNotEmpty())
+                <div class="divide-y divide-slate-100 border-t border-slate-100">
+                    @foreach ($announcementStats['recent'] as $a)
+                        <a href="{{ route('admin.announcements.show', $a) }}" class="flex items-center justify-between px-5 py-3 transition hover:bg-slate-50">
+                            <span class="truncate text-sm font-medium text-ink-900">{{ $a->title }}</span>
+                            <span class="ml-3 flex-none text-xs font-semibold capitalize {{ $a->status === 'sent' ? 'text-emerald-600' : ($a->status === 'scheduled' ? 'text-indigo-600' : 'text-slate-400') }}">{{ $a->status }}</span>
+                        </a>
+                    @endforeach
+                </div>
+            @endif
+        </div>
+    @endif
+
     {{-- System Health Quick Check --}}
     <div class="mt-6 card overflow-hidden">
         <div class="flex items-center justify-between border-b border-slate-100 p-5">

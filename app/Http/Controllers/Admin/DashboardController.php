@@ -79,6 +79,18 @@ class DashboardController extends Controller
         $topProducts = Product::orderByDesc('downloads')->take(5)->get();
         $lowStockOrDraft = Product::where('status', 'draft')->latest()->take(5)->get();
 
+        // Announcement snapshot.
+        $announcementStats = null;
+        if (\Illuminate\Support\Facades\Schema::hasTable('announcements')) {
+            $announcementStats = [
+                'total' => \App\Models\Announcement::count(),
+                'sent' => \App\Models\Announcement::where('status', 'sent')->count(),
+                'scheduled' => \App\Models\Announcement::where('status', 'scheduled')->count(),
+                'replies' => \Illuminate\Support\Facades\Schema::hasTable('announcement_replies') ? \App\Models\AnnouncementReply::where('is_admin', false)->count() : 0,
+                'recent' => \App\Models\Announcement::latest()->take(3)->get(),
+            ];
+        }
+
         return view('admin.dashboard', compact(
             'stats',
             'salesByDay',
@@ -87,7 +99,8 @@ class DashboardController extends Controller
             'recentUsers',
             'recentLogins',
             'topProducts',
-            'lowStockOrDraft'
+            'lowStockOrDraft',
+            'announcementStats'
         ));
     }
 }

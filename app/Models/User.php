@@ -139,6 +139,28 @@ class User extends Authenticatable
     }
 
     /**
+     * Announcement inbox rows delivered to this user.
+     *
+     * @return HasMany<AnnouncementRecipient>
+     */
+    public function announcementRecipients(): HasMany
+    {
+        return $this->hasMany(AnnouncementRecipient::class);
+    }
+
+    /**
+     * Count of unread announcements in the user's inbox.
+     */
+    public function unreadAnnouncementsCount(): int
+    {
+        if (! \Illuminate\Support\Facades\Schema::hasTable('announcement_recipients')) {
+            return 0;
+        }
+
+        return $this->announcementRecipients()->whereNull('read_at')->count();
+    }
+
+    /**
      * Wishlist entries belonging to the user.
      *
      * @return HasMany<Wishlist>

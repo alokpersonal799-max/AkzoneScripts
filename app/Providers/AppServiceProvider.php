@@ -38,6 +38,7 @@ class AppServiceProvider extends ServiceProvider
             \App\Models\Order::class,
             \App\Models\Advertisement::class,
             \App\Models\TelegramBot::class,
+            \App\Models\Announcement::class,
         ] as $auditable) {
             $auditable::observe(\App\Observers\ActivityObserver::class);
         }

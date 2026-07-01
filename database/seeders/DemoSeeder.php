@@ -29,6 +29,7 @@ class DemoSeeder extends Seeder
         $categories = $this->seedCategories();
         $this->seedProducts($categories);
         $this->seedReviews();
+        $this->seedAnnouncements();
         $this->seedPromotion();
         $this->seedChangelogs();
         $this->seedPages();
@@ -258,6 +259,39 @@ class DemoSeeder extends Seeder
                 ]
             );
         }
+    }
+
+    /**
+     * Seed a couple of demo announcements so the user inbox and admin
+     * announcement tools have content to explore right away.
+     */
+    protected function seedAnnouncements(): void
+    {
+        if (! \Illuminate\Support\Facades\Schema::hasTable('announcements')) {
+            return;
+        }
+
+        $offer = \App\Models\Announcement::create([
+            'title' => 'Weekend Flash Sale — up to 30% off! 🎉',
+            'body' => "Big savings this weekend on our featured scripts and templates.\n\nUse the moment — this offer ends Sunday midnight. Let us know what you think!",
+            'theme' => 'offer',
+            'audience' => 'all',
+            'status' => 'draft',
+            'allow_reply' => true,
+            'reply_types' => ['star', 'emoji', 'message'],
+        ]);
+        $offer->send();
+
+        $soon = \App\Models\Announcement::create([
+            'title' => 'Something big is coming soon 👀',
+            'body' => 'We are polishing an exciting new release for the store. Stay tuned — you will be the first to know!',
+            'theme' => 'coming_soon',
+            'audience' => 'all',
+            'status' => 'draft',
+            'allow_reply' => false,
+            'reply_types' => [],
+        ]);
+        $soon->send();
     }
 
     /**

@@ -18,6 +18,8 @@ use App\Http\Controllers\Admin\ActivityLogController as AdminActivityLogControll
 use App\Http\Controllers\Admin\ServiceController as AdminServiceController;
 use App\Http\Controllers\Admin\CronController as AdminCronController;
 use App\Http\Controllers\Admin\DemoDataController as AdminDemoDataController;
+use App\Http\Controllers\Admin\AnnouncementController as AdminAnnouncementController;
+use App\Http\Controllers\InboxController;
 use App\Http\Controllers\Admin\ThemeController as AdminThemeController;
 use App\Http\Controllers\Admin\TelegramController as AdminTelegramController;
 use App\Http\Controllers\Admin\TicketController as AdminTicketController;
@@ -169,6 +171,11 @@ Route::middleware('auth')->group(function () {
     Route::post('/products/{product}/reviews', [ReviewController::class, 'store'])->name('reviews.store');
     Route::post('/products/{product}/report', [ReportController::class, 'store'])->name('reports.store');
 
+    // Announcement inbox (user).
+    Route::get('/inbox', [InboxController::class, 'index'])->name('dashboard.inbox');
+    Route::get('/inbox/{announcement}', [InboxController::class, 'show'])->name('inbox.show');
+    Route::post('/inbox/{announcement}/reply', [InboxController::class, 'reply'])->name('inbox.reply');
+
     // Wishlist.
     Route::get('/wishlist', [WishlistController::class, 'index'])->name('wishlist.index');
     Route::post('/wishlist/{product}', [WishlistController::class, 'toggle'])->name('wishlist.toggle');
@@ -251,6 +258,14 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::patch('/reviews/{review}/testimonial', [AdminReviewController::class, 'toggleTestimonial'])->name('reviews.testimonial');
     Route::patch('/reviews/{review}/reply', [AdminReviewController::class, 'reply'])->name('reviews.reply');
     Route::delete('/reviews/{review}', [AdminReviewController::class, 'destroy'])->name('reviews.destroy');
+
+    // Announcements (broadcast / scheduled messages to users).
+    Route::get('/announcements', [AdminAnnouncementController::class, 'index'])->name('announcements.index');
+    Route::get('/announcements/create', [AdminAnnouncementController::class, 'create'])->name('announcements.create');
+    Route::post('/announcements', [AdminAnnouncementController::class, 'store'])->name('announcements.store');
+    Route::get('/announcements/{announcement}', [AdminAnnouncementController::class, 'show'])->name('announcements.show');
+    Route::post('/announcements/{announcement}/reply', [AdminAnnouncementController::class, 'reply'])->name('announcements.reply');
+    Route::delete('/announcements/{announcement}', [AdminAnnouncementController::class, 'destroy'])->name('announcements.destroy');
 
     // Site settings (section-based).
     Route::get('/settings', [AdminSettingController::class, 'index'])->name('settings.index');

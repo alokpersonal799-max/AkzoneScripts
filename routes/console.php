@@ -20,3 +20,16 @@ Schedule::call(function () {
 Schedule::call(function () {
     app(TelegramService::class)->runDailyReport();
 })->everyMinute()->name('telegram-daily-report')->withoutOverlapping();
+
+// Deliver scheduled announcements once their send time has arrived.
+Schedule::call(function () {
+    if (! \Illuminate\Support\Facades\Schema::hasTable('announcements')) {
+        return;
+    }
+
+    \App\Models\Announcement::where('status', 'scheduled')
+        ->whereNotNull('scheduled_at')
+        ->where('scheduled_at', '<=', now())
+        ->get()
+        ->each(fn ($a) => $a->send());
+})->everyMinute()->name('deliver-scheduled-announcements')->withoutOverlapping();

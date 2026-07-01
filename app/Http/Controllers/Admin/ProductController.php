@@ -55,10 +55,41 @@ class ProductController extends Controller
         // Announce newly published products to connected Telegram bots.
         if ($product->status === 'published') {
             app(\App\Services\TelegramService::class)->notify('product_added', \App\Support\TelegramMessages::productAdded($product));
+            $this->announceNewProduct($product);
         }
 
         return redirect()->route('admin.products.index')
             ->with('success', '"'.$product->title.'" has been created.');
+    }
+
+    /**
+     * Auto-create and send a "new product" announcement to all users (once per product).
+     */
+    protected function announceNewProduct(Product $product): void
+    {
+        if (! \Illuminate\Support\Facades\Schema::hasTable('announcements')) {
+            return;
+        }
+
+        // Avoid duplicate announcements for the same product.
+        if (\App\Models\Announcement::where('product_id', $product->id)->where('theme', 'new_product')->exists()) {
+            return;
+        }
+
+        $announcement = \App\Models\Announcement::create([
+            'title' => 'New product: '.$product->title,
+            'body' => $product->tagline ?: 'A brand new product has just landed in our store. Take a look!',
+            'theme' => 'new_product',
+            'audience' => 'all',
+            'status' => 'draft',
+            'allow_reply' => false,
+            'reply_types' => [],
+            'product_id' => $product->id,
+            'action_url' => route('products.show', $product),
+            'created_by' => auth()->id(),
+        ]);
+
+        $announcement->send();
     }
 
     /**
@@ -89,7 +120,14 @@ class ProductController extends Controller
         $data = $this->validateProduct($request, $product);
         $data = $this->handleUploads($request, $data, $product);
 
+        $wasPublished = $product->status === 'published';
+
         $product->update($data);
+
+        // Auto-announce when a product is published for the first time.
+        if ($product->status === 'published' && ! $wasPublished) {
+            $this->announceNewProduct($product);
+        }
 
         // Create a changelog entry if version and notes are provided.
         if ($request->filled('changelog_version') && $request->filled('changelog_notes')) {
