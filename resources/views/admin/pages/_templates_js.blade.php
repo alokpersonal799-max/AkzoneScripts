@@ -2,7 +2,6 @@
 function pageEditor() {
     return {
         contentType: '{{ old("content_type", $page->content_type ?? "text") }}',
-        layout: '{{ old("layout", $page->layout ?? "card") }}',
         selectedTemplate: '',
 
         applyTemplate() {
@@ -45,12 +44,6 @@ function pageEditor() {
             ctype.name = 'content_type';
             ctype.value = this.contentType;
             form.appendChild(ctype);
-
-            const lay = document.createElement('input');
-            lay.type = 'hidden';
-            lay.name = 'layout';
-            lay.value = this.layout;
-            form.appendChild(lay);
 
             document.body.appendChild(form);
             form.submit();

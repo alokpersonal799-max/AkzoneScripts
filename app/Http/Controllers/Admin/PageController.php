@@ -17,7 +17,7 @@ class PageController extends Controller
 
     public function create(): View
     {
-        return view('admin.pages.edit', ['page' => new Page(['is_published' => true, 'show_in_footer' => true, 'content_type' => 'text', 'layout' => 'card'])]);
+        return view('admin.pages.edit', ['page' => new Page(['is_published' => true, 'show_in_footer' => true, 'content_type' => 'text'])]);
     }
 
     public function store(Request $request): RedirectResponse
@@ -55,14 +55,12 @@ class PageController extends Controller
             'title' => ['nullable', 'string', 'max:255'],
             'content' => ['nullable', 'string'],
             'content_type' => ['nullable', 'string', 'in:text,html'],
-            'layout' => ['nullable', 'string', 'in:card,wide,plain'],
         ]);
 
         $page = new Page([
             'title' => $data['title'] ?? 'Page Preview',
             'content' => $data['content'] ?? '',
             'content_type' => $data['content_type'] ?? 'text',
-            'layout' => $data['layout'] ?? 'card',
             'is_published' => true,
         ]);
 
@@ -82,13 +80,11 @@ class PageController extends Controller
             'title' => ['required', 'string', 'max:255'],
             'content' => ['nullable', 'string'],
             'content_type' => ['nullable', 'string', 'in:text,html'],
-            'layout' => ['nullable', 'string', 'in:card,wide,plain'],
             'is_published' => ['nullable', 'boolean'],
             'show_in_footer' => ['nullable', 'boolean'],
         ]);
 
         $data['content_type'] = $data['content_type'] ?? 'text';
-        $data['layout'] = $data['layout'] ?? 'card';
         $data['is_published'] = $request->boolean('is_published');
         $data['show_in_footer'] = $request->boolean('show_in_footer');
 
