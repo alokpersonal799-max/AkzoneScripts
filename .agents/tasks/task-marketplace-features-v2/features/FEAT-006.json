@@ -1,0 +1,31 @@
+{
+  "id": "FEAT-006",
+  "type": "feat",
+  "description": "Comprehensive demo data update, health monitoring system in admin, and product detail contact button layout fix (1x2 grid).",
+  "status": "in_progress",
+  "steps": [
+    "Update DemoSeeder.php to seed product changelogs, custom pages with templates, contact messages, TelegramBot placeholder entry, storage provider settings, and auto TG promo settings",
+    "Add a health monitoring section to the admin System page showing PHP version, DB connection, storage writability, cache status, SMTP availability, error log size, disk usage, and ability to view/clear error logs",
+    "Update SystemController to provide health check data and error log viewing/clearing endpoints",
+    "Fix product detail page WhatsApp and Telegram contact buttons to show in a 1x2 grid layout instead of stacked vertically",
+    "Full verification sweep - php -l all PHP + blade balance all views"
+  ],
+  "acceptance_criteria": [
+    "DemoSeeder seeds changelogs for at least 3 products",
+    "DemoSeeder seeds at least 2 custom pages with HTML content",
+    "DemoSeeder seeds sample contact messages",
+    "DemoSeeder seeds a TelegramBot placeholder entry",
+    "Admin system page shows health monitoring with real-time checks",
+    "Admin system page has error log viewer with clear button",
+    "Product detail page shows WhatsApp and Telegram buttons in a 1x2 (side-by-side) grid",
+    "All PHP files pass php -l",
+    "All Blade views have balanced directives"
+  ],
+  "verification": [
+    "Run php -l on all modified PHP files",
+    "Verify Blade directive balance in all modified views",
+    "Grep products/show.blade.php for grid-cols-2 around contact buttons"
+  ],
+  "blocked_reason": null,
+  "findings": null
+}

@@ -256,6 +256,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     // System information & cache tools.
     Route::get('/system', [AdminSystemController::class, 'index'])->name('system.index');
     Route::post('/system/clear-cache', [AdminSystemController::class, 'clearCache'])->name('system.cache.clear');
+    Route::post('/system/clear-error-log', [AdminSystemController::class, 'clearErrorLog'])->name('system.error-log.clear');
 
     // Hero promotion manager.
     Route::get('/promotions', [AdminPromotionController::class, 'index'])->name('promotions.index');

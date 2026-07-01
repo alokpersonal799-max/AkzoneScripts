@@ -184,4 +184,43 @@
             </div>
         </div>
     @endif
+
+    {{-- System Health Quick Check --}}
+    <div class="mt-6 card overflow-hidden">
+        <div class="flex items-center justify-between border-b border-slate-100 p-5">
+            <div class="flex items-center gap-2">
+                <span class="flex h-9 w-9 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600">
+                    <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke-width="1.6" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75m-3-7.036A11.959 11.959 0 0 1 3.598 6 11.99 11.99 0 0 0 3 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285Z" /></svg>
+                </span>
+                <h2 class="font-display text-lg font-bold text-ink-900">System Health</h2>
+            </div>
+            <a href="{{ route('admin.system.index') }}" class="text-sm font-semibold text-brand-600 hover:text-brand-700">Full details</a>
+        </div>
+        <div class="grid grid-cols-2 gap-px bg-slate-100 sm:grid-cols-3 lg:grid-cols-4">
+            @php
+                $healthChecks = [
+                    ['label' => 'PHP', 'ok' => version_compare(PHP_VERSION, '8.2.0', '>='), 'detail' => PHP_VERSION],
+                    ['label' => 'Database', 'ok' => true, 'detail' => 'Connected'],
+                    ['label' => 'Storage', 'ok' => is_writable(storage_path('app')), 'detail' => is_writable(storage_path('app')) ? 'Writable' : 'Error'],
+                    ['label' => 'Debug', 'ok' => !config('app.debug'), 'detail' => config('app.debug') ? 'ON' : 'OFF'],
+                ];
+                try { \Illuminate\Support\Facades\DB::connection()->getPdo(); } catch (\Throwable $e) { $healthChecks[1]['ok'] = false; $healthChecks[1]['detail'] = 'Failed'; }
+            @endphp
+            @foreach ($healthChecks as $hc)
+                <div class="flex items-center gap-3 bg-white p-4">
+                    <span class="flex h-8 w-8 items-center justify-center rounded-full {{ $hc['ok'] ? 'bg-emerald-50' : 'bg-rose-50' }}">
+                        @if ($hc['ok'])
+                            <svg class="h-4 w-4 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" /></svg>
+                        @else
+                            <svg class="h-4 w-4 text-rose-500" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z" /></svg>
+                        @endif
+                    </span>
+                    <div>
+                        <p class="text-xs text-slate-500">{{ $hc['label'] }}</p>
+                        <p class="text-sm font-semibold {{ $hc['ok'] ? 'text-ink-900' : 'text-rose-600' }}">{{ $hc['detail'] }}</p>
+                    </div>
+                </div>
+            @endforeach
+        </div>
+    </div>
 @endsection

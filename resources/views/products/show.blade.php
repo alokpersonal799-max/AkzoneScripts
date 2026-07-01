@@ -216,11 +216,21 @@
                             <p class="text-center text-xs text-slate-400">This product is free. <a href="{{ route('login') }}" class="font-semibold text-brand-600 hover:underline">Sign in</a> or <a href="{{ route('register') }}" class="font-semibold text-brand-600 hover:underline">create an account</a> to download.</p>
                         @endauth
                     @elseif ($product->is_purchasable)
-                        @if ($waLink)
-                            <a href="{{ $waLink }}" target="_blank" rel="noopener" class="btn btn-lg w-full bg-emerald-500 text-white hover:bg-emerald-600">
-                                <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163a11.867 11.867 0 0 1-1.587-5.946C.16 5.335 5.495 0 12.05 0a11.82 11.82 0 0 1 8.413 3.488 11.82 11.82 0 0 1 3.48 8.414c-.003 6.557-5.338 11.892-11.893 11.892a11.9 11.9 0 0 1-5.688-1.448L.057 24Zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884a9.86 9.86 0 0 0 1.51 5.26l-.999 3.648 3.737-.98 .242 .147Z"/></svg>
-                                Ask on WhatsApp
-                            </a>
+                        @if ($waLink || $tgLink)
+                            <div class="grid grid-cols-2 gap-3">
+                                @if ($waLink)
+                                    <a href="{{ $waLink }}" target="_blank" rel="noopener" class="btn btn-lg bg-emerald-500 text-white hover:bg-emerald-600">
+                                        <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163a11.867 11.867 0 0 1-1.587-5.946C.16 5.335 5.495 0 12.05 0a11.82 11.82 0 0 1 8.413 3.488 11.82 11.82 0 0 1 3.48 8.414c-.003 6.557-5.338 11.892-11.893 11.892a11.9 11.9 0 0 1-5.688-1.448L.057 24Zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884a9.86 9.86 0 0 0 1.51 5.26l-.999 3.648 3.737-.98 .242 .147Z"/></svg>
+                                        WhatsApp
+                                    </a>
+                                @endif
+                                @if ($tgLink)
+                                    <a href="{{ $tgLink }}" target="_blank" rel="noopener" class="btn btn-lg bg-sky-500 text-white hover:bg-sky-600">
+                                        <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 24 24"><path d="M9.78 18.65l.28-4.23 7.68-6.92c.34-.31-.07-.46-.52-.19L7.74 13.3 3.64 12c-.88-.25-.89-.86.2-1.3l15.97-6.16c.73-.33 1.43.18 1.15 1.3l-2.72 12.81c-.19.91-.74 1.13-1.5.71L12.6 16.3l-1.99 1.93c-.23.23-.42.42-.83.42z"/></svg>
+                                        Telegram
+                                    </a>
+                                @endif
+                            </div>
                         @endif
                         <form method="POST" action="{{ route('cart.buy', $product) }}">
                             @csrf
@@ -236,28 +246,26 @@
                                 Add to Cart
                             </button>
                         </form>
-                        @if ($tgLink)
-                            <a href="{{ $tgLink }}" target="_blank" rel="noopener" class="btn btn-lg w-full bg-sky-500 text-white hover:bg-sky-600">
-                                <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 24 24"><path d="M9.78 18.65l.28-4.23 7.68-6.92c.34-.31-.07-.46-.52-.19L7.74 13.3 3.64 12c-.88-.25-.89-.86.2-1.3l15.97-6.16c.73-.33 1.43.18 1.15 1.3l-2.72 12.81c-.19.91-.74 1.13-1.5.71L12.6 16.3l-1.99 1.93c-.23.23-.42.42-.83.42z"/></svg>
-                                Message on Telegram
-                            </a>
-                        @endif
                     @else
                         {{-- Not available for direct sale → contact to purchase --}}
                         <div class="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-700">
                             This product isn't available for direct checkout. Contact us to purchase it directly:
                         </div>
-                        @if ($waLink)
-                            <a href="{{ $waLink }}" target="_blank" rel="noopener" class="btn btn-lg w-full bg-emerald-500 text-white hover:bg-emerald-600">
-                                <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163a11.867 11.867 0 0 1-1.587-5.946C.16 5.335 5.495 0 12.05 0a11.82 11.82 0 0 1 8.413 3.488 11.82 11.82 0 0 1 3.48 8.414c-.003 6.557-5.338 11.892-11.893 11.892a11.9 11.9 0 0 1-5.688-1.448L.057 24Zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884a9.86 9.86 0 0 0 1.51 5.26l-.999 3.648 3.737-.98 .242 .147Z"/></svg>
-                                Buy via WhatsApp
-                            </a>
-                        @endif
-                        @if ($tgLink)
-                            <a href="{{ $tgLink }}" target="_blank" rel="noopener" class="btn btn-lg w-full bg-sky-500 text-white hover:bg-sky-600">
-                                <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 24 24"><path d="M9.78 18.65l.28-4.23 7.68-6.92c.34-.31-.07-.46-.52-.19L7.74 13.3 3.64 12c-.88-.25-.89-.86.2-1.3l15.97-6.16c.73-.33 1.43.18 1.15 1.3l-2.72 12.81c-.19.91-.74 1.13-1.5.71L12.6 16.3l-1.99 1.93c-.23.23-.42.42-.83.42z"/></svg>
-                                Buy via Telegram
-                            </a>
+                        @if ($waLink || $tgLink)
+                            <div class="grid grid-cols-2 gap-3">
+                                @if ($waLink)
+                                    <a href="{{ $waLink }}" target="_blank" rel="noopener" class="btn btn-lg bg-emerald-500 text-white hover:bg-emerald-600">
+                                        <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163a11.867 11.867 0 0 1-1.587-5.946C.16 5.335 5.495 0 12.05 0a11.82 11.82 0 0 1 8.413 3.488 11.82 11.82 0 0 1 3.48 8.414c-.003 6.557-5.338 11.892-11.893 11.892a11.9 11.9 0 0 1-5.688-1.448L.057 24Zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884a9.86 9.86 0 0 0 1.51 5.26l-.999 3.648 3.737-.98 .242 .147Z"/></svg>
+                                        WhatsApp
+                                    </a>
+                                @endif
+                                @if ($tgLink)
+                                    <a href="{{ $tgLink }}" target="_blank" rel="noopener" class="btn btn-lg bg-sky-500 text-white hover:bg-sky-600">
+                                        <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 24 24"><path d="M9.78 18.65l.28-4.23 7.68-6.92c.34-.31-.07-.46-.52-.19L7.74 13.3 3.64 12c-.88-.25-.89-.86.2-1.3l15.97-6.16c.73-.33 1.43.18 1.15 1.3l-2.72 12.81c-.19.91-.74 1.13-1.5.71L12.6 16.3l-1.99 1.93c-.23.23-.42.42-.83.42z"/></svg>
+                                        Telegram
+                                    </a>
+                                @endif
+                            </div>
                         @endif
                         @unless ($waLink || $tgLink)
                             <p class="text-center text-xs text-slate-400">No contact channel configured yet.</p>
