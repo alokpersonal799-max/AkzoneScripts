@@ -77,11 +77,20 @@ class ProductController extends Controller
             ->get();
 
         $hasPurchased = $request->user()?->hasPurchased($product->id) ?? false;
+        $isFree = $product->is_free;
 
-        $canReview = $hasPurchased
-            && ! $product->reviews()->where('user_id', $request->user()->id)->exists();
+        $alreadyReviewed = $request->user()
+            ? $product->reviews()->where('user_id', $request->user()->id)->exists()
+            : false;
 
-        return view('products.show', compact('product', 'related', 'hasPurchased', 'canReview'));
+        // Paid products: only verified buyers may review. Free products: any
+        // logged-in user may review (but such reviews are not "verified").
+        $canReview = $request->user() && ! $alreadyReviewed && ($isFree || $hasPurchased);
+
+        // Logged in, hasn't purchased a paid product → show the purchase-first notice.
+        $mustPurchase = $request->user() && ! $isFree && ! $hasPurchased;
+
+        return view('products.show', compact('product', 'related', 'hasPurchased', 'canReview', 'isFree', 'alreadyReviewed', 'mustPurchase'));
     }
 
     /**

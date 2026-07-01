@@ -331,6 +331,8 @@ class DemoSeeder extends Seeder
                         'rating' => $rating,
                         'comment' => $comment,
                         'is_approved' => true,
+                        // Verified badge only for paid products (mirrors real logic).
+                        'is_verified' => ! $product->is_free,
                         // Feature a couple of the best reviews as homepage testimonials.
                         'is_testimonial' => $rating === 5 && $i < 2,
                     ]

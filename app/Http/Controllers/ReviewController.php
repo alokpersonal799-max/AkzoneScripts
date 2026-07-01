@@ -14,10 +14,12 @@ class ReviewController extends Controller
     public function store(Request $request, Product $product): RedirectResponse
     {
         $user = $request->user();
+        $hasPurchased = $user->hasPurchased($product->id);
 
-        // Only verified buyers may leave a review.
-        if (! $user->hasPurchased($product->id)) {
-            return back()->with('error', 'You can only review products you have purchased.');
+        // Paid products require a verified purchase. Free products may be
+        // reviewed by any logged-in user (without a verified badge).
+        if (! $product->is_free && ! $hasPurchased) {
+            return back()->with('error', 'You can review this product only after purchasing it.');
         }
 
         $validated = $request->validate([
@@ -34,6 +36,8 @@ class ReviewController extends Controller
                 'rating' => $validated['rating'],
                 'comment' => $validated['comment'] ?? null,
                 'is_approved' => false,
+                // Verified only when a paid product was actually purchased.
+                'is_verified' => ! $product->is_free && $hasPurchased,
             ]
         );
 

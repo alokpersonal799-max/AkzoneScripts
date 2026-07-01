@@ -128,6 +128,9 @@
                         <form method="POST" action="{{ route('reviews.store', $product) }}" class="mt-6 rounded-2xl border border-slate-200 bg-slate-50 p-5" x-data="{ rating: 5 }">
                             @csrf
                             <p class="text-sm font-semibold text-ink-900">Leave a review</p>
+                            @if ($isFree)
+                                <p class="mt-0.5 text-xs text-slate-400">This is a free product — your review won't carry a "Verified purchaser" badge.</p>
+                            @endif
                             <div class="mt-3 flex items-center gap-1">
                                 @for ($i = 1; $i <= 5; $i++)
                                     <button type="button" @click="rating = {{ $i }}" class="focus:outline-none">
@@ -140,6 +143,16 @@
                             <button type="submit" class="btn-primary btn-sm mt-3">Submit review</button>
                             <p class="mt-2 text-xs text-slate-400">Reviews are published after admin approval.</p>
                         </form>
+                    @elseif ($alreadyReviewed)
+                        <p class="mt-4 flex items-center gap-2 rounded-xl bg-emerald-50 px-4 py-3 text-sm text-emerald-700">
+                            <svg class="h-4 w-4 flex-none" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" /></svg>
+                            Thanks! You've already reviewed this product. It appears once an admin approves it.
+                        </p>
+                    @elseif ($mustPurchase)
+                        <div class="mt-4 flex items-start gap-2 rounded-xl bg-amber-50 px-4 py-3 text-sm text-amber-700">
+                            <svg class="mt-0.5 h-4 w-4 flex-none" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 1 0-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H6.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z" /></svg>
+                            <span>You can review this product only after purchasing it. Once your purchase is complete, come back here to share your feedback.</span>
+                        </div>
                     @endif
                 @else
                     <p class="mt-4 rounded-xl bg-slate-50 px-4 py-3 text-sm text-slate-500">
@@ -156,10 +169,12 @@
                                     <div>
                                         <p class="flex items-center gap-1.5 text-sm font-bold text-ink-900">
                                             {{ $review->user->name ?? 'Anonymous' }}
-                                            <span class="inline-flex items-center gap-0.5 rounded-full bg-emerald-100 px-1.5 py-0.5 text-[10px] font-bold text-emerald-700" title="Verified purchase, approved by store">
-                                                <svg class="h-2.5 w-2.5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.704 4.153a.75.75 0 0 1 .143 1.052l-8 10.5a.75.75 0 0 1-1.127.075l-4.5-4.5a.75.75 0 0 1 1.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 0 1 1.05-.143Z" clip-rule="evenodd" /></svg>
-                                                Verified
-                                            </span>
+                                            @if ($review->is_verified)
+                                                <span class="inline-flex items-center gap-0.5 rounded-full bg-emerald-100 px-1.5 py-0.5 text-[10px] font-bold text-emerald-700" title="Verified purchaser">
+                                                    <svg class="h-2.5 w-2.5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.704 4.153a.75.75 0 0 1 .143 1.052l-8 10.5a.75.75 0 0 1-1.127.075l-4.5-4.5a.75.75 0 0 1 1.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 0 1 1.05-.143Z" clip-rule="evenodd" /></svg>
+                                                    Verified purchaser
+                                                </span>
+                                            @endif
                                         </p>
                                         <p class="text-xs text-slate-400">{{ $review->created_at->diffForHumans() }}</p>
                                     </div>

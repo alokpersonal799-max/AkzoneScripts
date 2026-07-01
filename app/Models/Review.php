@@ -24,6 +24,7 @@ class Review extends Model
         'admin_reply',
         'replied_at',
         'is_approved',
+        'is_verified',
         'is_testimonial',
     ];
 
@@ -37,6 +38,7 @@ class Review extends Model
         return [
             'rating' => 'integer',
             'is_approved' => 'boolean',
+            'is_verified' => 'boolean',
             'is_testimonial' => 'boolean',
             'replied_at' => 'datetime',
         ];
