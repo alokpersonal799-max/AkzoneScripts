@@ -14,6 +14,7 @@ use App\Http\Controllers\Admin\SettingController as AdminSettingController;
 use App\Http\Controllers\Admin\StorageController as AdminStorageController;
 use App\Http\Controllers\Admin\PromotionController as AdminPromotionController;
 use App\Http\Controllers\Admin\SystemController as AdminSystemController;
+use App\Http\Controllers\Admin\ServiceController as AdminServiceController;
 use App\Http\Controllers\Admin\CronController as AdminCronController;
 use App\Http\Controllers\Admin\ThemeController as AdminThemeController;
 use App\Http\Controllers\Admin\TelegramController as AdminTelegramController;
@@ -37,6 +38,7 @@ use App\Http\Controllers\InvoiceController;
 use App\Http\Controllers\PageController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\ServiceController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\TicketController;
@@ -82,6 +84,10 @@ Route::get('/p/{page}', [PageController::class, 'show'])->name('pages.show');
 // Contact form (open to guests and members).
 Route::get('/contact', [ContactController::class, 'show'])->name('contact.show');
 Route::post('/contact', [ContactController::class, 'store'])->name('contact.store');
+
+// Services (self-contained cards, no detail page) + inquiry.
+Route::get('/services', [ServiceController::class, 'index'])->name('services.index');
+Route::post('/services/{service}/inquiry', [ServiceController::class, 'inquiry'])->name('services.inquiry');
 
 // Email verification link (signed, works without login).
 Route::get('/email/verify/{id}/{hash}', [EmailVerificationController::class, 'verify'])
@@ -263,6 +269,9 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
 
     // Cron jobs setup.
     Route::get('/cron', [AdminCronController::class, 'index'])->name('cron.index');
+
+    // Services management.
+    Route::resource('services', AdminServiceController::class)->except('show');
     Route::post('/system/clear-error-log', [AdminSystemController::class, 'clearErrorLog'])->name('system.error-log.clear');
 
     // Hero promotion manager.

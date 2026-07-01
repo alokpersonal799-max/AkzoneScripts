@@ -122,6 +122,7 @@ class SettingController extends Controller
             'social_facebook' => ['nullable', 'string', 'max:255'],
             'contact_whatsapp' => ['nullable', 'string', 'max:50'],
             'contact_telegram' => ['nullable', 'string', 'max:100'],
+            'portfolio_url' => ['nullable', 'url', 'max:255'],
             'timezone' => ['nullable', 'string', 'max:64', 'timezone'],
             'logo' => ['nullable', 'image', 'max:2048'],
         ]);
@@ -134,7 +135,7 @@ class SettingController extends Controller
             Setting::put('site_logo', $request->file('logo')->store('branding', 'public'), 'general');
         }
 
-        foreach (['site_name', 'support_email', 'social_twitter', 'social_github', 'social_discord', 'social_facebook', 'contact_whatsapp', 'contact_telegram'] as $key) {
+        foreach (['site_name', 'support_email', 'social_twitter', 'social_github', 'social_discord', 'social_facebook', 'contact_whatsapp', 'contact_telegram', 'portfolio_url'] as $key) {
             Setting::put($key, $data[$key] ?? '', 'general');
         }
         if (! empty($data['timezone'])) {

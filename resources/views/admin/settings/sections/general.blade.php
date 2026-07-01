@@ -33,6 +33,12 @@
             <p class="mt-1 text-xs text-slate-400">Controls dates &amp; times shown across the store and admin (e.g. orders, reports).</p>
         </div>
 
+        <div>
+            <label for="portfolio_url" class="label">Portfolio link <span class="text-slate-400">(optional)</span></label>
+            <input id="portfolio_url" name="portfolio_url" type="url" value="{{ old('portfolio_url', setting('portfolio_url')) }}" class="input" placeholder="https://your-portfolio.com">
+            <p class="mt-1 text-xs text-slate-400">Shown as a "View Portfolio" button on the Services page.</p>
+        </div>
+
         <div class="grid gap-5 sm:grid-cols-2">
             @foreach (['social_twitter' => 'Twitter URL', 'social_github' => 'GitHub URL', 'social_discord' => 'Discord URL', 'social_facebook' => 'Facebook URL'] as $key => $label)
                 <div><label for="{{ $key }}" class="label">{{ $label }}</label><input id="{{ $key }}" name="{{ $key }}" type="text" value="{{ old($key, setting($key)) }}" class="input"></div>

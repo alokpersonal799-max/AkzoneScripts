@@ -64,7 +64,7 @@
             <div class="hidden items-center gap-1 md:flex">
                 <a href="{{ route('home') }}" class="rounded-lg px-3 py-2 text-sm font-medium text-slate-600 transition hover:text-ink-900">Home</a>
                 <a href="{{ route('products.index') }}" class="rounded-lg px-3 py-2 text-sm font-medium text-slate-600 transition hover:text-ink-900">Marketplace</a>
-                <a href="{{ route('home') }}#categories" class="rounded-lg px-3 py-2 text-sm font-medium text-slate-600 transition hover:text-ink-900">Categories</a>
+                <a href="{{ route('services.index') }}" class="rounded-lg px-3 py-2 text-sm font-medium text-slate-600 transition hover:text-ink-900">Services</a>
             </div>
 
             <div class="flex items-center gap-2">
@@ -131,6 +131,7 @@
             <div class="space-y-1 px-4 py-3">
                 <a href="{{ route('home') }}" class="block rounded-lg px-3 py-2 text-base font-medium text-slate-700 hover:bg-slate-50">Home</a>
                 <a href="{{ route('products.index') }}" class="block rounded-lg px-3 py-2 text-base font-medium text-slate-700 hover:bg-slate-50">Marketplace</a>
+                <a href="{{ route('services.index') }}" class="block rounded-lg px-3 py-2 text-base font-medium text-slate-700 hover:bg-slate-50">Services</a>
                 @auth
                     <a href="{{ route('dashboard') }}" class="block rounded-lg px-3 py-2 text-base font-medium text-slate-700 hover:bg-slate-50">Dashboard</a>
                     @if (auth()->user()->isAdmin())

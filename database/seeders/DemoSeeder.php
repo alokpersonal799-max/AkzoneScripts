@@ -36,6 +36,26 @@ class DemoSeeder extends Seeder
         $this->seedStorageSettings();
         $this->seedAutoTelegramPromo();
         $this->seedAdvertisements();
+        $this->seedServices();
+    }
+
+    /**
+     * Demo services for the public Services page.
+     */
+    protected function seedServices(): void
+    {
+        \App\Models\Setting::put('portfolio_url', 'https://example.com/portfolio', 'general');
+
+        $services = [
+            ['name' => 'Custom Laravel Development', 'subtitle' => 'Web apps, APIs & SaaS', 'description' => "Need a custom feature, integration or a full app built on Laravel? We deliver clean, documented, production-ready code with ongoing support.", 'provider_type' => 'admin', 'use_global_contact' => true, 'allow_inquiry' => true, 'custom_label' => 'Book a call', 'custom_url' => 'https://example.com/book', 'sort_order' => 1],
+            ['name' => 'Premium UI/UX Design', 'subtitle' => 'Beautiful, modern interfaces', 'description' => "Landing pages, dashboards and design systems crafted in Figma and shipped as pixel-perfect Tailwind components.", 'provider_type' => 'custom', 'provider_name' => 'Aisha K.', 'allow_inquiry' => true, 'instagram' => 'https://instagram.com/example', 'whatsapp' => '14155550123', 'sort_order' => 2],
+            ['name' => 'Script Installation & Setup', 'subtitle' => 'We install it for you', 'description' => "Purchased a script but need help deploying it? We handle installation, configuration, SSL and go-live on your hosting.", 'provider_type' => 'admin', 'use_global_contact' => true, 'allow_inquiry' => true, 'sort_order' => 3],
+            ['name' => 'Telegram Bot Development', 'subtitle' => 'Automate your community', 'description' => "Custom Telegram bots for notifications, sales, moderation and more — integrated with your store.", 'provider_type' => 'custom', 'provider_name' => 'Marco P.', 'telegram' => 'example', 'custom_label' => 'See samples', 'custom_url' => 'https://example.com/bots', 'allow_inquiry' => true, 'sort_order' => 4],
+        ];
+
+        foreach ($services as $s) {
+            \App\Models\Service::updateOrCreate(['name' => $s['name']], array_merge(['is_active' => true], $s));
+        }
     }
 
     /**
@@ -438,7 +458,7 @@ class DemoSeeder extends Seeder
         \App\Models\Setting::put('ads_adsense_code', '', 'ads');
         \App\Models\Setting::put('ads_meta_code', '', 'ads');
 
-        foreach (['marketplace', 'cart', 'checkout', 'dashboard', 'purchases', 'wishlist', 'support', 'home_free', 'home_reviews', 'pages', 'contact'] as $page) {
+        foreach (['marketplace', 'cart', 'checkout', 'dashboard', 'purchases', 'wishlist', 'support', 'home_free', 'home_reviews', 'pages', 'contact', 'services'] as $page) {
             \App\Models\Setting::put('ads_page_'.$page, '1', 'ads');
         }
 

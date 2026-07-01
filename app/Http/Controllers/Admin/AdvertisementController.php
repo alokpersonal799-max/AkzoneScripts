@@ -19,7 +19,7 @@ class AdvertisementController extends Controller
      */
     protected array $pageKeys = [
         'marketplace', 'cart', 'checkout', 'dashboard', 'purchases', 'wishlist', 'support',
-        'home_free', 'home_reviews', 'pages', 'contact',
+        'home_free', 'home_reviews', 'pages', 'contact', 'services',
     ];
 
     /**

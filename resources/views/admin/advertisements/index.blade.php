@@ -81,6 +81,7 @@
                             'home_reviews' => 'Home — Below reviews',
                             'pages' => 'Custom pages',
                             'contact' => 'Contact us',
+                            'services' => 'Services page',
                         ];
                     @endphp
                     @foreach ($pageLabels as $key => $label)
