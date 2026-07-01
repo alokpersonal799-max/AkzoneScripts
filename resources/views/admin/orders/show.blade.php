@@ -42,6 +42,9 @@
                 <dl class="mt-4 space-y-2 text-sm">
                     <div><dt class="text-slate-400">Name</dt><dd class="text-ink-900">{{ $order->user?->name ?? $order->billing_name }}</dd></div>
                     <div><dt class="text-slate-400">Email</dt><dd class="text-ink-900">{{ $order->billing_email }}</dd></div>
+                    @if ($order->billing_phone)
+                    <div><dt class="text-slate-400">Phone</dt><dd class="text-ink-900">{{ $order->billing_phone }}</dd></div>
+                    @endif
                     <div><dt class="text-slate-400">Payment</dt><dd class="capitalize text-ink-900">{{ $order->payment_method }}</dd></div>
                     <div><dt class="text-slate-400">Transaction</dt><dd class="font-mono text-xs text-ink-900">{{ $order->transaction_id ?? '—' }}</dd></div>
                     <div><dt class="text-slate-400">Placed</dt><dd class="text-ink-900">{{ $order->created_at->format('M j, Y g:i A') }}</dd></div>
