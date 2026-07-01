@@ -102,5 +102,12 @@
                 <button type="submit" class="btn-primary btn-lg">Save storage settings</button>
             </div>
         </form>
+
+        {{-- Separate form so method spoofing (PUT) doesn't clash with the test POST --}}
+        <form method="POST" action="{{ route('admin.storage.test') }}" class="mt-4 flex items-center justify-between gap-3 rounded-2xl bg-slate-50 px-5 py-4">
+            @csrf
+            <p class="text-sm text-slate-500"><strong>Save</strong> your settings first, then test — this does a real write / read / delete on your storage.</p>
+            <button type="submit" class="btn-ghost btn-md flex-shrink-0">Test connection</button>
+        </form>
     </div>
 @endsection

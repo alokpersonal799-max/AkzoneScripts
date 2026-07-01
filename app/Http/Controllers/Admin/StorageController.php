@@ -84,4 +84,56 @@ class StorageController extends Controller
 
         return back()->with('success', 'Storage settings saved. Remember to move existing files to the new provider so previous uploads keep working.');
     }
+
+    /**
+     * Test the currently saved storage connection with a write → read → delete
+     * round-trip on a temporary file.
+     */
+    public function test(): RedirectResponse
+    {
+        $provider = Setting::get('storage_provider', 'local');
+        $name = '__akzone_conn_test_'.uniqid().'.txt';
+        $payload = 'akzone-connection-test';
+
+        try {
+            if ($provider === 'local') {
+                $disk = \Illuminate\Support\Facades\Storage::disk('public');
+            } else {
+                if (! class_exists(\Aws\S3\S3Client::class)) {
+                    return back()->with('error', 'The AWS S3 SDK is not installed. Run "composer require league/flysystem-aws-s3-v3" first.');
+                }
+
+                $key = Setting::get('storage_s3_key');
+                $secret = Setting::get('storage_s3_secret');
+                $bucket = Setting::get('storage_s3_bucket');
+
+                if (! $key || ! $secret || ! $bucket) {
+                    return back()->with('error', 'Please save your access key, secret and bucket before testing.');
+                }
+
+                $disk = \Illuminate\Support\Facades\Storage::build([
+                    'driver' => 's3',
+                    'key' => $key,
+                    'secret' => $secret,
+                    'region' => Setting::get('storage_s3_region') ?: 'us-east-1',
+                    'bucket' => $bucket,
+                    'endpoint' => Setting::get('storage_s3_endpoint') ?: null,
+                    'use_path_style_endpoint' => Setting::get('storage_s3_path_style') === '1',
+                    'throw' => true,
+                ]);
+            }
+
+            $disk->put($name, $payload);
+            $readBack = $disk->get($name);
+            $disk->delete($name);
+
+            if ($readBack === $payload) {
+                return back()->with('success', '✅ Connection successful! Write, read and delete all worked on the '.self::PROVIDERS[$provider].' storage.');
+            }
+
+            return back()->with('error', 'Wrote a test file but the read-back did not match. Check bucket permissions.');
+        } catch (\Throwable $e) {
+            return back()->with('error', 'Connection failed: '.$e->getMessage());
+        }
+    }
 }

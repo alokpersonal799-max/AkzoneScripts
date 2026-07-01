@@ -14,6 +14,7 @@ use App\Http\Controllers\Admin\SettingController as AdminSettingController;
 use App\Http\Controllers\Admin\StorageController as AdminStorageController;
 use App\Http\Controllers\Admin\PromotionController as AdminPromotionController;
 use App\Http\Controllers\Admin\SystemController as AdminSystemController;
+use App\Http\Controllers\Admin\CronController as AdminCronController;
 use App\Http\Controllers\Admin\ThemeController as AdminThemeController;
 use App\Http\Controllers\Admin\TelegramController as AdminTelegramController;
 use App\Http\Controllers\Admin\TicketController as AdminTicketController;
@@ -254,10 +255,14 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     // Storage provider (where product images & files are stored).
     Route::get('/storage', [AdminStorageController::class, 'index'])->name('storage.index');
     Route::put('/storage', [AdminStorageController::class, 'update'])->name('storage.update');
+    Route::post('/storage/test', [AdminStorageController::class, 'test'])->name('storage.test');
 
     // System information & cache tools.
     Route::get('/system', [AdminSystemController::class, 'index'])->name('system.index');
     Route::post('/system/clear-cache', [AdminSystemController::class, 'clearCache'])->name('system.cache.clear');
+
+    // Cron jobs setup.
+    Route::get('/cron', [AdminCronController::class, 'index'])->name('cron.index');
     Route::post('/system/clear-error-log', [AdminSystemController::class, 'clearErrorLog'])->name('system.error-log.clear');
 
     // Hero promotion manager.
