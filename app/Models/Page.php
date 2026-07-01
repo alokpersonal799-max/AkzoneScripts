@@ -8,7 +8,7 @@ use Illuminate\Support\Str;
 class Page extends Model
 {
     protected $fillable = [
-        'title', 'slug', 'content', 'is_published', 'show_in_footer',
+        'title', 'slug', 'content', 'content_type', 'is_published', 'show_in_footer',
     ];
 
     protected function casts(): array

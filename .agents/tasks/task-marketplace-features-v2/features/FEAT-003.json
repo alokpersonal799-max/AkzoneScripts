@@ -1,0 +1,34 @@
+{
+  "id": "FEAT-003",
+  "type": "feat",
+  "description": "Custom Pages Redesign - Update admin page editor to support raw HTML/CSS/JS content (code editor textarea), add pre-designed page templates (Privacy Policy, Refund Policy, Terms of Service, About Us, FAQ, Contact Info) that admin can select when creating, add page preview functionality, modernize the public page rendering with nice typography and layout.",
+  "status": "in_progress",
+  "steps": [
+    "Update resources/views/admin/pages/edit.blade.php to: (a) Replace the simple textarea with a monospace code editor textarea that supports HTML/CSS/JS, with a note that raw HTML is fully supported. (b) Add a 'content_type' radio toggle at top: 'visual' (plain text with nl2br rendering) vs 'html' (raw HTML rendered as-is). (c) When creating a new page (not editing), show a 'Start from template' dropdown/selector with options: Blank, Privacy Policy, Refund Policy, Terms of Service, About Us, FAQ, Contact Info. (d) Add Alpine.js logic to populate the content textarea with the selected template's pre-built HTML content. (e) Add a 'Preview' button that opens a modal or new tab showing how the page will look. (f) Store content_type in a hidden field.",
+    "Update app/Models/Page.php to add 'content_type' to fillable array (values: 'text' or 'html', default 'text').",
+    "Create database/migrations/2024_07_01_000200_add_content_type_to_pages_table.php adding a content_type varchar(10) column defaulting to 'text'.",
+    "Update app/Http/Controllers/Admin/PageController.php validatePage method to also validate and include content_type field (in:text,html).",
+    "Create resources/views/admin/pages/templates.blade.php (or inline in edit.blade.php) with pre-designed HTML templates for each page type. Templates should be modern, well-styled with inline Tailwind classes, and include placeholder content that admin can customize.",
+    "Update resources/views/pages/show.blade.php to: If page->content_type is 'html', render content with {!! $page->content !!} (raw HTML). If 'text' (default), keep existing nl2br(e()) rendering. Add modern typography classes, better spacing, table of contents sidebar for long pages, last-updated date, and breadcrumb navigation.",
+    "Add a page preview route: GET /admin/pages/preview (POST with content and content_type) that renders a preview of the page content without saving. Add to routes/web.php under admin middleware.",
+    "Update the admin PageController with a preview() method that takes content and content_type from request and renders the page show view in a simple layout."
+  ],
+  "acceptance_criteria": [
+    "Admin page editor shows content_type toggle (text vs html)",
+    "Template selector appears on new page creation with 6+ templates",
+    "Selecting a template populates the textarea with pre-designed HTML",
+    "Preview button/route works to show page preview",
+    "Public page rendering handles both text and html content types",
+    "Public page has modern typography with prose styling",
+    "Migration adds content_type column",
+    "All PHP files pass php -l"
+  ],
+  "verification": [
+    "Run php -l on all modified PHP files",
+    "Verify Blade directive balance in edit.blade.php and show.blade.php",
+    "Grep routes/web.php for preview route",
+    "Grep Page.php for content_type in fillable"
+  ],
+  "blocked_reason": null,
+  "findings": ""
+}

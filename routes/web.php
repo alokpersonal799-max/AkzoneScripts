@@ -200,6 +200,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
 
     // Custom pages.
     Route::resource('pages', AdminPageController::class)->except('show');
+    Route::post('pages/preview', [AdminPageController::class, 'preview'])->name('pages.preview');
 
     // Coupons.
     Route::get('/coupons/generate', [AdminCouponController::class, 'generate'])->name('coupons.generate');
