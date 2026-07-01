@@ -1,8 +1,14 @@
 <div class="card p-6 sm:p-8">
-    <form method="POST" action="{{ route('admin.settings.payments') }}" class="space-y-6">
+    <form method="POST" action="{{ route('admin.settings.payments') }}" enctype="multipart/form-data" class="space-y-6">
         @csrf @method('PUT')
         <h2 class="font-display text-lg font-bold text-ink-900">Payment gateways</h2>
-        <p class="text-sm text-slate-500">Toggle which methods appear at checkout. Disabled gateways are hidden from customers.</p>
+        <p class="text-sm text-slate-500">Toggle which methods appear at checkout. Disabled gateways are hidden from customers. Upload a <strong>PNG</strong> icon to show a logo next to each method.</p>
+
+        @php
+            $payIcon = function ($key) {
+                return setting($key) ? \Illuminate\Support\Facades\Storage::disk('public')->url(setting($key)) : null;
+            };
+        @endphp
 
         {{-- Manual --}}
         <div class="rounded-xl border border-slate-200 p-4">
@@ -11,6 +17,10 @@
                 Manual / Offline payment (UPI, bank, crypto, QR)
             </label>
             <p class="mt-1 pl-6 text-xs text-slate-400">Configure the details under the "Manual Payment" section.</p>
+            <div class="mt-3 flex items-center gap-3 pl-6">
+                <span class="flex h-10 w-16 items-center justify-center overflow-hidden rounded-lg bg-slate-100">@if ($payIcon('pay_manual_icon'))<img src="{{ $payIcon('pay_manual_icon') }}" class="h-full w-full object-contain">@else<span class="text-[10px] text-slate-400">PNG</span>@endif</span>
+                <input name="pay_manual_icon" type="file" accept="image/png" class="block text-xs text-slate-500 file:mr-2 file:rounded file:border-0 file:bg-brand-50 file:px-2 file:py-1 file:text-xs file:font-semibold file:text-brand-600">
+            </div>
         </div>
 
         {{-- Stripe --}}
@@ -22,6 +32,10 @@
             <div class="mt-3 grid gap-3 pl-6 sm:grid-cols-2">
                 <input name="stripe_key" value="{{ old('stripe_key', setting('stripe_key')) }}" class="input" placeholder="Publishable key">
                 <input name="stripe_secret" value="{{ old('stripe_secret', setting('stripe_secret')) }}" class="input" placeholder="Secret key">
+            </div>
+            <div class="mt-3 flex items-center gap-3 pl-6">
+                <span class="flex h-10 w-16 items-center justify-center overflow-hidden rounded-lg bg-slate-100">@if ($payIcon('pay_stripe_icon'))<img src="{{ $payIcon('pay_stripe_icon') }}" class="h-full w-full object-contain">@else<span class="text-[10px] text-slate-400">PNG</span>@endif</span>
+                <input name="pay_stripe_icon" type="file" accept="image/png" class="block text-xs text-slate-500 file:mr-2 file:rounded file:border-0 file:bg-brand-50 file:px-2 file:py-1 file:text-xs file:font-semibold file:text-brand-600">
             </div>
         </div>
 
@@ -39,6 +53,10 @@
                     <option value="live" {{ setting('paypal_mode') === 'live' ? 'selected' : '' }}>Live</option>
                 </select>
             </div>
+            <div class="mt-3 flex items-center gap-3 pl-6">
+                <span class="flex h-10 w-16 items-center justify-center overflow-hidden rounded-lg bg-slate-100">@if ($payIcon('pay_paypal_icon'))<img src="{{ $payIcon('pay_paypal_icon') }}" class="h-full w-full object-contain">@else<span class="text-[10px] text-slate-400">PNG</span>@endif</span>
+                <input name="pay_paypal_icon" type="file" accept="image/png" class="block text-xs text-slate-500 file:mr-2 file:rounded file:border-0 file:bg-brand-50 file:px-2 file:py-1 file:text-xs file:font-semibold file:text-brand-600">
+            </div>
         </div>
 
         {{-- Razorpay --}}
@@ -50,6 +68,10 @@
             <div class="mt-3 grid gap-3 pl-6 sm:grid-cols-2">
                 <input name="razorpay_key" value="{{ old('razorpay_key', setting('razorpay_key')) }}" class="input" placeholder="Key ID">
                 <input name="razorpay_secret" value="{{ old('razorpay_secret', setting('razorpay_secret')) }}" class="input" placeholder="Key secret">
+            </div>
+            <div class="mt-3 flex items-center gap-3 pl-6">
+                <span class="flex h-10 w-16 items-center justify-center overflow-hidden rounded-lg bg-slate-100">@if ($payIcon('pay_razorpay_icon'))<img src="{{ $payIcon('pay_razorpay_icon') }}" class="h-full w-full object-contain">@else<span class="text-[10px] text-slate-400">PNG</span>@endif</span>
+                <input name="pay_razorpay_icon" type="file" accept="image/png" class="block text-xs text-slate-500 file:mr-2 file:rounded file:border-0 file:bg-brand-50 file:px-2 file:py-1 file:text-xs file:font-semibold file:text-brand-600">
             </div>
         </div>
 

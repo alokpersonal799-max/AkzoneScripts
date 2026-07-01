@@ -58,6 +58,9 @@ class CheckoutController extends Controller
             'crypto' => json_decode(setting('manual_crypto', '[]'), true) ?: [],
             'crypto_enabled' => setting('manual_crypto_enabled', '1') === '1',
             'crypto_qr' => setting('manual_crypto_qr') ? \Illuminate\Support\Facades\Storage::disk('public')->url(setting('manual_crypto_qr')) : null,
+            'upi_icon' => setting('manual_upi_icon') ? \Illuminate\Support\Facades\Storage::disk('public')->url(setting('manual_upi_icon')) : null,
+            'bank_icon' => setting('manual_bank_icon') ? \Illuminate\Support\Facades\Storage::disk('public')->url(setting('manual_bank_icon')) : null,
+            'crypto_icon' => setting('manual_crypto_icon') ? \Illuminate\Support\Facades\Storage::disk('public')->url(setting('manual_crypto_icon')) : null,
         ];
     }
 
@@ -89,6 +92,12 @@ class CheckoutController extends Controller
             'total' => max($subtotal - $discount, 0),
             'methods' => $this->enabledMethods(),
             'manual' => $this->manualDetails(),
+            'gatewayIcons' => [
+                'manual' => setting('pay_manual_icon') ? \Illuminate\Support\Facades\Storage::disk('public')->url(setting('pay_manual_icon')) : null,
+                'stripe' => setting('pay_stripe_icon') ? \Illuminate\Support\Facades\Storage::disk('public')->url(setting('pay_stripe_icon')) : null,
+                'paypal' => setting('pay_paypal_icon') ? \Illuminate\Support\Facades\Storage::disk('public')->url(setting('pay_paypal_icon')) : null,
+                'razorpay' => setting('pay_razorpay_icon') ? \Illuminate\Support\Facades\Storage::disk('public')->url(setting('pay_razorpay_icon')) : null,
+            ],
         ]);
     }
 

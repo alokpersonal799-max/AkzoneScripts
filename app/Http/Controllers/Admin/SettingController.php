@@ -222,6 +222,10 @@ class SettingController extends Controller
             'paypal_mode' => ['nullable', 'in:sandbox,live'],
             'razorpay_key' => ['nullable', 'string', 'max:255'],
             'razorpay_secret' => ['nullable', 'string', 'max:255'],
+            'pay_stripe_icon' => ['nullable', 'image', 'mimes:png', 'max:1024'],
+            'pay_paypal_icon' => ['nullable', 'image', 'mimes:png', 'max:1024'],
+            'pay_razorpay_icon' => ['nullable', 'image', 'mimes:png', 'max:1024'],
+            'pay_manual_icon' => ['nullable', 'image', 'mimes:png', 'max:1024'],
         ]);
 
         foreach (['pay_manual_enabled', 'pay_stripe_enabled', 'pay_paypal_enabled', 'pay_razorpay_enabled'] as $flag) {
@@ -232,6 +236,17 @@ class SettingController extends Controller
             Setting::put($key, $data[$key] ?? '', 'payments');
         }
         Setting::put('paypal_mode', $data['paypal_mode'] ?? 'sandbox', 'payments');
+
+        // Gateway icons (PNG).
+        foreach (['pay_stripe_icon', 'pay_paypal_icon', 'pay_razorpay_icon', 'pay_manual_icon'] as $iconKey) {
+            if ($request->hasFile($iconKey)) {
+                $existing = Setting::get($iconKey);
+                if ($existing) {
+                    Storage::disk('public')->delete($existing);
+                }
+                Setting::put($iconKey, $request->file($iconKey)->store('branding', 'public'), 'payments');
+            }
+        }
 
         return back()->with('success', 'Payment gateway settings saved.');
     }
@@ -244,6 +259,9 @@ class SettingController extends Controller
             'manual_bank_details' => ['nullable', 'string', 'max:2000'],
             'manual_qr' => ['nullable', 'image', 'max:2048'],
             'manual_crypto_qr' => ['nullable', 'image', 'max:2048'],
+            'manual_upi_icon' => ['nullable', 'image', 'mimes:png', 'max:1024'],
+            'manual_bank_icon' => ['nullable', 'image', 'mimes:png', 'max:1024'],
+            'manual_crypto_icon' => ['nullable', 'image', 'mimes:png', 'max:1024'],
             'crypto_label' => ['nullable', 'array'],
             'crypto_label.*' => ['nullable', 'string', 'max:100'],
             'crypto_address' => ['nullable', 'array'],
@@ -270,6 +288,17 @@ class SettingController extends Controller
         Setting::put('manual_upi_enabled', $request->boolean('manual_upi_enabled') ? '1' : '0', 'manual');
         Setting::put('manual_bank_enabled', $request->boolean('manual_bank_enabled') ? '1' : '0', 'manual');
         Setting::put('manual_crypto_enabled', $request->boolean('manual_crypto_enabled') ? '1' : '0', 'manual');
+
+        // Method icons (PNG). Replace old file when a new one is uploaded.
+        foreach (['manual_upi_icon', 'manual_bank_icon', 'manual_crypto_icon'] as $iconKey) {
+            if ($request->hasFile($iconKey)) {
+                $existing = Setting::get($iconKey);
+                if ($existing) {
+                    Storage::disk('public')->delete($existing);
+                }
+                Setting::put($iconKey, $request->file($iconKey)->store('branding', 'public'), 'manual');
+            }
+        }
 
         // Build the crypto wallet list from paired label/address inputs.
         $crypto = [];

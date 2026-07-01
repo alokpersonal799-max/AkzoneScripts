@@ -49,6 +49,9 @@
                             <label class="flex cursor-pointer items-center gap-3 rounded-xl border px-4 py-3 transition"
                                    :class="method === '{{ $value }}' ? 'border-brand-300 bg-brand-50' : 'border-slate-200 hover:bg-slate-50'">
                                 <input type="radio" name="payment_method" value="{{ $value }}" x-model="method" class="border-slate-300 text-brand-600 focus:ring-brand-500/30">
+                                @if (! empty($gatewayIcons[$value]))
+                                    <img src="{{ $gatewayIcons[$value] }}" alt="" class="h-6 w-auto max-w-[80px] object-contain">
+                                @endif
                                 <span class="text-sm font-semibold text-ink-900">{{ $label }}</span>
                             </label>
                         @endforeach
@@ -81,19 +84,31 @@
                                 <div class="grid grid-cols-3 gap-2">
                                     @if ($mUpi)
                                         <button type="button" @click="choose('upi')" :class="sub==='upi' ? 'border-brand-500 bg-brand-50 text-brand-700' : 'border-slate-200 text-slate-600 hover:bg-slate-50'" class="flex flex-col items-center gap-1 rounded-xl border-2 px-3 py-3 text-xs font-bold transition">
-                                            <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke-width="1.6" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 4.875c0-.621.504-1.125 1.125-1.125h4.5c.621 0 1.125.504 1.125 1.125v4.5c0 .621-.504 1.125-1.125 1.125h-4.5A1.125 1.125 0 0 1 3.75 9.375v-4.5ZM3.75 14.625c0-.621.504-1.125 1.125-1.125h4.5c.621 0 1.125.504 1.125 1.125v4.5c0 .621-.504 1.125-1.125 1.125h-4.5a1.125 1.125 0 0 1-1.125-1.125v-4.5ZM13.5 4.875c0-.621.504-1.125 1.125-1.125h4.5c.621 0 1.125.504 1.125 1.125v4.5c0 .621-.504 1.125-1.125 1.125h-4.5A1.125 1.125 0 0 1 13.5 9.375v-4.5Z" /></svg>
+                                            @if ($manual['upi_icon'])
+                                                <img src="{{ $manual['upi_icon'] }}" alt="" class="h-6 w-auto object-contain">
+                                            @else
+                                                <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke-width="1.6" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 4.875c0-.621.504-1.125 1.125-1.125h4.5c.621 0 1.125.504 1.125 1.125v4.5c0 .621-.504 1.125-1.125 1.125h-4.5A1.125 1.125 0 0 1 3.75 9.375v-4.5ZM3.75 14.625c0-.621.504-1.125 1.125-1.125h4.5c.621 0 1.125.504 1.125 1.125v4.5c0 .621-.504 1.125-1.125 1.125h-4.5a1.125 1.125 0 0 1-1.125-1.125v-4.5ZM13.5 4.875c0-.621.504-1.125 1.125-1.125h4.5c.621 0 1.125.504 1.125 1.125v4.5c0 .621-.504 1.125-1.125 1.125h-4.5A1.125 1.125 0 0 1 13.5 9.375v-4.5Z" /></svg>
+                                            @endif
                                             UPI / QR
                                         </button>
                                     @endif
                                     @if ($mBank)
                                         <button type="button" @click="choose('bank')" :class="sub==='bank' ? 'border-brand-500 bg-brand-50 text-brand-700' : 'border-slate-200 text-slate-600 hover:bg-slate-50'" class="flex flex-col items-center gap-1 rounded-xl border-2 px-3 py-3 text-xs font-bold transition">
-                                            <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke-width="1.6" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3 21h18M3 10h18M5 6l7-3 7 3M4 10v11m16-11v11M8 14v3m4-3v3m4-3v3" /></svg>
+                                            @if ($manual['bank_icon'])
+                                                <img src="{{ $manual['bank_icon'] }}" alt="" class="h-6 w-auto object-contain">
+                                            @else
+                                                <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke-width="1.6" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3 21h18M3 10h18M5 6l7-3 7 3M4 10v11m16-11v11M8 14v3m4-3v3m4-3v3" /></svg>
+                                            @endif
                                             Bank
                                         </button>
                                     @endif
                                     @if ($mCrypto)
                                         <button type="button" @click="choose('crypto')" :class="sub==='crypto' ? 'border-brand-500 bg-brand-50 text-brand-700' : 'border-slate-200 text-slate-600 hover:bg-slate-50'" class="flex flex-col items-center gap-1 rounded-xl border-2 px-3 py-3 text-xs font-bold transition">
-                                            <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke-width="1.6" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18Zm-2.25-9h4.5m-4.5 0V8.25m0 3.75v3.75m4.5-3.75V8.25m0 3.75v3.75M9 7.5h4.125a1.875 1.875 0 0 1 0 3.75H9m0 0h4.5a1.875 1.875 0 0 1 0 3.75H9" /></svg>
+                                            @if ($manual['crypto_icon'])
+                                                <img src="{{ $manual['crypto_icon'] }}" alt="" class="h-6 w-auto object-contain">
+                                            @else
+                                                <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke-width="1.6" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18Zm-2.25-9h4.5m-4.5 0V8.25m0 3.75v3.75m4.5-3.75V8.25m0 3.75v3.75M9 7.5h4.125a1.875 1.875 0 0 1 0 3.75H9m0 0h4.5a1.875 1.875 0 0 1 0 3.75H9" /></svg>
+                                            @endif
                                             Crypto
                                         </button>
                                     @endif
