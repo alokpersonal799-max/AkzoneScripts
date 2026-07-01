@@ -3,6 +3,7 @@
 use App\Http\Middleware\AutoTelegramPromo;
 use App\Http\Middleware\EnsureInstalled;
 use App\Http\Middleware\EnsureUserIsAdmin;
+use App\Http\Middleware\TrackVisitorCountry;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -18,6 +19,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->web(append: [
             EnsureInstalled::class,
             AutoTelegramPromo::class,
+            TrackVisitorCountry::class,
         ]);
 
         // Register the route middleware alias used to guard admin-only routes.

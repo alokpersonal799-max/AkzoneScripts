@@ -141,6 +141,7 @@ class CheckoutController extends Controller
             'billing_email' => ['required', 'email', 'max:255'],
             'billing_phone' => ['nullable', 'string', 'max:30'],
             'billing_phone_country' => ['nullable', 'string', 'max:8'],
+            'billing_country' => ['nullable', 'string', 'size:2'],
         ]);
 
         $user = $request->user();
@@ -195,6 +196,7 @@ class CheckoutController extends Controller
                 'payment_proof' => $proofPath,
                 'billing_name' => $request->input('billing_name'),
                 'billing_email' => $request->input('billing_email'),
+                'billing_country' => $request->input('billing_country') ? strtoupper($request->input('billing_country')) : null,
                 'billing_phone' => $billingPhone,
                 'paid_at' => $isManual ? null : now(),
             ]);

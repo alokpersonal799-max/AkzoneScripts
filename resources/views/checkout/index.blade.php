@@ -31,6 +31,15 @@
                             <input name="billing_phone" type="tel" value="{{ old('billing_phone', auth()->user()->phone) }}" class="input" placeholder="Phone number">
                         </div>
                     </div>
+                    <div class="sm:col-span-2">
+                        <label for="billing_country" class="label">Country</label>
+                        <select id="billing_country" name="billing_country" class="input">
+                            <option value="">Select your country…</option>
+                            @foreach (config('countries') as $code => $name)
+                                <option value="{{ $code }}" @selected(old('billing_country') === $code)>{{ $name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
                 </div>
             </div>
 

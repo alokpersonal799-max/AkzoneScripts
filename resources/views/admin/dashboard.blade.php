@@ -187,6 +187,62 @@
         </div>
     @endif
 
+    {{-- Country analytics --}}
+    @if ($topPurchasingCountries->isNotEmpty() || $topBrowsingCountries->isNotEmpty())
+        <div class="mt-6 grid gap-6 lg:grid-cols-2">
+            {{-- Top purchasing countries --}}
+            <div class="card p-5">
+                <h2 class="font-display text-lg font-bold text-ink-900">Top Purchasing Countries</h2>
+                <p class="text-xs text-slate-400">By completed-order revenue</p>
+                @php $maxRev = $topPurchasingCountries->max('revenue') ?: 1; @endphp
+                <div class="mt-4 space-y-3">
+                    @forelse ($topPurchasingCountries as $c)
+                        <div>
+                            <div class="flex items-center justify-between text-sm">
+                                <span class="flex items-center gap-2 text-ink-900">
+                                    <span class="text-lg leading-none">{{ country_flag($c->billing_country) }}</span>
+                                    <span class="font-medium">{{ country_name($c->billing_country) }}</span>
+                                    <span class="text-xs text-slate-400">({{ $c->orders }})</span>
+                                </span>
+                                <span class="font-bold text-emerald-600">{{ money($c->revenue) }}</span>
+                            </div>
+                            <div class="mt-1 h-1.5 overflow-hidden rounded-full bg-slate-100">
+                                <div class="h-full rounded-full bg-emerald-500" style="width: {{ max(4, round(($c->revenue / $maxRev) * 100)) }}%"></div>
+                            </div>
+                        </div>
+                    @empty
+                        <p class="py-6 text-center text-sm text-slate-400">No completed orders with a country yet.</p>
+                    @endforelse
+                </div>
+            </div>
+
+            {{-- Top browsing countries --}}
+            <div class="card p-5">
+                <h2 class="font-display text-lg font-bold text-ink-900">Top Browsing Countries</h2>
+                <p class="text-xs text-slate-400">By storefront page views</p>
+                @php $maxViews = $topBrowsingCountries->max('views') ?: 1; @endphp
+                <div class="mt-4 space-y-3">
+                    @forelse ($topBrowsingCountries as $c)
+                        <div>
+                            <div class="flex items-center justify-between text-sm">
+                                <span class="flex items-center gap-2 text-ink-900">
+                                    <span class="text-lg leading-none">{{ country_flag($c->code) }}</span>
+                                    <span class="font-medium">{{ country_name($c->code) }}</span>
+                                </span>
+                                <span class="font-bold text-brand-600">{{ number_format($c->views) }} views</span>
+                            </div>
+                            <div class="mt-1 h-1.5 overflow-hidden rounded-full bg-slate-100">
+                                <div class="h-full rounded-full bg-brand-500" style="width: {{ max(4, round(($c->views / $maxViews) * 100)) }}%"></div>
+                            </div>
+                        </div>
+                    @empty
+                        <p class="py-6 text-center text-sm text-slate-400">No browsing data yet. Country is detected via your CDN/proxy (e.g. Cloudflare) in production.</p>
+                    @endforelse
+                </div>
+            </div>
+        </div>
+    @endif
+
     {{-- Announcements snapshot --}}
     @if ($announcementStats)
         <div class="mt-6 card overflow-hidden">

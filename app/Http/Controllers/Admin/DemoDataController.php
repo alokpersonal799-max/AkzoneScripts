@@ -107,6 +107,9 @@ class DemoDataController extends Controller
             $this->safeDelete(fn () => ContactMessage::query()->delete(), 'contact_messages');
             $this->safeDelete(fn () => Page::query()->delete(), 'pages');
             $this->safeDelete(fn () => TelegramBot::query()->delete(), 'telegram_bots');
+            $this->safeDelete(fn () => \App\Models\Order::where('order_number', 'like', 'DEMO-%')->delete(), 'orders');
+            $this->safeDelete(fn () => \App\Models\CountryView::query()->delete(), 'country_views');
+            $this->safeDelete(fn () => \App\Models\Announcement::query()->delete(), 'announcements');
 
             // 3) Remove seeded demo accounts, but never the admin performing this action.
             $this->safeDelete(function () {

@@ -30,6 +30,7 @@ class DemoSeeder extends Seeder
         $this->seedProducts($categories);
         $this->seedReviews();
         $this->seedAnnouncements();
+        $this->seedCountryStats();
         $this->seedPromotion();
         $this->seedChangelogs();
         $this->seedPages();
@@ -258,6 +259,43 @@ class DemoSeeder extends Seeder
                     'download_message' => $p['download_message'] ?? null,
                 ]
             );
+        }
+    }
+
+    /**
+     * Seed demo purchasing + browsing country data so the dashboard country
+     * analytics charts have content to display.
+     */
+    protected function seedCountryStats(): void
+    {
+        // Browsing country views.
+        if (\Illuminate\Support\Facades\Schema::hasTable('country_views')) {
+            $views = ['IN' => 155, 'US' => 120, 'BD' => 98, 'GB' => 76, 'BR' => 54, 'DE' => 42, 'GH' => 31, 'DK' => 22];
+            foreach ($views as $code => $v) {
+                \App\Models\CountryView::updateOrCreate(['code' => $code], ['views' => $v]);
+            }
+        }
+
+        // Purchasing countries: a handful of completed demo orders per country.
+        if (\Illuminate\Support\Facades\Schema::hasColumn('orders', 'billing_country')) {
+            $customer = \App\Models\User::where('email', 'user@akzone.com')->first();
+
+            $revenueByCountry = ['BD' => 6792, 'IN' => 6484, 'DK' => 2430, 'US' => 1966, 'BR' => 1858, 'GH' => 1710, 'DE' => 1290, 'GB' => 980];
+            foreach ($revenueByCountry as $code => $revenue) {
+                \App\Models\Order::create([
+                    'order_number' => 'DEMO-'.strtoupper(uniqid()),
+                    'user_id' => $customer?->id,
+                    'subtotal' => $revenue,
+                    'total' => $revenue,
+                    'status' => 'completed',
+                    'payment_method' => 'manual',
+                    'transaction_id' => 'DEMO-'.strtoupper(uniqid()),
+                    'billing_name' => $customer?->name ?? 'Demo Customer',
+                    'billing_email' => $customer?->email ?? 'user@akzone.com',
+                    'billing_country' => $code,
+                    'paid_at' => now()->subDays(rand(1, 60)),
+                ]);
+            }
         }
     }
 

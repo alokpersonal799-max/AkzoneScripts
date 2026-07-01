@@ -91,6 +91,17 @@ class DashboardController extends Controller
             ];
         }
 
+        // Country analytics.
+        $topPurchasingCountries = \Illuminate\Support\Facades\Schema::hasColumn('orders', 'billing_country')
+            ? Order::where('status', 'completed')->whereNotNull('billing_country')
+                ->select('billing_country', DB::raw('SUM(total) as revenue'), DB::raw('COUNT(*) as orders'))
+                ->groupBy('billing_country')->orderByDesc('revenue')->take(8)->get()
+            : collect();
+
+        $topBrowsingCountries = \Illuminate\Support\Facades\Schema::hasTable('country_views')
+            ? \App\Models\CountryView::orderByDesc('views')->take(8)->get()
+            : collect();
+
         return view('admin.dashboard', compact(
             'stats',
             'salesByDay',
@@ -100,7 +111,9 @@ class DashboardController extends Controller
             'recentLogins',
             'topProducts',
             'lowStockOrDraft',
-            'announcementStats'
+            'announcementStats',
+            'topPurchasingCountries',
+            'topBrowsingCountries'
         ));
     }
 }

@@ -80,3 +80,41 @@ if (! function_exists('active_theme')) {
         return in_array($selected, $themes, true) ? $selected : 'default';
     }
 }
+
+
+if (! function_exists('country_name')) {
+    /**
+     * Resolve a country display name from an ISO 3166-1 alpha-2 code.
+     */
+    function country_name(?string $code): string
+    {
+        if (! $code) {
+            return 'Unknown';
+        }
+
+        $code = strtoupper($code);
+
+        return config('countries.'.$code, $code);
+    }
+}
+
+if (! function_exists('country_flag')) {
+    /**
+     * Convert an ISO 3166-1 alpha-2 code into a flag emoji (🇮🇳, 🇺🇸, ...).
+     */
+    function country_flag(?string $code): string
+    {
+        $code = strtoupper((string) $code);
+
+        if (strlen($code) !== 2 || ! ctype_alpha($code)) {
+            return '🏳️';
+        }
+
+        $flag = '';
+        foreach (str_split($code) as $char) {
+            $flag .= mb_chr(0x1F1E6 + (ord($char) - ord('A')), 'UTF-8');
+        }
+
+        return $flag;
+    }
+}

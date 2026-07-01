@@ -32,6 +32,7 @@ class Order extends Model
         'payment_proof',
         'billing_name',
         'billing_email',
+        'billing_country',
         'billing_phone',
         'paid_at',
     ];
