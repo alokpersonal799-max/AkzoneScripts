@@ -69,10 +69,10 @@ class PromotionController extends Controller
             'promo_message_url' => ['nullable', 'url', 'max:255'],
             'promo_countdown_product' => ['nullable', 'integer', 'exists:products,id', 'required_if:promo_mode,countdown'],
             'promo_countdown_label' => ['nullable', 'string', 'max:60'],
-            'promo_countdown_until' => ['nullable', 'date', 'after:now', 'required_if:promo_mode,countdown'],
+            'promo_countdown_until' => ['nullable', 'date', 'required_if:promo_mode,countdown'],
             'promo_countdown_product_2' => ['nullable', 'integer', 'exists:products,id', 'required_with:promo_countdown_until_2'],
             'promo_countdown_label_2' => ['nullable', 'string', 'max:60'],
-            'promo_countdown_until_2' => ['nullable', 'date', 'after:now', 'required_with:promo_countdown_product_2'],
+            'promo_countdown_until_2' => ['nullable', 'date', 'required_with:promo_countdown_product_2'],
             'announcement_text' => ['nullable', 'string', 'max:255'],
             'announcement_type' => ['nullable', 'in:info,offer,success,warning,alert'],
             'announcement_link' => ['nullable', 'url', 'max:255'],
@@ -95,12 +95,12 @@ class PromotionController extends Controller
             'popup_audience' => ['nullable', 'in:all,new,guests'],
         ], [
             'promo_products.max' => 'You can feature at most 4 products.',
-            'promo_countdown_until.after' => 'The offer end time must be in the future.',
-            'promo_countdown_until_2.after' => 'The second offer end time must be in the future.',
         ]);
 
+        // Featured-products mode with nothing selected simply falls back to the
+        // normal hero — we still save the rest of the promotion settings.
         if ($data['promo_mode'] === 'products' && empty($data['promo_products'])) {
-            return back()->withInput()->with('error', 'Select at least one product to feature.');
+            $data['promo_mode'] = 'off';
         }
 
         Setting::put('promo_mode', $data['promo_mode'], 'promotion');

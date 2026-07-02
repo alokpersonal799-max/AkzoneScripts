@@ -22,6 +22,19 @@
             <p class="mt-1 text-sm text-slate-500">Drive attention with a homepage hero promo, a top announcement bar, and a welcome popup.</p>
         </div>
 
+        @if ($errors->any())
+            <div class="mb-6 rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">
+                <p class="font-semibold">Couldn't save — please fix:</p>
+                <ul class="mt-1 list-inside list-disc">@foreach ($errors->all() as $e)<li>{{ $e }}</li>@endforeach</ul>
+            </div>
+        @endif
+        @if (session('success'))
+            <div class="mb-6 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700">{{ session('success') }}</div>
+        @endif
+        @if (session('error'))
+            <div class="mb-6 rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">{{ session('error') }}</div>
+        @endif
+
         {{-- Live status summary --}}
         <div class="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-3">
             <div class="card flex items-center gap-3 p-4">
