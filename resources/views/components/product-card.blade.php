@@ -6,11 +6,21 @@
              class="h-full w-full object-cover transition duration-500 group-hover:scale-105" loading="lazy">
         <div class="absolute inset-x-0 top-0 flex items-start justify-between p-3">
             <div class="flex flex-col gap-1.5">
+                @if ($product->is_expired)
+                    <span class="chip bg-rose-500/95 text-white shadow-sm backdrop-blur">Expired</span>
+                @elseif ($product->is_out_of_stock)
+                    <span class="chip bg-rose-500/95 text-white shadow-sm backdrop-blur">Sold out</span>
+                @elseif ($product->is_deal)
+                    <span class="chip bg-amber-500/95 text-white shadow-sm backdrop-blur">⏳ Deal</span>
+                @endif
                 @if ($product->is_featured)
                     <span class="chip bg-indigo-600/95 text-white shadow-sm backdrop-blur">Featured</span>
                 @endif
                 @if ($product->is_on_sale)
                     <span class="chip bg-rose-500/95 text-white shadow-sm backdrop-blur">Sale</span>
+                @endif
+                @if ($product->manages_stock && ! $product->is_out_of_stock)
+                    <span class="chip bg-white/95 text-emerald-700 shadow-sm backdrop-blur">{{ $product->stock }} left</span>
                 @endif
             </div>
             <span class="chip bg-white/95 text-ink-900 shadow-sm backdrop-blur">
@@ -34,6 +44,18 @@
         </h3>
         <p class="mt-1 line-clamp-2 text-sm text-slate-500">{{ $product->tagline ?: Str::limit(strip_tags($product->description), 80) }}</p>
 
+        @if ($product->is_deal && ! $product->is_expired)
+            <div class="mt-3 flex items-center gap-1.5 rounded-lg bg-amber-50 px-2.5 py-1.5 text-xs font-semibold text-amber-700"
+                 x-data="{ end: new Date('{{ $product->deal_ends_at->toIso8601String() }}').getTime(), t: '',
+                    tick() { let diff = this.end - Date.now(); if (diff <= 0) { this.t = 'Ended'; return; }
+                        let s = Math.floor(diff/1000); let d = Math.floor(s/86400); s%=86400; let h = Math.floor(s/3600); s%=3600; let m = Math.floor(s/60); s%=60;
+                        this.t = (d>0? d+'d ':'') + h+'h '+m+'m '+(d>0?'':s+'s'); } }"
+                 x-init="tick(); setInterval(() => tick(), 1000)">
+                <svg class="h-3.5 w-3.5 flex-none" fill="none" viewBox="0 0 24 24" stroke-width="1.7" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" /></svg>
+                Ends in <span x-text="t" class="font-mono"></span>
+            </div>
+        @endif
+
         <div class="mt-4 flex items-center justify-between border-t border-slate-100 pt-3">
             <div class="flex items-baseline gap-1.5">
                 <x-price :amount="$product->current_price" class="font-display text-lg font-extrabold text-ink-900" />
@@ -41,12 +63,18 @@
                     <span class="text-sm text-slate-400 line-through">{{ money($product->price) }}</span>
                 @endif
             </div>
-            <form method="POST" action="{{ route('cart.add', $product) }}">
-                @csrf
-                <button type="submit" class="flex h-9 w-9 items-center justify-center rounded-xl bg-brand-50 text-brand-600 transition hover:bg-brand-600 hover:text-white" title="Add to cart">
-                    <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke-width="1.7" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 0 0-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 0 0-16.536-1.84M7.5 14.25 5.106 5.272M6 20.25a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Zm12.75 0a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z" /></svg>
-                </button>
-            </form>
+            @if ($product->is_expired)
+                <span class="rounded-xl bg-rose-50 px-3 py-1.5 text-xs font-bold text-rose-500">Expired</span>
+            @elseif ($product->is_out_of_stock)
+                <span class="rounded-xl bg-rose-50 px-3 py-1.5 text-xs font-bold text-rose-500">Sold out</span>
+            @else
+                <form method="POST" action="{{ route('cart.add', $product) }}">
+                    @csrf
+                    <button type="submit" class="flex h-9 w-9 items-center justify-center rounded-xl bg-brand-50 text-brand-600 transition hover:bg-brand-600 hover:text-white" title="Add to cart">
+                        <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke-width="1.7" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 0 0-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 0 0-16.536-1.84M7.5 14.25 5.106 5.272M6 20.25a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Zm12.75 0a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z" /></svg>
+                    </button>
+                </form>
+            @endif
         </div>
     </div>
 </article>

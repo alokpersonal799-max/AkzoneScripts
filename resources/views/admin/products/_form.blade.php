@@ -125,6 +125,12 @@
                 <label for="download_message" class="label">Download message <span class="text-slate-400">(optional)</span></label>
                 <textarea id="download_message" name="download_message" rows="2" class="input" placeholder="Shown to buyers on the download screen, e.g. installation notes or support info.">{{ old('download_message', $product->download_message) }}</textarea>
             </div>
+
+            <div class="mt-5">
+                <label for="file_password" class="label">File password <span class="text-slate-400">(optional)</span></label>
+                <input id="file_password" name="file_password" type="text" value="{{ old('file_password', $product->file_password) }}" class="input" placeholder="e.g. archive/unlock password">
+                <p class="mt-1 text-xs text-slate-400">If your file (or external ZIP) is password protected, enter it here. Buyers see it on their <strong>My Purchases</strong> page after purchasing.</p>
+            </div>
         </div>
     </div>
 
@@ -148,6 +154,37 @@
                 <div>
                     <label for="version" class="label">Version</label>
                     <input id="version" name="version" type="text" value="{{ old('version', $product->version) }}" required class="input">
+                </div>
+            </div>
+        </div>
+
+        {{-- Availability: limited stock + limited-time deal --}}
+        <div class="card p-6"
+             x-data="{
+                trackStock: {{ old('track_stock', $product->manages_stock ?? false) ? 'true' : 'false' }},
+                enableDeal: {{ old('enable_deal', ($product->deal_ends_at ?? false) ? true : false) ? 'true' : 'false' }}
+             }">
+            <h3 class="font-display text-base font-bold text-ink-900">Availability</h3>
+            <p class="mt-1 text-xs text-slate-400">Optional limited stock or a limited-time deal.</p>
+
+            <div class="mt-4 space-y-4">
+                <label class="flex items-start gap-2 text-sm text-slate-600">
+                    <input type="checkbox" name="track_stock" value="1" x-model="trackStock" class="mt-0.5 rounded border-slate-300 text-brand-600 focus:ring-brand-500/30">
+                    <span><span class="font-semibold text-ink-900">Limited stock</span><br><span class="text-xs text-slate-400">Show remaining units and mark out of stock when it hits zero.</span></span>
+                </label>
+                <div x-show="trackStock" x-cloak>
+                    <label for="stock" class="label">Units in stock</label>
+                    <input id="stock" name="stock" type="number" min="0" value="{{ old('stock', $product->stock) }}" placeholder="e.g. 25" class="input">
+                    <p class="mt-1 text-xs text-slate-400">Stock decreases automatically after each confirmed purchase.</p>
+                </div>
+
+                <label class="flex items-start gap-2 border-t border-slate-100 pt-4 text-sm text-slate-600">
+                    <input type="checkbox" name="enable_deal" value="1" x-model="enableDeal" class="mt-0.5 rounded border-slate-300 text-brand-600 focus:ring-brand-500/30">
+                    <span><span class="font-semibold text-ink-900">Limited-time deal</span><br><span class="text-xs text-slate-400">Show a countdown; after it ends, buying is disabled (Expired).</span></span>
+                </label>
+                <div x-show="enableDeal" x-cloak>
+                    <label for="deal_ends_at" class="label">Deal ends at</label>
+                    <input id="deal_ends_at" name="deal_ends_at" type="datetime-local" value="{{ old('deal_ends_at', $product->deal_ends_at?->format('Y-m-d\TH:i')) }}" class="input">
                 </div>
             </div>
         </div>

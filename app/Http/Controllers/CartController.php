@@ -29,6 +29,14 @@ class CartController extends Controller
     {
         abort_unless($product->status === 'published', 404);
 
+        if ($product->is_expired) {
+            return back()->with('error', 'This deal has expired — "'.$product->title.'" is no longer available.');
+        }
+
+        if ($product->is_out_of_stock) {
+            return back()->with('error', '"'.$product->title.'" is out of stock.');
+        }
+
         if ($this->cart->has($product->id)) {
             return back()->with('info', '"'.$product->title.'" is already in your cart.');
         }
@@ -44,6 +52,14 @@ class CartController extends Controller
     public function buyNow(Product $product): RedirectResponse
     {
         abort_unless($product->status === 'published', 404);
+
+        if ($product->is_expired) {
+            return back()->with('error', 'This deal has expired — "'.$product->title.'" is no longer available.');
+        }
+
+        if ($product->is_out_of_stock) {
+            return back()->with('error', '"'.$product->title.'" is out of stock.');
+        }
 
         if (! $product->is_purchasable) {
             return back()->with('error', '"'.$product->title.'" is not available for direct purchase. Please contact us via WhatsApp or Telegram to buy it.');

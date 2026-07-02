@@ -215,21 +215,50 @@
                     <span class="inline-flex items-center gap-1 text-emerald-600"><span class="h-1.5 w-1.5 rounded-full bg-emerald-500"></span>{{ $product->viewers_now }} people viewing now</span>
                 </p>
 
-                <div class="mt-5 flex items-baseline gap-3">
+                <div class="mt-5 flex flex-wrap items-baseline gap-3">
                     <x-price :amount="$product->current_price" class="font-display text-4xl font-extrabold text-ink-900" />
                     @if ($product->is_on_sale)<span class="text-lg text-slate-400 line-through">{{ money($product->price) }}</span>@endif
-                    @if ($product->is_purchasable)
+                    @if ($product->is_expired)
+                        <span class="chip bg-rose-50 text-rose-700">Deal expired</span>
+                    @elseif ($product->is_out_of_stock)
+                        <span class="chip bg-rose-50 text-rose-700">Out of stock</span>
+                    @elseif ($product->manages_stock)
+                        <span class="chip bg-emerald-50 text-emerald-700">{{ $product->stock }} in stock</span>
+                    @elseif ($product->is_purchasable || $product->is_free)
                         <span class="chip bg-emerald-50 text-emerald-700">In stock</span>
                     @else
                         <span class="chip bg-amber-50 text-amber-700">Contact to buy</span>
                     @endif
                 </div>
 
+                {{-- Limited-time deal countdown --}}
+                @if ($product->is_deal && ! $product->is_expired)
+                    <div class="mt-4 flex items-center gap-2 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm font-semibold text-amber-800"
+                         x-data="{ end: new Date('{{ $product->deal_ends_at->toIso8601String() }}').getTime(), t: '',
+                            tick() { let diff = this.end - Date.now(); if (diff <= 0) { this.t = 'Expired'; location.reload(); return; }
+                                let s = Math.floor(diff/1000); let d = Math.floor(s/86400); s%=86400; let h = Math.floor(s/3600); s%=3600; let m = Math.floor(s/60); s%=60;
+                                this.t = (d>0? d+'d ':'') + h+'h '+m+'m '+s+'s'; } }"
+                         x-init="tick(); setInterval(() => tick(), 1000)">
+                        <svg class="h-5 w-5 flex-none" fill="none" viewBox="0 0 24 24" stroke-width="1.7" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" /></svg>
+                        <span>Limited-time deal ends in <span x-text="t" class="font-mono font-bold text-amber-900"></span></span>
+                    </div>
+                @endif
+
                 {{-- Action buttons --}}
                 <div class="mt-6 space-y-3">
                     @if ($hasPurchased)
                         <div class="rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-center text-sm font-semibold text-emerald-700">✓ You own this product</div>
                         <a href="{{ route('dashboard.purchases') }}" class="btn-primary btn-lg w-full">Go to downloads</a>
+                    @elseif ($product->is_expired)
+                        <div class="rounded-xl border border-rose-200 bg-rose-50 px-4 py-4 text-center">
+                            <p class="font-display text-lg font-bold text-rose-600">⏳ Deal expired</p>
+                            <p class="mt-1 text-sm text-rose-500">This limited-time offer has ended and is no longer available for purchase.</p>
+                        </div>
+                    @elseif ($product->is_out_of_stock)
+                        <div class="rounded-xl border border-rose-200 bg-rose-50 px-4 py-4 text-center">
+                            <p class="font-display text-lg font-bold text-rose-600">Out of stock</p>
+                            <p class="mt-1 text-sm text-rose-500">All units have been sold. Check back later or contact us.</p>
+                        </div>
                     @elseif ($product->is_free)
                         {{-- Free product → direct download (login required), no checkout --}}
                         @auth

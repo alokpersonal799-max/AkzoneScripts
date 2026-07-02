@@ -76,7 +76,7 @@ class CheckoutController extends Controller
                 ->with('info', 'Your cart is empty. Browse the catalog to find something great.');
         }
 
-        $items = $allItems->filter(fn ($p) => $p->is_purchasable)->values();
+        $items = $allItems->filter(fn ($p) => $p->is_buyable)->values();
         $contactOnly = $allItems->reject(fn ($p) => $p->is_purchasable)->values();
 
         $subtotal = (float) $items->sum(fn ($p) => $p->current_price);
@@ -147,12 +147,12 @@ class CheckoutController extends Controller
         $user = $request->user();
         $items = $this->cart->items()
             ->reject(fn ($product) => $user->hasPurchased($product->id))
-            ->filter(fn ($product) => $product->is_purchasable)
+            ->filter(fn ($product) => $product->is_buyable)
             ->values();
 
         if ($items->isEmpty()) {
             return redirect()->route('cart.index')
-                ->with('error', 'The items in your cart are not available for direct checkout. Please contact us via WhatsApp or Telegram to purchase them.');
+                ->with('error', 'The items in your cart are not available for direct checkout (out of stock, expired, or contact-only). Please contact us via WhatsApp or Telegram to purchase them.');
         }
 
         $subtotal = (float) $items->sum(fn ($product) => $product->current_price);
@@ -211,6 +211,7 @@ class CheckoutController extends Controller
                 // Only count a sale once the payment is confirmed.
                 if (! $isManual) {
                     $product->incrementQuietly('sales');
+                    $product->decrementStock();
                 }
             }
 

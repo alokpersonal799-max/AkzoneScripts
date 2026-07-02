@@ -25,9 +25,20 @@ class ProductController extends Controller
             ->paginate(15)
             ->withQueryString();
 
+        $hasStock = \Illuminate\Support\Facades\Schema::hasColumn('products', 'stock');
+        $hasDeal = \Illuminate\Support\Facades\Schema::hasColumn('products', 'deal_ends_at');
+
         return view('admin.products.index', [
             'products' => $products,
             'filters' => $request->only(['q', 'status']),
+            'productStats' => [
+                'total' => Product::count(),
+                'published' => Product::where('status', 'published')->count(),
+                'free' => Product::where(fn ($q) => $q->where('price', '<=', 0)->orWhere('sale_price', '<=', 0))->count(),
+                'limited_stock' => $hasStock ? Product::whereNotNull('stock')->count() : 0,
+                'out_of_stock' => $hasStock ? Product::whereNotNull('stock')->where('stock', '<=', 0)->count() : 0,
+                'limited_time' => $hasDeal ? Product::whereNotNull('deal_ends_at')->count() : 0,
+            ],
         ]);
     }
 
@@ -203,9 +214,14 @@ class ProductController extends Controller
             ],
             'file_type' => ['nullable', 'in:upload,external'],
             'external_url' => ['nullable', 'url', 'max:2000', 'required_if:file_type,external'],
+            'file_password' => ['nullable', 'string', 'max:255'],
             'download_limit' => ['nullable', 'integer', 'min:0', 'max:100000'],
             'link_expiry_minutes' => ['nullable', 'integer', 'min:0', 'max:525600'],
             'download_message' => ['nullable', 'string', 'max:1000'],
+            'track_stock' => ['nullable', 'boolean'],
+            'stock' => ['nullable', 'integer', 'min:0', 'max:1000000'],
+            'enable_deal' => ['nullable', 'boolean'],
+            'deal_ends_at' => ['nullable', 'date'],
         ]);
 
         // Normalise the comma separated tag string into an array.
@@ -230,6 +246,16 @@ class ProductController extends Controller
         if ($validated['file_type'] !== 'external') {
             $validated['external_url'] = null;
         }
+
+        // Limited stock: NULL when not tracked, otherwise the quantity.
+        $validated['stock'] = $request->boolean('track_stock') ? (int) ($validated['stock'] ?? 0) : null;
+
+        // Limited-time deal: NULL when disabled.
+        $validated['deal_ends_at'] = $request->boolean('enable_deal') ? ($validated['deal_ends_at'] ?? null) : null;
+
+        $validated['file_password'] = $validated['file_password'] ?? null;
+
+        unset($validated['track_stock'], $validated['enable_deal']);
 
         return $validated;
     }

@@ -31,6 +31,29 @@
         @endforeach
     </div>
 
+    {{-- Products at a glance --}}
+    <div class="mt-6 card p-5">
+        <div class="flex items-center justify-between">
+            <h2 class="font-display text-lg font-bold text-ink-900">Products at a glance</h2>
+            <a href="{{ route('admin.products.index') }}" class="text-sm font-semibold text-brand-600 hover:text-brand-700">Manage products</a>
+        </div>
+        <div class="mt-4 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
+            @foreach ([
+                ['Total', $stats['products'], 'slate'],
+                ['Published', $stats['published'], 'emerald'],
+                ['Free', $stats['free_products'], 'cyan'],
+                ['Limited stock', $stats['limited_stock'], 'amber'],
+                ['Limited-time', $stats['limited_time'], 'indigo'],
+                ['Out of stock', $stats['out_of_stock'], 'rose'],
+            ] as $ps)
+                <div class="rounded-xl bg-slate-50 p-3 text-center">
+                    <p class="font-display text-2xl font-extrabold text-{{ $ps[2] }}-600">{{ number_format($ps[1]) }}</p>
+                    <p class="mt-0.5 text-xs text-slate-500">{{ $ps[0] }}</p>
+                </div>
+            @endforeach
+        </div>
+    </div>
+
     {{-- Announcements snapshot --}}
     @if ($announcementStats)
         <div class="mt-6 card overflow-hidden">

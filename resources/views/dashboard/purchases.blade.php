@@ -53,6 +53,13 @@
                         @if ($p?->download_message)
                             <p class="mt-2 rounded-lg bg-slate-50 px-3 py-2 text-xs text-slate-500">{{ $p->download_message }}</p>
                         @endif
+                        @if ($p?->file_password && $item->order->isCompleted())
+                            <div class="mt-2 flex flex-wrap items-center gap-2 rounded-lg bg-amber-50 px-3 py-2 text-xs text-amber-800">
+                                <svg class="h-3.5 w-3.5 flex-none" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 1 0-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H6.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z" /></svg>
+                                <span class="font-semibold">File password:</span>
+                                <code class="select-all rounded bg-white px-1.5 py-0.5 font-mono font-bold">{{ $p->file_password }}</code>
+                            </div>
+                        @endif
                     </div>
                     <div class="flex flex-shrink-0 items-center gap-2">
                         @if ($item->order->isCompleted())

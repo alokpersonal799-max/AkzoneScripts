@@ -21,6 +21,14 @@ class DownloadController extends Controller
         abort_unless($product->status === 'published', 404);
         abort_unless($product->current_price <= 0, 404);
 
+        if ($product->is_expired) {
+            return back()->with('error', 'This offer has expired and is no longer available.');
+        }
+
+        if ($product->is_out_of_stock) {
+            return back()->with('error', 'This item is out of stock.');
+        }
+
         $user = $request->user();
         $disk = Storage::disk('products');
 
@@ -51,6 +59,9 @@ class DownloadController extends Controller
                 'product_title' => $product->title,
                 'price' => 0,
             ]);
+
+            // Limited-stock free products lose a unit on first claim.
+            $product->decrementStock();
         }
 
         // Free products track downloads (not sales).

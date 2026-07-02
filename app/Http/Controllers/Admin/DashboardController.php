@@ -27,6 +27,9 @@ class DashboardController extends Controller
             $q->where('price', '<=', 0)->orWhere('sale_price', '<=', 0);
         })->pluck('id');
 
+        $hasStock = \Illuminate\Support\Facades\Schema::hasColumn('products', 'stock');
+        $hasDeal = \Illuminate\Support\Facades\Schema::hasColumn('products', 'deal_ends_at');
+
         $stats = [
             'revenue' => (float) (clone $completedOrders)->sum('total'),
             'revenue_today' => (float) Order::where('status', 'completed')->whereDate('paid_at', Carbon::today())->sum('total'),
@@ -40,6 +43,9 @@ class DashboardController extends Controller
             'sold' => (int) Product::sum('sales'),
             'downloads' => (int) Product::whereIn('id', $freeProductIds)->sum('downloads'),
             'free_products' => $freeProductIds->count(),
+            'limited_stock' => $hasStock ? Product::whereNotNull('stock')->count() : 0,
+            'out_of_stock' => $hasStock ? Product::whereNotNull('stock')->where('stock', '<=', 0)->count() : 0,
+            'limited_time' => $hasDeal ? Product::whereNotNull('deal_ends_at')->count() : 0,
             'views' => $totalViews,
             'services' => \Illuminate\Support\Facades\Schema::hasTable('services') ? \App\Models\Service::where('is_active', true)->count() : 0,
             'conversion' => $totalViews > 0 ? round(($completedCount / $totalViews) * 100, 2) : 0,

@@ -37,12 +37,15 @@ class Product extends Model
         'file_size',
         'file_type',
         'external_url',
+        'file_password',
         'download_limit',
         'link_expiry_minutes',
         'download_message',
         'tags',
         'downloads',
         'sales',
+        'stock',
+        'deal_ends_at',
         'views',
         'rating',
         'reviews_count',
@@ -77,6 +80,8 @@ class Product extends Model
             'file_size' => 'integer',
             'download_limit' => 'integer',
             'link_expiry_minutes' => 'integer',
+            'stock' => 'integer',
+            'deal_ends_at' => 'datetime',
         ];
     }
 
@@ -202,6 +207,80 @@ class Product extends Model
     public function getIsFreeAttribute(): bool
     {
         return $this->current_price <= 0;
+    }
+
+    /**
+     * Whether this product tracks a limited stock quantity.
+     */
+    public function getManagesStockAttribute(): bool
+    {
+        return ! is_null($this->stock);
+    }
+
+    /**
+     * Whether the product is sold out (only when stock is tracked).
+     */
+    public function getIsOutOfStockAttribute(): bool
+    {
+        return $this->manages_stock && (int) $this->stock <= 0;
+    }
+
+    /**
+     * Whether this product is running a limited-time deal.
+     */
+    public function getIsDealAttribute(): bool
+    {
+        return ! is_null($this->deal_ends_at);
+    }
+
+    /**
+     * Whether a limited-time deal has ended.
+     */
+    public function getIsExpiredAttribute(): bool
+    {
+        return $this->is_deal && $this->deal_ends_at->isPast();
+    }
+
+    /**
+     * Whether the product can currently be added to cart / purchased.
+     */
+    public function getIsBuyableAttribute(): bool
+    {
+        return $this->is_purchasable
+            && $this->status === 'published'
+            && ! $this->is_out_of_stock
+            && ! $this->is_expired;
+    }
+
+    /**
+     * A short availability label for badges.
+     */
+    public function getAvailabilityLabelAttribute(): string
+    {
+        if ($this->is_expired) {
+            return 'Expired';
+        }
+        if ($this->is_out_of_stock) {
+            return 'Out of stock';
+        }
+        if ($this->manages_stock) {
+            return $this->stock.' left';
+        }
+
+        return 'In stock';
+    }
+
+    /**
+     * Reduce remaining stock by the given quantity (no-op if unlimited).
+     */
+    public function decrementStock(int $qty = 1): void
+    {
+        if (! $this->manages_stock) {
+            return;
+        }
+
+        $this->stock = max(0, (int) $this->stock - $qty);
+        $this->saveQuietly();
     }
 
     /**

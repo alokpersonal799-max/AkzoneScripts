@@ -70,6 +70,7 @@ class OrderController extends Controller
 
             foreach ($order->items as $item) {
                 $item->product?->incrementQuietly('sales');
+                $item->product?->decrementStock();
             }
 
             // Announce verified purchases to connected Telegram bots.

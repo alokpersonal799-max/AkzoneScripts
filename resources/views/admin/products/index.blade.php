@@ -3,6 +3,23 @@
 @section('page-title', 'Products')
 
 @section('admin')
+    {{-- Product stats --}}
+    <div class="mb-6 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
+        @foreach ([
+            ['Total', $productStats['total'], 'slate'],
+            ['Published', $productStats['published'], 'emerald'],
+            ['Free', $productStats['free'], 'cyan'],
+            ['Limited stock', $productStats['limited_stock'], 'amber'],
+            ['Limited-time', $productStats['limited_time'], 'indigo'],
+            ['Out of stock', $productStats['out_of_stock'], 'rose'],
+        ] as $ps)
+            <div class="card p-4">
+                <p class="text-xs font-semibold uppercase tracking-wide text-slate-400">{{ $ps[0] }}</p>
+                <p class="mt-1 font-display text-2xl font-extrabold text-{{ $ps[2] }}-600">{{ number_format($ps[1]) }}</p>
+            </div>
+        @endforeach
+    </div>
+
     <div class="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <form method="GET" action="{{ route('admin.products.index') }}" class="flex flex-1 items-center gap-2 sm:max-w-md">
             <input type="text" name="q" value="{{ $filters['q'] ?? '' }}" placeholder="Search products..."
