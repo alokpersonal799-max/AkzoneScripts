@@ -37,6 +37,9 @@ class CheckoutController extends Controller
         if (setting('pay_razorpay_enabled') === '1') {
             $methods['razorpay'] = 'Razorpay';
         }
+        if (setting('pay_coinbase_enabled') === '1') {
+            $methods['coinbase'] = 'Crypto (Coinbase Commerce)';
+        }
 
         return $methods;
     }

@@ -72,6 +72,8 @@ class CoreSeeder extends Seeder
             'pay_razorpay_enabled' => ['payments', '0'],
             'razorpay_key' => ['payments', ''],
             'razorpay_secret' => ['payments', ''],
+            'pay_coinbase_enabled' => ['payments', '0'],
+            'coinbase_key' => ['payments', ''],
 
             // Manual payment methods
             'manual_instructions' => ['manual', 'Pay using any method below, then enter your transaction ID and upload a payment screenshot. We will verify and unlock your downloads.'],

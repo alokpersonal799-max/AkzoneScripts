@@ -237,23 +237,25 @@ class SettingController extends Controller
             'paypal_mode' => ['nullable', 'in:sandbox,live'],
             'razorpay_key' => ['nullable', 'string', 'max:255'],
             'razorpay_secret' => ['nullable', 'string', 'max:255'],
+            'coinbase_key' => ['nullable', 'string', 'max:255'],
             'pay_stripe_icon' => ['nullable', 'image', 'mimes:png', 'max:1024'],
             'pay_paypal_icon' => ['nullable', 'image', 'mimes:png', 'max:1024'],
             'pay_razorpay_icon' => ['nullable', 'image', 'mimes:png', 'max:1024'],
+            'pay_coinbase_icon' => ['nullable', 'image', 'mimes:png', 'max:1024'],
             'pay_manual_icon' => ['nullable', 'image', 'mimes:png', 'max:1024'],
         ]);
 
-        foreach (['pay_manual_enabled', 'pay_stripe_enabled', 'pay_paypal_enabled', 'pay_razorpay_enabled'] as $flag) {
+        foreach (['pay_manual_enabled', 'pay_stripe_enabled', 'pay_paypal_enabled', 'pay_razorpay_enabled', 'pay_coinbase_enabled'] as $flag) {
             Setting::put($flag, $request->boolean($flag) ? '1' : '0', 'payments');
         }
 
-        foreach (['stripe_key', 'stripe_secret', 'paypal_client_id', 'paypal_secret', 'razorpay_key', 'razorpay_secret'] as $key) {
+        foreach (['stripe_key', 'stripe_secret', 'paypal_client_id', 'paypal_secret', 'razorpay_key', 'razorpay_secret', 'coinbase_key'] as $key) {
             Setting::put($key, $data[$key] ?? '', 'payments');
         }
         Setting::put('paypal_mode', $data['paypal_mode'] ?? 'sandbox', 'payments');
 
         // Gateway icons (PNG).
-        foreach (['pay_stripe_icon', 'pay_paypal_icon', 'pay_razorpay_icon', 'pay_manual_icon'] as $iconKey) {
+        foreach (['pay_stripe_icon', 'pay_paypal_icon', 'pay_razorpay_icon', 'pay_coinbase_icon', 'pay_manual_icon'] as $iconKey) {
             if ($request->hasFile($iconKey)) {
                 $existing = Setting::get($iconKey);
                 if ($existing) {
