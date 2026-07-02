@@ -88,6 +88,7 @@ class CoreSeeder extends Seeder
             'home_show_latest' => ['home', '1'],
             'home_show_featured' => ['home', '1'],
             'home_show_bestselling' => ['home', '1'],
+            'home_show_limited' => ['home', '1'],
             'home_show_free' => ['home', '1'],
             'home_show_testimonials' => ['home', '1'],
 

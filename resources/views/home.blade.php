@@ -249,7 +249,7 @@
     @endif
 
     {{-- Limited Deal band (limited-time offers + soon-out-of-stock) --}}
-    @if ($limitedDeals->isNotEmpty())
+    @if ($limitedDeals->isNotEmpty() && setting('home_show_limited', '1') !== '0')
         <section class="reveal bg-gradient-to-br from-ink-900 via-brand-700 to-brand-500 py-14">
             <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8"
                  x-data="{ scroll(dir){ $refs.t.scrollBy({left: dir*$refs.t.clientWidth*0.85, behavior:'smooth'}) } }">

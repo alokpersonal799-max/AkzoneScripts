@@ -57,7 +57,7 @@ class SettingController extends Controller
 
     public function updateHomepage(Request $request): RedirectResponse
     {
-        foreach (['home_show_categories', 'home_show_latest', 'home_show_featured', 'home_show_bestselling', 'home_show_free', 'home_show_testimonials'] as $key) {
+        foreach (['home_show_categories', 'home_show_latest', 'home_show_featured', 'home_show_bestselling', 'home_show_limited', 'home_show_free', 'home_show_testimonials'] as $key) {
             Setting::put($key, $request->boolean($key) ? '1' : '0', 'home');
         }
 

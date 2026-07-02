@@ -10,6 +10,7 @@
                 'home_show_latest' => 'Latest items',
                 'home_show_featured' => 'The world-leading marketplace (featured)',
                 'home_show_bestselling' => 'Weekly best selling',
+                'home_show_limited' => 'Limited Deal band (limited-time / low stock)',
                 'home_show_free' => 'Free items band',
                 'home_show_testimonials' => 'Testimonials',
             ];
