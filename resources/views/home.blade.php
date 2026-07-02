@@ -250,7 +250,7 @@
 
     {{-- Limited Deal band (limited-time offers + soon-out-of-stock) --}}
     @if ($limitedDeals->isNotEmpty())
-        <section class="reveal bg-gradient-to-br from-brand-600 via-brand-500 to-indigo-600 py-14">
+        <section class="reveal bg-gradient-to-br from-ink-900 via-brand-700 to-brand-500 py-14">
             <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8" x-data="{}" x-ref="ld">
                 <div class="mb-6 flex items-end justify-between">
                     <div>

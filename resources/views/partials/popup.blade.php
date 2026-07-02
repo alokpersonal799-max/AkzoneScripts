@@ -40,7 +40,7 @@
         audience: '{{ $popupAudience }}',
         storageKey: 'akz_popup_{{ $popupHash }}',
         init() {
-            // Track whether this browser has ever visited (for the "new visitors" audience).
+            // Track whether this browser has visited before (for the new-visitors audience).
             const isNewVisitor = localStorage.getItem('akz_visited') !== '1';
             localStorage.setItem('akz_visited', '1');
 
