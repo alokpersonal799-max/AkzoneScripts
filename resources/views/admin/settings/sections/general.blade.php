@@ -1,29 +1,40 @@
 <div class="card p-6 sm:p-8">
+    @if (setting('site_logo'))
+        <form id="logo-delete-form" method="POST" action="{{ route('admin.settings.logo.delete') }}" class="hidden">@csrf @method('DELETE')</form>
+    @endif
     <form method="POST" action="{{ route('admin.settings.general') }}" enctype="multipart/form-data" class="space-y-5">
         @csrf @method('PUT')
         <h2 class="font-display text-lg font-bold text-ink-900">Branding &amp; general</h2>
 
-        <div class="flex items-center gap-4" x-data="{ removeLogo: false }">
-            <span class="flex h-16 w-16 items-center justify-center overflow-hidden rounded-2xl bg-slate-100">
+        <div class="flex items-start gap-4">
+            <span class="flex h-16 w-16 flex-none items-center justify-center overflow-hidden rounded-2xl bg-slate-100">
                 @if (setting('site_logo'))
-                    <img id="logo-preview" src="{{ \Illuminate\Support\Facades\Storage::disk('public')->url(setting('site_logo')) }}" alt="logo" class="h-full w-full object-contain" :class="removeLogo && 'opacity-30'">
+                    <img id="logo-preview" src="{{ \Illuminate\Support\Facades\Storage::disk('public')->url(setting('site_logo')) }}" alt="logo" class="h-full w-full object-contain">
                 @else
                     <img id="logo-preview" src="" alt="" class="hidden h-full w-full object-contain">
                     <span class="font-display text-2xl font-extrabold text-brand-600">{{ strtoupper(substr(setting('site_name', config('app.name', 'A')), 0, 1)) }}</span>
                 @endif
             </span>
-            <div>
+            <div class="flex-1">
                 <label for="logo" class="label">Site logo</label>
                 <input id="logo" name="logo" type="file" accept="image/png,image/jpeg,image/webp,image/svg+xml"
                        data-crop data-crop-ratio="0" data-crop-preview="#logo-preview"
                        class="block text-sm text-slate-500 file:mr-3 file:rounded-lg file:border-0 file:bg-brand-50 file:px-3 file:py-1.5 file:text-sm file:font-semibold file:text-brand-600 hover:file:bg-brand-100">
                 <p class="mt-1 text-xs text-slate-400">Recommended: transparent <strong>PNG</strong>, about <strong>240&times;80&nbsp;px</strong> (or a 512&times;512 square). Max 2&nbsp;MB.</p>
+
+                <label class="mt-3 flex items-center gap-2 text-sm">
+                    <input type="hidden" name="logo_enabled" value="0">
+                    <input type="checkbox" name="logo_enabled" value="1" @checked(setting('logo_enabled', '1') === '1') class="h-4 w-4 rounded border-slate-300 text-brand-600 focus:ring-brand-500">
+                    <span class="font-medium text-slate-700">Show logo in header</span>
+                    <span class="text-xs text-slate-400">(uncheck to show the text/initial brand instead)</span>
+                </label>
+
                 @if (setting('site_logo'))
-                    <input type="hidden" name="remove_logo" :value="removeLogo ? '1' : '0'">
-                    <label class="mt-2 inline-flex items-center gap-2 text-xs font-medium text-rose-600">
-                        <input type="checkbox" x-model="removeLogo" class="h-3.5 w-3.5 rounded border-slate-300 text-rose-600 focus:ring-rose-500">
-                        Remove current logo (use text brand)
-                    </label>
+                    <button type="submit" form="logo-delete-form" onclick="return confirm('Delete the current logo? You can upload a new one afterwards.')"
+                            class="mt-3 inline-flex items-center gap-1.5 rounded-lg border border-rose-200 bg-rose-50 px-3 py-1.5 text-xs font-semibold text-rose-600 transition hover:bg-rose-100">
+                        <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" /></svg>
+                        Delete logo
+                    </button>
                 @endif
             </div>
         </div>

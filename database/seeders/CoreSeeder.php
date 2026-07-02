@@ -25,6 +25,7 @@ class CoreSeeder extends Seeder
             // General
             'site_name' => ['general', 'AkzoneScripts'],
             'site_logo' => ['general', null],
+            'logo_enabled' => ['general', '1'],
             'support_email' => ['general', 'support@akzonescripts.test'],
             'social_twitter' => ['general', '#'],
             'social_github' => ['general', '#'],

@@ -251,8 +251,9 @@
     {{-- Limited Deal band (limited-time offers + soon-out-of-stock) --}}
     @if ($limitedDeals->isNotEmpty())
         <section class="reveal bg-gradient-to-br from-ink-900 via-brand-700 to-brand-500 py-14">
-            <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8" x-data="{}" x-ref="ld">
-                <div class="mb-6 flex items-end justify-between">
+            <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8"
+                 x-data="{ scroll(dir){ $refs.t.scrollBy({left: dir*$refs.t.clientWidth*0.85, behavior:'smooth'}) } }">
+                <div class="mb-6 flex items-end justify-between gap-4">
                     <div>
                         <span class="inline-flex items-center gap-1.5 rounded-full bg-white/15 px-3 py-1 text-xs font-bold uppercase tracking-wide text-white">
                             <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" /></svg>
@@ -261,9 +262,13 @@
                         <h2 class="mt-2 font-display text-2xl font-extrabold tracking-tight text-white sm:text-3xl">Limited-time offers &amp; low stock</h2>
                         <p class="mt-1.5 text-sm text-white/80">Grab these before the timer runs out or they sell out.</p>
                     </div>
-                    <a href="{{ route('products.index') }}" class="hidden text-sm font-semibold text-white hover:underline sm:inline">View all &rarr;</a>
+                    <div class="flex items-center gap-2">
+                        <a href="{{ route('products.index') }}" class="hidden rounded-full bg-white/15 px-4 py-2 text-sm font-semibold text-white transition hover:bg-white/25 sm:block">View all items</a>
+                        <button type="button" @click="scroll(-1)" class="flex h-10 w-10 items-center justify-center rounded-full bg-white/15 text-white transition hover:bg-white/25"><svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" /></svg></button>
+                        <button type="button" @click="scroll(1)" class="flex h-10 w-10 items-center justify-center rounded-full bg-white/15 text-white transition hover:bg-white/25"><svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" /></svg></button>
+                    </div>
                 </div>
-                <div class="no-scrollbar -mx-1 flex snap-x gap-4 overflow-x-auto scroll-smooth px-1 pb-2 sm:gap-5">
+                <div x-ref="t" class="no-scrollbar -mx-1 flex snap-x gap-4 overflow-x-auto scroll-smooth px-1 pb-2 sm:gap-5">
                     @foreach ($limitedDeals as $product)
                         <x-product-card :product="$product" class="w-[46%] flex-none snap-start sm:w-[290px]" />
                     @endforeach

@@ -126,6 +126,7 @@ class SettingController extends Controller
             'timezone' => ['nullable', 'string', 'max:64', 'timezone'],
             'logo' => ['nullable', 'image', 'max:2048'],
             'remove_logo' => ['nullable', 'in:0,1'],
+            'logo_enabled' => ['nullable', 'in:0,1'],
             'pwa_install_enabled' => ['nullable', 'in:0,1'],
             'pwa_install_mobile' => ['nullable', 'in:0,1'],
             'pwa_install_desktop' => ['nullable', 'in:0,1'],
@@ -153,11 +154,25 @@ class SettingController extends Controller
             Setting::put('timezone', $data['timezone'], 'general');
         }
 
-        foreach (['pwa_install_enabled', 'pwa_install_mobile', 'pwa_install_desktop'] as $key) {
+        foreach (['logo_enabled', 'pwa_install_enabled', 'pwa_install_mobile', 'pwa_install_desktop'] as $key) {
             Setting::put($key, ($data[$key] ?? '0') === '1' ? '1' : '0', 'general');
         }
 
         return back()->with('success', 'General settings saved.');
+    }
+
+    /**
+     * Delete the uploaded site logo so a new one can be uploaded.
+     */
+    public function deleteLogo(): RedirectResponse
+    {
+        $existing = Setting::get('site_logo');
+        if ($existing) {
+            Storage::disk('public')->delete($existing);
+        }
+        Setting::put('site_logo', '', 'general');
+
+        return back()->with('success', 'Logo deleted. You can upload a new one now.');
     }
 
     public function updateHero(Request $request): RedirectResponse

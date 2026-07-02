@@ -63,7 +63,7 @@
             :class="scrolled ? 'border-slate-200 bg-white/90 backdrop-blur-lg shadow-sm' : 'border-transparent bg-white'">
         <nav class="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-3.5 sm:px-6 lg:px-8">
             <a href="{{ route('home') }}" class="flex flex-shrink-0 items-center gap-2">
-                @if (setting('site_logo'))
+                @if (setting('site_logo') && setting('logo_enabled', '1') === '1')
                     <img src="{{ \Illuminate\Support\Facades\Storage::disk('public')->url(setting('site_logo')) }}" alt="{{ setting('site_name', 'AkzoneScripts') }}" class="h-9 w-auto">
                 @else
                     <span class="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-brand-500 to-indigo-500 font-display text-lg font-extrabold text-white shadow-lift">{{ strtoupper(substr(setting('site_name', 'A'), 0, 1)) }}</span>

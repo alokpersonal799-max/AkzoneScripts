@@ -273,6 +273,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::get('/settings', [AdminSettingController::class, 'index'])->name('settings.index');
     Route::get('/settings/section/{section}', [AdminSettingController::class, 'show'])->name('settings.show');
     Route::put('/settings/general', [AdminSettingController::class, 'updateGeneral'])->name('settings.general');
+    Route::delete('/settings/logo', [AdminSettingController::class, 'deleteLogo'])->name('settings.logo.delete');
     Route::put('/settings/hero', [AdminSettingController::class, 'updateHero'])->name('settings.hero');
     Route::put('/settings/footer', [AdminSettingController::class, 'updateFooter'])->name('settings.footer');
     Route::put('/settings/seo', [AdminSettingController::class, 'updateSeo'])->name('settings.seo');
