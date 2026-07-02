@@ -85,7 +85,7 @@
         </div>
 
         {{-- ============ HERO PROMO ============ --}}
-        <form method="POST" action="{{ route('admin.promotions.update') }}" x-show="tab === 'hero'" x-cloak class="space-y-6">
+        <form method="POST" action="{{ route('admin.promotions.update') }}" x-show="tab === 'hero'" class="space-y-6">
             @csrf
             @method('PUT')
             <input type="hidden" name="section" value="hero">
@@ -224,7 +224,7 @@
         </form>
 
         {{-- ============ ANNOUNCEMENT BAR ============ --}}
-        <form method="POST" action="{{ route('admin.promotions.update') }}" x-show="tab === 'announcement'" x-cloak>
+        <form method="POST" action="{{ route('admin.promotions.update') }}" x-show="tab === 'announcement'">
             @csrf
             @method('PUT')
             <input type="hidden" name="section" value="announcement">
@@ -298,7 +298,7 @@
         </form>
 
         {{-- ============ POPUP ============ --}}
-        <form method="POST" action="{{ route('admin.promotions.update') }}" x-show="tab === 'popup'" x-cloak>
+        <form method="POST" action="{{ route('admin.promotions.update') }}" x-show="tab === 'popup'">
             @csrf
             @method('PUT')
             <input type="hidden" name="section" value="popup">
