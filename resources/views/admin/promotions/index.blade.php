@@ -31,19 +31,6 @@
             <p class="mt-1 text-sm text-slate-500">Drive attention with a homepage hero promo, a top announcement bar, and a welcome popup.</p>
         </div>
 
-        @if ($errors->any())
-            <div class="mb-6 rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">
-                <p class="font-semibold">Couldn't save — please fix:</p>
-                <ul class="mt-1 list-inside list-disc">@foreach ($errors->all() as $e)<li>{{ $e }}</li>@endforeach</ul>
-            </div>
-        @endif
-        @if (session('success'))
-            <div class="mb-6 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700">{{ session('success') }}</div>
-        @endif
-        @if (session('error'))
-            <div class="mb-6 rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">{{ session('error') }}</div>
-        @endif
-
         {{-- Live status summary --}}
         <div class="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-3">
             <div class="card flex items-center gap-3 p-4">
@@ -373,11 +360,11 @@
                     <p class="text-xs font-bold uppercase tracking-wide text-brand-600">Message fields</p>
                     <div>
                         <label for="popup_heading" class="label">Heading</label>
-                        <input id="popup_heading" :name="popupMode === 'message' ? 'popup_heading' : null" type="text" x-model="popHeading" value="{{ old('popup_heading', $popupHeading) }}" class="input" placeholder="Welcome!">
+                        <input id="popup_heading" name="popup_heading_msg" type="text" x-model="popHeading" value="{{ old('popup_heading', $popupHeading) }}" class="input" placeholder="Welcome!">
                     </div>
                     <div>
                         <label for="popup_message_msg" class="label">Message</label>
-                        <textarea id="popup_message_msg" :name="popupMode === 'message' ? 'popup_message' : null" rows="3" x-model="popMessage" class="input" placeholder="Check out our latest products...">{{ old('popup_message', $popupMessage) }}</textarea>
+                        <textarea id="popup_message_msg" name="popup_message_msg" rows="3" x-model="popMessage" class="input" placeholder="Check out our latest products...">{{ old('popup_message', $popupMessage) }}</textarea>
                     </div>
                     <div class="grid gap-4 sm:grid-cols-2">
                         <div>
@@ -395,7 +382,7 @@
                     <p class="text-xs font-bold uppercase tracking-wide text-brand-600">Product fields</p>
                     <div>
                         <label for="popup_product_select" class="label">Select product</label>
-                        <select id="popup_product_select" :name="popupMode === 'product' ? 'popup_product' : null" x-model="popProductId" class="input">
+                        <select id="popup_product_select" name="popup_product_prod" x-model="popProductId" class="input">
                             <option value="">-- Select a product --</option>
                             @foreach ($products as $product)
                                 <option value="{{ $product->id }}" {{ (int) old('popup_product', $popupProduct) === $product->id ? 'selected' : '' }}>{{ $product->title }}</option>
@@ -404,7 +391,7 @@
                     </div>
                     <div>
                         <label for="popup_message_prod" class="label">Optional message</label>
-                        <textarea id="popup_message_prod" :name="popupMode === 'product' ? 'popup_message' : null" rows="2" x-model="popMessage" class="input" placeholder="Check this out...">{{ old('popup_message', $popupMessage) }}</textarea>
+                        <textarea id="popup_message_prod" name="popup_message_prod" rows="2" x-model="popMessage" class="input" placeholder="Check this out...">{{ old('popup_message', $popupMessage) }}</textarea>
                     </div>
                 </div>
 
@@ -412,7 +399,7 @@
                     <p class="text-xs font-bold uppercase tracking-wide text-brand-600">Offer fields</p>
                     <div>
                         <label for="popup_product_offer" class="label">Select product</label>
-                        <select id="popup_product_offer" :name="popupMode === 'offer' ? 'popup_product' : null" x-model="popProductId" class="input">
+                        <select id="popup_product_offer" name="popup_product_off" x-model="popProductId" class="input">
                             <option value="">-- Select a product --</option>
                             @foreach ($products as $product)
                                 <option value="{{ $product->id }}" {{ (int) old('popup_product', $popupProduct) === $product->id ? 'selected' : '' }}>{{ $product->title }}</option>
@@ -425,11 +412,11 @@
                     </div>
                     <div>
                         <label for="popup_heading_offer" class="label">Heading <span class="text-slate-400">(optional)</span></label>
-                        <input id="popup_heading_offer" :name="popupMode === 'offer' ? 'popup_heading' : null" type="text" x-model="popHeading" value="{{ old('popup_heading', $popupHeading) }}" class="input" placeholder="Limited Time Offer!">
+                        <input id="popup_heading_offer" name="popup_heading_off" type="text" x-model="popHeading" value="{{ old('popup_heading', $popupHeading) }}" class="input" placeholder="Limited Time Offer!">
                     </div>
                     <div>
                         <label for="popup_message_offer" class="label">Message <span class="text-slate-400">(optional)</span></label>
-                        <textarea id="popup_message_offer" :name="popupMode === 'offer' ? 'popup_message' : null" rows="2" x-model="popMessage" class="input" placeholder="Grab this deal before time runs out...">{{ old('popup_message', $popupMessage) }}</textarea>
+                        <textarea id="popup_message_offer" name="popup_message_off" rows="2" x-model="popMessage" class="input" placeholder="Grab this deal before time runs out...">{{ old('popup_message', $popupMessage) }}</textarea>
                     </div>
                 </div>
 

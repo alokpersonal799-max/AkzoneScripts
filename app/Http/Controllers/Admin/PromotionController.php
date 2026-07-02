@@ -145,9 +145,13 @@ class PromotionController extends Controller
     {
         $data = $request->validate([
             'popup_mode' => ['nullable', 'in:message,product,offer'],
-            'popup_product' => ['nullable', 'integer', 'exists:products,id'],
-            'popup_heading' => ['nullable', 'string', 'max:120'],
-            'popup_message' => ['nullable', 'string', 'max:500'],
+            'popup_heading_msg' => ['nullable', 'string', 'max:120'],
+            'popup_message_msg' => ['nullable', 'string', 'max:500'],
+            'popup_product_prod' => ['nullable', 'integer', 'exists:products,id'],
+            'popup_message_prod' => ['nullable', 'string', 'max:500'],
+            'popup_product_off' => ['nullable', 'integer', 'exists:products,id'],
+            'popup_heading_off' => ['nullable', 'string', 'max:120'],
+            'popup_message_off' => ['nullable', 'string', 'max:500'],
             'popup_link' => ['nullable', 'url', 'max:255'],
             'popup_link_text' => ['nullable', 'string', 'max:60'],
             'popup_timer_until' => ['nullable', 'date'],
@@ -157,11 +161,26 @@ class PromotionController extends Controller
             'popup_audience' => ['nullable', 'in:all,new,guests'],
         ]);
 
+        $mode = $data['popup_mode'] ?? 'message';
+
+        // Resolve the active mode's heading / message / product from static field names.
+        $heading = $mode === 'offer' ? ($data['popup_heading_off'] ?? '') : ($data['popup_heading_msg'] ?? '');
+        $message = match ($mode) {
+            'product' => $data['popup_message_prod'] ?? '',
+            'offer' => $data['popup_message_off'] ?? '',
+            default => $data['popup_message_msg'] ?? '',
+        };
+        $product = match ($mode) {
+            'product' => $data['popup_product_prod'] ?? '',
+            'offer' => $data['popup_product_off'] ?? '',
+            default => '',
+        };
+
         Setting::put('popup_enabled', $request->boolean('popup_enabled') ? '1' : '0', 'promotion');
-        Setting::put('popup_mode', $data['popup_mode'] ?? 'message', 'promotion');
-        Setting::put('popup_product', (string) ($data['popup_product'] ?? ''), 'promotion');
-        Setting::put('popup_heading', $data['popup_heading'] ?? '', 'promotion');
-        Setting::put('popup_message', $data['popup_message'] ?? '', 'promotion');
+        Setting::put('popup_mode', $mode, 'promotion');
+        Setting::put('popup_product', (string) $product, 'promotion');
+        Setting::put('popup_heading', $heading, 'promotion');
+        Setting::put('popup_message', $message, 'promotion');
         Setting::put('popup_link', $data['popup_link'] ?? '', 'promotion');
         Setting::put('popup_link_text', $data['popup_link_text'] ?? '', 'promotion');
         Setting::put('popup_timer_until', $data['popup_timer_until'] ?? '', 'promotion');
