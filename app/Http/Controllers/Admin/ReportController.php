@@ -23,6 +23,13 @@ class ReportController extends Controller
             'reports' => $reports,
             'filters' => $request->only('status'),
             'pendingCount' => Report::where('status', 'pending')->count(),
+            'stats' => [
+                'total' => Report::count(),
+                'pending' => Report::where('status', 'pending')->count(),
+                'reviewing' => Report::where('status', 'reviewing')->count(),
+                'resolved' => Report::where('status', 'resolved')->count(),
+                'dismissed' => Report::where('status', 'dismissed')->count(),
+            ],
         ]);
     }
 

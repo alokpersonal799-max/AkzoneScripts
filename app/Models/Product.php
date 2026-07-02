@@ -279,8 +279,14 @@ class Product extends Model
             return;
         }
 
-        $this->stock = max(0, (int) $this->stock - $qty);
+        $before = (int) $this->stock;
+        $this->stock = max(0, $before - $qty);
         $this->saveQuietly();
+
+        // Alert admins the moment a product sells out.
+        if ($before > 0 && (int) $this->stock === 0) {
+            \App\Models\AdminNotification::notifyAdmins('product', 'Product out of stock', '"'.$this->title.'" just sold out.', route('admin.products.edit', $this));
+        }
     }
 
     /**

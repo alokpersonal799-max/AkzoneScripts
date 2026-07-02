@@ -3,18 +3,175 @@
 @section('page-title', 'Promotions')
 
 @section('admin')
-    <div class="mx-auto max-w-3xl" x-data="{ mode: '{{ old('promo_mode', $mode) }}', popupMode: '{{ old('popup_mode', $popupMode) }}' }">
+    <div class="mx-auto max-w-3xl"
+         x-data="{ tab: 'hero', mode: '{{ old('promo_mode', $mode) }}', popupMode: '{{ old('popup_mode', $popupMode) }}' }">
+
         <div class="mb-6">
-            <h1 class="font-display text-2xl font-extrabold text-ink-900">Hero Promotion</h1>
-            <p class="mt-1 text-sm text-slate-500">Control the promotional band shown at the top of the homepage hero. Choose one mode below.</p>
+            <h1 class="font-display text-2xl font-extrabold text-ink-900">Promotions</h1>
+            <p class="mt-1 text-sm text-slate-500">Drive attention with a homepage hero promo, a top announcement bar, and a welcome popup.</p>
+        </div>
+
+        {{-- Live status summary --}}
+        <div class="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-3">
+            <div class="card flex items-center gap-3 p-4">
+                <span class="flex h-10 w-10 items-center justify-center rounded-xl {{ $mode !== 'off' ? 'bg-emerald-100 text-emerald-600' : 'bg-slate-100 text-slate-400' }}">
+                    <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke-width="1.6" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12.75V12A2.25 2.25 0 0 1 4.5 9.75h15A2.25 2.25 0 0 1 21.75 12v.75m-8.69-6.44-2.12-2.12a1.5 1.5 0 0 0-1.061-.44H4.5A2.25 2.25 0 0 0 2.25 6v12a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18V9a2.25 2.25 0 0 0-2.25-2.25h-5.379a1.5 1.5 0 0 1-1.06-.44Z" /></svg>
+                </span>
+                <div>
+                    <p class="text-xs text-slate-400">Hero promo</p>
+                    <p class="text-sm font-bold text-ink-900">{{ $mode === 'off' ? 'Off' : ucfirst($mode) }}</p>
+                </div>
+            </div>
+            <div class="card flex items-center gap-3 p-4">
+                <span class="flex h-10 w-10 items-center justify-center rounded-xl {{ $announcementEnabled ? 'bg-emerald-100 text-emerald-600' : 'bg-slate-100 text-slate-400' }}">
+                    <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke-width="1.6" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M10.34 15.84c-.688-.06-1.386-.09-2.09-.09H7.5a4.5 4.5 0 1 1 0-9h.75c.704 0 1.402-.03 2.09-.09m0 9.18a23.848 23.848 0 0 1 8.835 2.535M10.34 6.66a23.847 23.847 0 0 0 8.835-2.535" /></svg>
+                </span>
+                <div>
+                    <p class="text-xs text-slate-400">Announcement bar</p>
+                    <p class="text-sm font-bold {{ $announcementEnabled ? 'text-emerald-600' : 'text-slate-500' }}">{{ $announcementEnabled ? 'Enabled' : 'Disabled' }}</p>
+                </div>
+            </div>
+            <div class="card flex items-center gap-3 p-4">
+                <span class="flex h-10 w-10 items-center justify-center rounded-xl {{ $popupEnabled ? 'bg-emerald-100 text-emerald-600' : 'bg-slate-100 text-slate-400' }}">
+                    <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke-width="1.6" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 3.75v4.5m0-4.5h4.5m-4.5 0L9 9M3.75 20.25v-4.5m0 4.5h4.5m-4.5 0L9 15M20.25 3.75h-4.5m4.5 0v4.5m0-4.5L15 9m5.25 11.25h-4.5m4.5 0v-4.5m0 4.5L15 15" /></svg>
+                </span>
+                <div>
+                    <p class="text-xs text-slate-400">Welcome popup</p>
+                    <p class="text-sm font-bold {{ $popupEnabled ? 'text-emerald-600' : 'text-slate-500' }}">{{ $popupEnabled ? 'Enabled' : 'Disabled' }}</p>
+                </div>
+            </div>
+        </div>
+
+        {{-- Tabs --}}
+        <div class="mb-6 flex gap-1 rounded-xl border border-slate-200 bg-white p-1">
+            @foreach (['hero' => 'Hero Promo', 'announcement' => 'Announcement Bar', 'popup' => 'Popup'] as $t => $label)
+                <button type="button" @click="tab = '{{ $t }}'"
+                        class="flex-1 rounded-lg px-3 py-2 text-sm font-semibold transition"
+                        :class="tab === '{{ $t }}' ? 'bg-brand-600 text-white shadow-sm' : 'text-slate-500 hover:bg-slate-50'">{{ $label }}</button>
+            @endforeach
         </div>
 
         <form method="POST" action="{{ route('admin.promotions.update') }}" class="space-y-6">
             @csrf
             @method('PUT')
 
-            {{-- Announcement bar (independent of hero mode) --}}
-            <div class="card p-6">
+            {{-- ============ HERO PROMO TAB ============ --}}
+            <div x-show="tab === 'hero'" x-cloak class="space-y-6">
+                <div class="card p-6">
+                    <label class="label">Promotion mode</label>
+                    <div class="mt-2 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+                        @foreach ([
+                            'off' => ['Off', 'Normal hero, no promotion'],
+                            'products' => ['Featured products', 'Show 3–4 product cards'],
+                            'message' => ['Custom message', 'Show a banner message'],
+                            'countdown' => ['Countdown offer', 'Up to 2 products + timers'],
+                        ] as $value => $meta)
+                            <label class="flex cursor-pointer flex-col gap-1 rounded-xl border p-3 text-sm transition"
+                                   :class="mode === '{{ $value }}' ? 'border-brand-500 bg-brand-50' : 'border-slate-200 hover:bg-slate-50'">
+                                <span class="flex items-center gap-2">
+                                    <input type="radio" name="promo_mode" value="{{ $value }}" x-model="mode" class="text-brand-600 focus:ring-brand-500/30">
+                                    <span class="font-semibold text-ink-900">{{ $meta[0] }}</span>
+                                </span>
+                                <span class="pl-6 text-xs text-slate-400">{{ $meta[1] }}</span>
+                            </label>
+                        @endforeach
+                    </div>
+                </div>
+
+                {{-- Featured products --}}
+                <div x-show="mode === 'products'" x-cloak class="card p-6">
+                    <h2 class="font-display text-lg font-bold text-ink-900">Featured products</h2>
+                    <div class="mt-4">
+                        <label for="promo_heading" class="label">Section label</label>
+                        <input id="promo_heading" name="promo_heading" type="text" value="{{ old('promo_heading', $heading) }}" class="input" placeholder="Featured picks">
+                    </div>
+                    <div class="mt-4">
+                        <label class="label">Choose up to 4 products</label>
+                        <div class="mt-1 grid max-h-72 gap-1 overflow-y-auto rounded-xl border border-slate-200 p-3 sm:grid-cols-2">
+                            @forelse ($products as $product)
+                                <label class="flex items-center gap-2 rounded-lg px-2 py-1.5 text-sm hover:bg-slate-50">
+                                    <input type="checkbox" name="promo_products[]" value="{{ $product->id }}"
+                                           {{ in_array($product->id, old('promo_products', $selectedProducts)) ? 'checked' : '' }}
+                                           class="rounded border-slate-300 text-brand-600 focus:ring-brand-500/30">
+                                    <span class="truncate text-slate-700">{{ $product->title }}</span>
+                                </label>
+                            @empty
+                                <p class="text-sm text-slate-400">No published products yet.</p>
+                            @endforelse
+                        </div>
+                        <p class="mt-1 text-xs text-slate-400">Only the first 4 selected (in list order) are shown.</p>
+                    </div>
+                </div>
+
+                {{-- Custom message --}}
+                <div x-show="mode === 'message'" x-cloak class="card p-6">
+                    <h2 class="font-display text-lg font-bold text-ink-900">Custom message</h2>
+                    <div class="mt-4">
+                        <label for="promo_message" class="label">Message</label>
+                        <input id="promo_message" name="promo_message" type="text" value="{{ old('promo_message', $message) }}" class="input" placeholder="🎉 Summer Sale — 30% off all Laravel packages this week!">
+                    </div>
+                    <div class="mt-4">
+                        <label for="promo_message_url" class="label">Button link <span class="text-slate-400">(optional)</span></label>
+                        <input id="promo_message_url" name="promo_message_url" type="url" value="{{ old('promo_message_url', $messageUrl) }}" class="input" placeholder="https://...">
+                    </div>
+                </div>
+
+                {{-- Countdown --}}
+                <div x-show="mode === 'countdown'" x-cloak class="card p-6">
+                    <h2 class="font-display text-lg font-bold text-ink-900">Countdown offers</h2>
+                    <p class="mt-1 text-sm text-slate-500">Show one or two limited-time product offers with live timers. Offer #1 is required; offer #2 is optional.</p>
+
+                    <div class="mt-5 rounded-2xl border border-slate-200 p-4">
+                        <p class="mb-3 text-xs font-bold uppercase tracking-wide text-brand-600">Offer #1</p>
+                        <div class="grid gap-5 sm:grid-cols-2">
+                            <div>
+                                <label for="promo_countdown_product" class="label">Product</label>
+                                <select id="promo_countdown_product" name="promo_countdown_product" class="input">
+                                    <option value="">— Select a product —</option>
+                                    @foreach ($products as $product)
+                                        <option value="{{ $product->id }}" {{ (int) old('promo_countdown_product', $countdownProduct) === $product->id ? 'selected' : '' }}>{{ $product->title }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div>
+                                <label for="promo_countdown_label" class="label">Label</label>
+                                <input id="promo_countdown_label" name="promo_countdown_label" type="text" value="{{ old('promo_countdown_label', $countdownLabel) }}" class="input" placeholder="Limited time offer">
+                            </div>
+                        </div>
+                        <div class="mt-4">
+                            <label for="promo_countdown_until" class="label">Offer ends at</label>
+                            <input id="promo_countdown_until" name="promo_countdown_until" type="datetime-local" value="{{ old('promo_countdown_until', $countdownUntil ? \Illuminate\Support\Carbon::parse($countdownUntil)->format('Y-m-d\TH:i') : '') }}" class="input">
+                        </div>
+                    </div>
+
+                    <div class="mt-4 rounded-2xl border border-dashed border-slate-300 p-4">
+                        <p class="mb-3 text-xs font-bold uppercase tracking-wide text-slate-500">Offer #2 <span class="font-medium normal-case text-slate-400">— optional</span></p>
+                        <div class="grid gap-5 sm:grid-cols-2">
+                            <div>
+                                <label for="promo_countdown_product_2" class="label">Product</label>
+                                <select id="promo_countdown_product_2" name="promo_countdown_product_2" class="input">
+                                    <option value="">— None —</option>
+                                    @foreach ($products as $product)
+                                        <option value="{{ $product->id }}" {{ (int) old('promo_countdown_product_2', $countdownProduct2) === $product->id ? 'selected' : '' }}>{{ $product->title }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div>
+                                <label for="promo_countdown_label_2" class="label">Label</label>
+                                <input id="promo_countdown_label_2" name="promo_countdown_label_2" type="text" value="{{ old('promo_countdown_label_2', $countdownLabel2) }}" class="input" placeholder="Flash deal">
+                            </div>
+                        </div>
+                        <div class="mt-4">
+                            <label for="promo_countdown_until_2" class="label">Offer ends at</label>
+                            <input id="promo_countdown_until_2" name="promo_countdown_until_2" type="datetime-local" value="{{ old('promo_countdown_until_2', $countdownUntil2 ? \Illuminate\Support\Carbon::parse($countdownUntil2)->format('Y-m-d\TH:i') : '') }}" class="input">
+                        </div>
+                    </div>
+                    <p class="mt-3 text-xs text-slate-400">Each offer shows a live timer; when it hits zero it reads “Offer ended”.</p>
+                </div>
+            </div>
+
+            {{-- ============ ANNOUNCEMENT BAR TAB ============ --}}
+            <div x-show="tab === 'announcement'" x-cloak class="card p-6">
                 <div class="flex items-center justify-between">
                     <div>
                         <h2 class="font-display text-lg font-bold text-ink-900">Announcement bar</h2>
@@ -25,12 +182,10 @@
                         Enabled
                     </label>
                 </div>
-
                 <div class="mt-4">
                     <label for="announcement_text" class="label">Message</label>
                     <input id="announcement_text" name="announcement_text" type="text" value="{{ old('announcement_text', $announcementText) }}" class="input" placeholder="🎉 Summer sale — up to 40% off this week only!">
                 </div>
-
                 <div class="mt-4 grid gap-5 sm:grid-cols-2">
                     <div>
                         <label for="announcement_type" class="label">Priority / style</label>
@@ -48,8 +203,8 @@
                 <p class="mt-2 text-xs text-slate-400">If no link is set, the bar links to your products/marketplace page automatically.</p>
             </div>
 
-            {{-- Promotional Popup --}}
-            <div class="card p-6">
+            {{-- ============ POPUP TAB ============ --}}
+            <div x-show="tab === 'popup'" x-cloak class="card p-6">
                 <div class="flex items-center justify-between">
                     <div>
                         <h2 class="font-display text-lg font-bold text-ink-900">Promotional Popup</h2>
@@ -81,7 +236,6 @@
                     </div>
                 </div>
 
-                {{-- Message mode fields --}}
                 <div x-show="popupMode === 'message'" x-cloak class="mt-5 space-y-4 rounded-2xl border border-slate-200 p-4">
                     <p class="text-xs font-bold uppercase tracking-wide text-brand-600">Message fields</p>
                     <div>
@@ -104,7 +258,6 @@
                     </div>
                 </div>
 
-                {{-- Product mode fields --}}
                 <div x-show="popupMode === 'product'" x-cloak class="mt-5 space-y-4 rounded-2xl border border-slate-200 p-4">
                     <p class="text-xs font-bold uppercase tracking-wide text-brand-600">Product fields</p>
                     <div>
@@ -122,7 +275,6 @@
                     </div>
                 </div>
 
-                {{-- Offer mode fields --}}
                 <div x-show="popupMode === 'offer'" x-cloak class="mt-5 space-y-4 rounded-2xl border border-slate-200 p-4">
                     <p class="text-xs font-bold uppercase tracking-wide text-brand-600">Offer fields</p>
                     <div>
@@ -148,7 +300,6 @@
                     </div>
                 </div>
 
-                {{-- Common popup settings --}}
                 <div class="mt-5 grid gap-5 sm:grid-cols-2">
                     <div>
                         <label for="popup_auto_close_seconds" class="label">Auto-close after (seconds)</label>
@@ -171,124 +322,8 @@
                 </div>
             </div>
 
-            {{-- Mode picker --}}
-            <div class="card p-6">
-                <label class="label">Promotion mode</label>
-                <div class="mt-2 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-                    @foreach ([
-                        'off' => ['Off', 'Normal hero, no promotion'],
-                        'products' => ['Featured products', 'Show 3–4 product cards'],
-                        'message' => ['Custom message', 'Show a banner message'],
-                        'countdown' => ['Countdown offer', 'Up to 2 products + timers'],
-                    ] as $value => $meta)
-                        <label class="flex cursor-pointer flex-col gap-1 rounded-xl border p-3 text-sm transition"
-                               :class="mode === '{{ $value }}' ? 'border-brand-500 bg-brand-50' : 'border-slate-200 hover:bg-slate-50'">
-                            <span class="flex items-center gap-2">
-                                <input type="radio" name="promo_mode" value="{{ $value }}" x-model="mode" class="text-brand-600 focus:ring-brand-500/30">
-                                <span class="font-semibold text-ink-900">{{ $meta[0] }}</span>
-                            </span>
-                            <span class="pl-6 text-xs text-slate-400">{{ $meta[1] }}</span>
-                        </label>
-                    @endforeach
-                </div>
-            </div>
-
-            {{-- Featured products --}}
-            <div x-show="mode === 'products'" x-cloak class="card p-6">
-                <h2 class="font-display text-lg font-bold text-ink-900">Featured products</h2>
-                <div class="mt-4">
-                    <label for="promo_heading" class="label">Section label</label>
-                    <input id="promo_heading" name="promo_heading" type="text" value="{{ old('promo_heading', $heading) }}" class="input" placeholder="Featured picks">
-                </div>
-                <div class="mt-4">
-                    <label class="label">Choose up to 4 products</label>
-                    <div class="mt-1 grid max-h-72 gap-1 overflow-y-auto rounded-xl border border-slate-200 p-3 sm:grid-cols-2">
-                        @forelse ($products as $product)
-                            <label class="flex items-center gap-2 rounded-lg px-2 py-1.5 text-sm hover:bg-slate-50">
-                                <input type="checkbox" name="promo_products[]" value="{{ $product->id }}"
-                                       {{ in_array($product->id, old('promo_products', $selectedProducts)) ? 'checked' : '' }}
-                                       class="rounded border-slate-300 text-brand-600 focus:ring-brand-500/30">
-                                <span class="truncate text-slate-700">{{ $product->title }}</span>
-                            </label>
-                        @empty
-                            <p class="text-sm text-slate-400">No published products yet.</p>
-                        @endforelse
-                    </div>
-                    <p class="mt-1 text-xs text-slate-400">Only the first 4 selected (in list order) are shown.</p>
-                </div>
-            </div>
-
-            {{-- Custom message --}}
-            <div x-show="mode === 'message'" x-cloak class="card p-6">
-                <h2 class="font-display text-lg font-bold text-ink-900">Custom message</h2>
-                <div class="mt-4">
-                    <label for="promo_message" class="label">Message</label>
-                    <input id="promo_message" name="promo_message" type="text" value="{{ old('promo_message', $message) }}" class="input" placeholder="🎉 Summer Sale — 30% off all Laravel packages this week!">
-                </div>
-                <div class="mt-4">
-                    <label for="promo_message_url" class="label">Button link <span class="text-slate-400">(optional)</span></label>
-                    <input id="promo_message_url" name="promo_message_url" type="url" value="{{ old('promo_message_url', $messageUrl) }}" class="input" placeholder="https://...">
-                </div>
-            </div>
-
-            {{-- Countdown --}}
-            <div x-show="mode === 'countdown'" x-cloak class="card p-6">
-                <h2 class="font-display text-lg font-bold text-ink-900">Countdown offers</h2>
-                <p class="mt-1 text-sm text-slate-500">Show one or two limited-time product offers with live timers. Offer #1 is required; offer #2 is optional.</p>
-
-                {{-- Offer #1 --}}
-                <div class="mt-5 rounded-2xl border border-slate-200 p-4">
-                    <p class="mb-3 text-xs font-bold uppercase tracking-wide text-brand-600">Offer #1</p>
-                    <div class="grid gap-5 sm:grid-cols-2">
-                        <div>
-                            <label for="promo_countdown_product" class="label">Product</label>
-                            <select id="promo_countdown_product" name="promo_countdown_product" class="input">
-                                <option value="">— Select a product —</option>
-                                @foreach ($products as $product)
-                                    <option value="{{ $product->id }}" {{ (int) old('promo_countdown_product', $countdownProduct) === $product->id ? 'selected' : '' }}>{{ $product->title }}</option>
-                                @endforeach
-                            </select>
-                        </div>
-                        <div>
-                            <label for="promo_countdown_label" class="label">Label</label>
-                            <input id="promo_countdown_label" name="promo_countdown_label" type="text" value="{{ old('promo_countdown_label', $countdownLabel) }}" class="input" placeholder="Limited time offer">
-                        </div>
-                    </div>
-                    <div class="mt-4">
-                        <label for="promo_countdown_until" class="label">Offer ends at</label>
-                        <input id="promo_countdown_until" name="promo_countdown_until" type="datetime-local" value="{{ old('promo_countdown_until', $countdownUntil ? \Illuminate\Support\Carbon::parse($countdownUntil)->format('Y-m-d\TH:i') : '') }}" class="input">
-                    </div>
-                </div>
-
-                {{-- Offer #2 (optional) --}}
-                <div class="mt-4 rounded-2xl border border-dashed border-slate-300 p-4">
-                    <p class="mb-3 text-xs font-bold uppercase tracking-wide text-slate-500">Offer #2 <span class="font-medium normal-case text-slate-400">— optional</span></p>
-                    <div class="grid gap-5 sm:grid-cols-2">
-                        <div>
-                            <label for="promo_countdown_product_2" class="label">Product</label>
-                            <select id="promo_countdown_product_2" name="promo_countdown_product_2" class="input">
-                                <option value="">— None —</option>
-                                @foreach ($products as $product)
-                                    <option value="{{ $product->id }}" {{ (int) old('promo_countdown_product_2', $countdownProduct2) === $product->id ? 'selected' : '' }}>{{ $product->title }}</option>
-                                @endforeach
-                            </select>
-                        </div>
-                        <div>
-                            <label for="promo_countdown_label_2" class="label">Label</label>
-                            <input id="promo_countdown_label_2" name="promo_countdown_label_2" type="text" value="{{ old('promo_countdown_label_2', $countdownLabel2) }}" class="input" placeholder="Flash deal">
-                        </div>
-                    </div>
-                    <div class="mt-4">
-                        <label for="promo_countdown_until_2" class="label">Offer ends at</label>
-                        <input id="promo_countdown_until_2" name="promo_countdown_until_2" type="datetime-local" value="{{ old('promo_countdown_until_2', $countdownUntil2 ? \Illuminate\Support\Carbon::parse($countdownUntil2)->format('Y-m-d\TH:i') : '') }}" class="input">
-                    </div>
-                </div>
-
-                <p class="mt-3 text-xs text-slate-400">Each offer shows a live timer; when it hits zero it reads “Offer ended”.</p>
-            </div>
-
-            <div class="flex justify-end">
-                <button type="submit" class="btn-primary btn-lg">Save promotion</button>
+            <div class="sticky bottom-4 flex justify-end">
+                <button type="submit" class="btn-primary btn-lg shadow-lift">Save all promotions</button>
             </div>
         </form>
     </div>

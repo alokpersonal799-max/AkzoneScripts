@@ -3,6 +3,21 @@
 @section('page-title', 'Support Tickets')
 
 @section('admin')
+    {{-- Stats --}}
+    <div class="mb-6 grid grid-cols-2 gap-4 sm:grid-cols-4">
+        @foreach ([
+            ['Total', $stats['total'], 'slate'],
+            ['Open', $stats['open'], 'amber'],
+            ['Answered', $stats['answered'], 'emerald'],
+            ['Closed', $stats['closed'], 'slate'],
+        ] as $s)
+            <div class="card p-4">
+                <p class="text-xs font-semibold uppercase tracking-wide text-slate-400">{{ $s[0] }}</p>
+                <p class="mt-1 font-display text-2xl font-extrabold text-{{ $s[2] }}-600">{{ number_format($s[1]) }}</p>
+            </div>
+        @endforeach
+    </div>
+
     <form method="GET" action="{{ route('admin.tickets.index') }}" class="mb-6 flex flex-wrap items-center gap-2">
         <select name="status" onchange="this.form.submit()" class="rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 focus:border-brand-500 focus:outline-none">
             <option value="">All statuses</option>

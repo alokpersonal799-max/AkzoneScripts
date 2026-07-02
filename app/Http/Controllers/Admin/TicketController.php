@@ -22,6 +22,12 @@ class TicketController extends Controller
         return view('admin.tickets.index', [
             'tickets' => $tickets,
             'filters' => $request->only('status'),
+            'stats' => [
+                'total' => Ticket::count(),
+                'open' => Ticket::where('status', '!=', 'closed')->count(),
+                'answered' => Ticket::where('status', 'answered')->count(),
+                'closed' => Ticket::where('status', 'closed')->count(),
+            ],
         ]);
     }
 
