@@ -60,6 +60,24 @@ class HomeController extends Controller
             ->orderBy('name')
             ->get();
 
+        // Limited-time deals + low/soon-out-of-stock products.
+        $limitedDeals = collect();
+        if (\Illuminate\Support\Facades\Schema::hasColumn('products', 'deal_ends_at')) {
+            $limitedDeals = Product::query()
+                ->published()
+                ->with('category')
+                ->where('is_purchasable', true)
+                ->where(function ($q) {
+                    $q->where('deal_ends_at', '>', now())
+                        ->orWhere(function ($q2) {
+                            $q2->whereNotNull('stock')->where('stock', '>', 0)->where('stock', '<=', 5);
+                        });
+                })
+                ->orderByRaw('deal_ends_at IS NULL, deal_ends_at ASC')
+                ->take(8)
+                ->get();
+        }
+
         $testimonials = \App\Models\Review::query()
             ->testimonials()
             ->with(['user', 'product'])
@@ -81,7 +99,7 @@ class HomeController extends Controller
 
         $promotion = $this->resolvePromotion();
 
-        return view('home', compact('featured', 'latest', 'topRated', 'bestSelling', 'freeItems', 'categories', 'testimonials', 'stats', 'promotion'));
+        return view('home', compact('featured', 'latest', 'topRated', 'bestSelling', 'freeItems', 'limitedDeals', 'categories', 'testimonials', 'stats', 'promotion'));
     }
 
     /**

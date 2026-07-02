@@ -3,6 +3,13 @@
 @section('page-title', 'Promotions')
 
 @section('admin')
+    @php
+        $popupProductsJson = $products->mapWithKeys(fn ($p) => [$p->id => [
+            'title' => $p->title,
+            'price' => money($p->current_price),
+            'img' => $p->thumbnail_url,
+        ]])->toArray();
+    @endphp
     <div class="mx-auto max-w-3xl"
          x-data="{
             tab: 'hero',
@@ -14,7 +21,9 @@
             popHeading: @js(old('popup_heading', $popupHeading)),
             popMessage: @js(old('popup_message', $popupMessage)),
             popCoupon: @js(old('popup_coupon', $popupCoupon)),
-            popLinkText: @js(old('popup_link_text', $popupLinkText)) || 'Browse Products'
+            popLinkText: @js(old('popup_link_text', $popupLinkText)) || 'Browse Products',
+            popProductId: '{{ old('popup_product', $popupProduct) }}',
+            products: @js($popupProductsJson)
          }">
 
         <div class="mb-6">
@@ -75,12 +84,12 @@
             @endforeach
         </div>
 
-        <form method="POST" action="{{ route('admin.promotions.update') }}" class="space-y-6">
+        {{-- ============ HERO PROMO ============ --}}
+        <form method="POST" action="{{ route('admin.promotions.update') }}" x-show="tab === 'hero'" x-cloak class="space-y-6">
             @csrf
             @method('PUT')
-
-            {{-- ============ HERO PROMO TAB ============ --}}
-            <div x-show="tab === 'hero'" x-cloak class="space-y-6">
+            <input type="hidden" name="section" value="hero">
+            <div class="space-y-6">
                 <div class="card p-6">
                     <label class="label">Promotion mode</label>
                     <div class="mt-2 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
@@ -209,9 +218,17 @@
                     <p class="mt-3 text-xs text-slate-400">Each offer shows a live timer; when it hits zero it reads “Offer ended”.</p>
                 </div>
             </div>
+            <div class="mt-6 flex justify-end">
+                <button type="submit" class="btn-primary btn-lg">Save hero promo</button>
+            </div>
+        </form>
 
-            {{-- ============ ANNOUNCEMENT BAR TAB ============ --}}
-            <div x-show="tab === 'announcement'" x-cloak class="card p-6">
+        {{-- ============ ANNOUNCEMENT BAR ============ --}}
+        <form method="POST" action="{{ route('admin.promotions.update') }}" x-show="tab === 'announcement'" x-cloak>
+            @csrf
+            @method('PUT')
+            <input type="hidden" name="section" value="announcement">
+            <div class="card p-6">
                 <div class="flex items-center justify-between">
                     <div>
                         <h2 class="font-display text-lg font-bold text-ink-900">Announcement bar</h2>
@@ -275,9 +292,17 @@
                     </div>
                 </div>
             </div>
+            <div class="mt-6 flex justify-end">
+                <button type="submit" class="btn-primary btn-lg">Save announcement bar</button>
+            </div>
+        </form>
 
-            {{-- ============ POPUP TAB ============ --}}
-            <div x-show="tab === 'popup'" x-cloak class="card p-6">
+        {{-- ============ POPUP ============ --}}
+        <form method="POST" action="{{ route('admin.promotions.update') }}" x-show="tab === 'popup'" x-cloak>
+            @csrf
+            @method('PUT')
+            <input type="hidden" name="section" value="popup">
+            <div class="card p-6">
                 <div class="flex items-center justify-between">
                     <div>
                         <h2 class="font-display text-lg font-bold text-ink-900">Promotional Popup</h2>
@@ -295,10 +320,31 @@
                     <div class="mx-auto max-w-xs overflow-hidden rounded-2xl border border-slate-200 bg-white text-center shadow-sm">
                         <div class="h-1.5 bg-gradient-to-r from-brand-500 via-indigo-500 to-fuchsia-500"></div>
                         <div class="p-5">
-                            <h3 class="text-lg font-bold text-ink-900" x-text="popHeading || 'Your heading'"></h3>
-                            <p class="mt-2 text-sm text-slate-500" x-text="popMessage || 'Your message text shows here…'"></p>
+                            {{-- Message mode --}}
+                            <template x-if="popupMode === 'message'">
+                                <div>
+                                    <h3 class="text-lg font-bold text-ink-900" x-text="popHeading || 'Your heading'"></h3>
+                                    <p class="mt-2 text-sm text-slate-500" x-text="popMessage || 'Your message text shows here…'"></p>
+                                </div>
+                            </template>
+                            {{-- Product / Offer mode --}}
+                            <template x-if="popupMode !== 'message'">
+                                <div>
+                                    <template x-if="popupMode === 'offer'">
+                                        <h3 class="text-base font-bold text-rose-600" x-text="popHeading || 'Limited Time Offer!'"></h3>
+                                    </template>
+                                    <img x-show="products[popProductId]" :src="products[popProductId] ? products[popProductId].img : ''" class="mx-auto mt-2 h-24 w-24 rounded-xl object-cover" alt="">
+                                    <h4 class="mt-2 text-base font-bold text-ink-900" x-text="products[popProductId] ? products[popProductId].title : 'Select a product'"></h4>
+                                    <p class="text-sm font-semibold text-brand-600" x-text="products[popProductId] ? products[popProductId].price : ''"></p>
+                                    <p class="mt-1 text-sm text-slate-500" x-text="popMessage"></p>
+                                    <template x-if="popupMode === 'offer'">
+                                        <p class="mt-2 text-xs font-semibold text-rose-500">⏳ Countdown timer shows here</p>
+                                    </template>
+                                </div>
+                            </template>
+                            {{-- Coupon (all modes) --}}
                             <span x-show="popCoupon" x-cloak class="mt-3 inline-block rounded-lg border-2 border-dashed border-brand-300 bg-brand-50 px-3 py-1 font-mono text-sm font-bold text-brand-700" x-text="popCoupon"></span>
-                            <div class="mt-3"><span class="btn-primary btn-sm" x-text="popLinkText"></span></div>
+                            <div class="mt-3"><span class="btn-primary btn-sm" x-text="popupMode === 'message' ? popLinkText : (popupMode === 'offer' ? 'Grab This Deal' : 'View Product')"></span></div>
                         </div>
                     </div>
                 </div>
@@ -349,7 +395,7 @@
                     <p class="text-xs font-bold uppercase tracking-wide text-brand-600">Product fields</p>
                     <div>
                         <label for="popup_product_select" class="label">Select product</label>
-                        <select id="popup_product_select" :name="popupMode === 'product' ? 'popup_product' : null" class="input">
+                        <select id="popup_product_select" :name="popupMode === 'product' ? 'popup_product' : null" x-model="popProductId" class="input">
                             <option value="">-- Select a product --</option>
                             @foreach ($products as $product)
                                 <option value="{{ $product->id }}" {{ (int) old('popup_product', $popupProduct) === $product->id ? 'selected' : '' }}>{{ $product->title }}</option>
@@ -358,7 +404,7 @@
                     </div>
                     <div>
                         <label for="popup_message_prod" class="label">Optional message</label>
-                        <textarea id="popup_message_prod" :name="popupMode === 'product' ? 'popup_message' : null" rows="2" class="input" placeholder="Check this out...">{{ old('popup_message', $popupMessage) }}</textarea>
+                        <textarea id="popup_message_prod" :name="popupMode === 'product' ? 'popup_message' : null" rows="2" x-model="popMessage" class="input" placeholder="Check this out...">{{ old('popup_message', $popupMessage) }}</textarea>
                     </div>
                 </div>
 
@@ -366,7 +412,7 @@
                     <p class="text-xs font-bold uppercase tracking-wide text-brand-600">Offer fields</p>
                     <div>
                         <label for="popup_product_offer" class="label">Select product</label>
-                        <select id="popup_product_offer" :name="popupMode === 'offer' ? 'popup_product' : null" class="input">
+                        <select id="popup_product_offer" :name="popupMode === 'offer' ? 'popup_product' : null" x-model="popProductId" class="input">
                             <option value="">-- Select a product --</option>
                             @foreach ($products as $product)
                                 <option value="{{ $product->id }}" {{ (int) old('popup_product', $popupProduct) === $product->id ? 'selected' : '' }}>{{ $product->title }}</option>
@@ -379,11 +425,11 @@
                     </div>
                     <div>
                         <label for="popup_heading_offer" class="label">Heading <span class="text-slate-400">(optional)</span></label>
-                        <input id="popup_heading_offer" :name="popupMode === 'offer' ? 'popup_heading' : null" type="text" value="{{ old('popup_heading', $popupHeading) }}" class="input" placeholder="Limited Time Offer!">
+                        <input id="popup_heading_offer" :name="popupMode === 'offer' ? 'popup_heading' : null" type="text" x-model="popHeading" value="{{ old('popup_heading', $popupHeading) }}" class="input" placeholder="Limited Time Offer!">
                     </div>
                     <div>
                         <label for="popup_message_offer" class="label">Message <span class="text-slate-400">(optional)</span></label>
-                        <textarea id="popup_message_offer" :name="popupMode === 'offer' ? 'popup_message' : null" rows="2" class="input" placeholder="Grab this deal before time runs out...">{{ old('popup_message', $popupMessage) }}</textarea>
+                        <textarea id="popup_message_offer" :name="popupMode === 'offer' ? 'popup_message' : null" rows="2" x-model="popMessage" class="input" placeholder="Grab this deal before time runs out...">{{ old('popup_message', $popupMessage) }}</textarea>
                     </div>
                 </div>
 
@@ -425,9 +471,8 @@
                     </div>
                 </div>
             </div>
-
-            <div class="sticky bottom-4 flex justify-end">
-                <button type="submit" class="btn-primary btn-lg shadow-lift">Save all promotions</button>
+            <div class="mt-6 flex justify-end">
+                <button type="submit" class="btn-primary btn-lg">Save popup</button>
             </div>
         </form>
     </div>

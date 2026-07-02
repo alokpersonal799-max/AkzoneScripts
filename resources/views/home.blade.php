@@ -248,6 +248,30 @@
         </section>
     @endif
 
+    {{-- Limited Deal band (limited-time offers + soon-out-of-stock) --}}
+    @if ($limitedDeals->isNotEmpty())
+        <section class="reveal bg-gradient-to-br from-rose-600 via-red-500 to-orange-500 py-14">
+            <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8" x-data="{}" x-ref="ld">
+                <div class="mb-6 flex items-end justify-between">
+                    <div>
+                        <span class="inline-flex items-center gap-1.5 rounded-full bg-white/15 px-3 py-1 text-xs font-bold uppercase tracking-wide text-white">
+                            <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" /></svg>
+                            Limited Deal
+                        </span>
+                        <h2 class="mt-2 font-display text-2xl font-extrabold tracking-tight text-white sm:text-3xl">Limited-time offers &amp; low stock</h2>
+                        <p class="mt-1.5 text-sm text-white/80">Grab these before the timer runs out or they sell out.</p>
+                    </div>
+                    <a href="{{ route('products.index') }}" class="hidden text-sm font-semibold text-white hover:underline sm:inline">View all &rarr;</a>
+                </div>
+                <div class="no-scrollbar -mx-1 flex snap-x gap-4 overflow-x-auto scroll-smooth px-1 pb-2 sm:gap-5">
+                    @foreach ($limitedDeals as $product)
+                        <x-product-card :product="$product" class="w-[46%] flex-none snap-start sm:w-[290px]" />
+                    @endforeach
+                </div>
+            </div>
+        </section>
+    @endif
+
     @include('partials.ads', ['page' => 'home_free'])
 
     {{-- Free items band (pastel gradient) --}}

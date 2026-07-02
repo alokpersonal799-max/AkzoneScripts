@@ -30,7 +30,7 @@ class PromotionController extends Controller
             'countdownUntil2' => Setting::get('promo_countdown_until_2', ''),
             'promoStartsAt' => Setting::get('promo_starts_at', ''),
             'promoEndsAt' => Setting::get('promo_ends_at', ''),
-            'products' => Product::published()->orderBy('title')->get(['id', 'title']),
+            'products' => Product::published()->orderBy('title')->get(),
             'coupons' => \App\Models\Coupon::orderBy('code')->pluck('code'),
             'announcementEnabled' => Setting::get('announcement_enabled', '0') === '1',
             'announcementText' => Setting::get('announcement_text', ''),
@@ -56,9 +56,29 @@ class PromotionController extends Controller
     }
 
     /**
-     * Persist the promotion configuration.
+     * Persist the promotion configuration. Each section (hero / announcement /
+     * popup) saves independently so one section can never block another.
      */
     public function update(Request $request): RedirectResponse
+    {
+        $section = $request->input('section', 'all');
+
+        if (in_array($section, ['hero', 'all'], true)) {
+            $this->saveHero($request);
+        }
+        if (in_array($section, ['announcement', 'all'], true)) {
+            $this->saveAnnouncement($request);
+        }
+        if (in_array($section, ['popup', 'all'], true)) {
+            $this->savePopup($request);
+        }
+
+        $labels = ['hero' => 'Hero promotion', 'announcement' => 'Announcement bar', 'popup' => 'Popup', 'all' => 'Promotions'];
+
+        return back()->with('success', ($labels[$section] ?? 'Promotion').' saved.');
+    }
+
+    protected function saveHero(Request $request): void
     {
         $data = $request->validate([
             'promo_mode' => ['required', 'in:off,products,message,countdown'],
@@ -73,32 +93,11 @@ class PromotionController extends Controller
             'promo_countdown_product_2' => ['nullable', 'integer', 'exists:products,id', 'required_with:promo_countdown_until_2'],
             'promo_countdown_label_2' => ['nullable', 'string', 'max:60'],
             'promo_countdown_until_2' => ['nullable', 'date', 'required_with:promo_countdown_product_2'],
-            'announcement_text' => ['nullable', 'string', 'max:255'],
-            'announcement_type' => ['nullable', 'in:info,offer,success,warning,alert'],
-            'announcement_link' => ['nullable', 'url', 'max:255'],
-            'announcement_coupon' => ['nullable', 'string', 'max:60'],
-            'announcement_starts_at' => ['nullable', 'date'],
-            'announcement_ends_at' => ['nullable', 'date'],
             'promo_starts_at' => ['nullable', 'date'],
             'promo_ends_at' => ['nullable', 'date'],
-            // Popup settings
-            'popup_mode' => ['nullable', 'in:message,product,offer'],
-            'popup_product' => ['nullable', 'integer', 'exists:products,id'],
-            'popup_heading' => ['nullable', 'string', 'max:120'],
-            'popup_message' => ['nullable', 'string', 'max:500'],
-            'popup_link' => ['nullable', 'url', 'max:255'],
-            'popup_link_text' => ['nullable', 'string', 'max:60'],
-            'popup_timer_until' => ['nullable', 'date'],
-            'popup_auto_close_seconds' => ['nullable', 'integer', 'min:0', 'max:120'],
-            'popup_frequency' => ['nullable', 'in:once,always'],
-            'popup_coupon' => ['nullable', 'string', 'max:60'],
-            'popup_audience' => ['nullable', 'in:all,new,guests'],
-        ], [
-            'promo_products.max' => 'You can feature at most 4 products.',
-        ]);
+        ], ['promo_products.max' => 'You can feature at most 4 products.']);
 
-        // Featured-products mode with nothing selected simply falls back to the
-        // normal hero — we still save the rest of the promotion settings.
+        // Featured mode with nothing selected simply falls back to a normal hero.
         if ($data['promo_mode'] === 'products' && empty($data['promo_products'])) {
             $data['promo_mode'] = 'off';
         }
@@ -114,8 +113,25 @@ class PromotionController extends Controller
         Setting::put('promo_countdown_product_2', (string) ($data['promo_countdown_product_2'] ?? ''), 'promotion');
         Setting::put('promo_countdown_label_2', $data['promo_countdown_label_2'] ?? '', 'promotion');
         Setting::put('promo_countdown_until_2', $data['promo_countdown_until_2'] ?? '', 'promotion');
+        Setting::put('promo_starts_at', $data['promo_starts_at'] ?? '', 'promotion');
+        Setting::put('promo_ends_at', $data['promo_ends_at'] ?? '', 'promotion');
 
-        // Announcement bar (independent of the hero promo mode).
+        if ($data['promo_mode'] !== 'off') {
+            app(\App\Services\TelegramService::class)->notify('promotion', \App\Support\TelegramMessages::promotionFromSettings());
+        }
+    }
+
+    protected function saveAnnouncement(Request $request): void
+    {
+        $data = $request->validate([
+            'announcement_text' => ['nullable', 'string', 'max:255'],
+            'announcement_type' => ['nullable', 'in:info,offer,success,warning,alert'],
+            'announcement_link' => ['nullable', 'url', 'max:255'],
+            'announcement_coupon' => ['nullable', 'string', 'max:60'],
+            'announcement_starts_at' => ['nullable', 'date'],
+            'announcement_ends_at' => ['nullable', 'date'],
+        ]);
+
         Setting::put('announcement_enabled', $request->boolean('announcement_enabled') ? '1' : '0', 'promotion');
         Setting::put('announcement_text', $data['announcement_text'] ?? '', 'promotion');
         Setting::put('announcement_type', $data['announcement_type'] ?? 'offer', 'promotion');
@@ -123,12 +139,24 @@ class PromotionController extends Controller
         Setting::put('announcement_coupon', $data['announcement_coupon'] ?? '', 'promotion');
         Setting::put('announcement_starts_at', $data['announcement_starts_at'] ?? '', 'promotion');
         Setting::put('announcement_ends_at', $data['announcement_ends_at'] ?? '', 'promotion');
+    }
 
-        // Hero promo schedule (auto on/off window).
-        Setting::put('promo_starts_at', $data['promo_starts_at'] ?? '', 'promotion');
-        Setting::put('promo_ends_at', $data['promo_ends_at'] ?? '', 'promotion');
+    protected function savePopup(Request $request): void
+    {
+        $data = $request->validate([
+            'popup_mode' => ['nullable', 'in:message,product,offer'],
+            'popup_product' => ['nullable', 'integer', 'exists:products,id'],
+            'popup_heading' => ['nullable', 'string', 'max:120'],
+            'popup_message' => ['nullable', 'string', 'max:500'],
+            'popup_link' => ['nullable', 'url', 'max:255'],
+            'popup_link_text' => ['nullable', 'string', 'max:60'],
+            'popup_timer_until' => ['nullable', 'date'],
+            'popup_auto_close_seconds' => ['nullable', 'integer', 'min:0', 'max:120'],
+            'popup_frequency' => ['nullable', 'in:once,always'],
+            'popup_coupon' => ['nullable', 'string', 'max:60'],
+            'popup_audience' => ['nullable', 'in:all,new,guests'],
+        ]);
 
-        // Promotional popup settings.
         Setting::put('popup_enabled', $request->boolean('popup_enabled') ? '1' : '0', 'promotion');
         Setting::put('popup_mode', $data['popup_mode'] ?? 'message', 'promotion');
         Setting::put('popup_product', (string) ($data['popup_product'] ?? ''), 'promotion');
@@ -141,14 +169,5 @@ class PromotionController extends Controller
         Setting::put('popup_frequency', $data['popup_frequency'] ?? 'once', 'promotion');
         Setting::put('popup_coupon', $data['popup_coupon'] ?? '', 'promotion');
         Setting::put('popup_audience', $data['popup_audience'] ?? 'all', 'promotion');
-
-        $labels = ['off' => 'turned off', 'products' => 'set to featured products', 'message' => 'set to a custom message', 'countdown' => 'set to a countdown offer'];
-
-        // Announce the updated promotion to connected Telegram bots.
-        if ($data['promo_mode'] !== 'off') {
-            app(\App\Services\TelegramService::class)->notify('promotion', \App\Support\TelegramMessages::promotionFromSettings());
-        }
-
-        return back()->with('success', 'Hero promotion '.$labels[$data['promo_mode']].'.');
     }
 }
