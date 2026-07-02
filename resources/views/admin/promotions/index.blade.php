@@ -4,7 +4,18 @@
 
 @section('admin')
     <div class="mx-auto max-w-3xl"
-         x-data="{ tab: 'hero', mode: '{{ old('promo_mode', $mode) }}', popupMode: '{{ old('popup_mode', $popupMode) }}' }">
+         x-data="{
+            tab: 'hero',
+            mode: '{{ old('promo_mode', $mode) }}',
+            popupMode: '{{ old('popup_mode', $popupMode) }}',
+            annText: @js(old('announcement_text', $announcementText)),
+            annType: @js(old('announcement_type', $announcementType)),
+            annCoupon: @js(old('announcement_coupon', $announcementCoupon)),
+            popHeading: @js(old('popup_heading', $popupHeading)),
+            popMessage: @js(old('popup_message', $popupMessage)),
+            popCoupon: @js(old('popup_coupon', $popupCoupon)),
+            popLinkText: @js(old('popup_link_text', $popupLinkText)) || 'Browse Products'
+         }">
 
         <div class="mb-6">
             <h1 class="font-display text-2xl font-extrabold text-ink-900">Promotions</h1>
@@ -75,6 +86,22 @@
                                 <span class="pl-6 text-xs text-slate-400">{{ $meta[1] }}</span>
                             </label>
                         @endforeach
+                    </div>
+                </div>
+
+                {{-- Hero schedule --}}
+                <div x-show="mode !== 'off'" x-cloak class="card p-6">
+                    <h2 class="font-display text-lg font-bold text-ink-900">Schedule <span class="text-xs font-normal text-slate-400">(optional)</span></h2>
+                    <p class="mt-1 text-sm text-slate-500">Automatically turn this promo on and off. Leave blank to run indefinitely.</p>
+                    <div class="mt-4 grid gap-5 sm:grid-cols-2">
+                        <div>
+                            <label for="promo_starts_at" class="label">Starts at</label>
+                            <input id="promo_starts_at" type="datetime-local" name="promo_starts_at" value="{{ old('promo_starts_at', $promoStartsAt ? \Illuminate\Support\Carbon::parse($promoStartsAt)->format('Y-m-d\TH:i') : '') }}" class="input">
+                        </div>
+                        <div>
+                            <label for="promo_ends_at" class="label">Ends at</label>
+                            <input id="promo_ends_at" type="datetime-local" name="promo_ends_at" value="{{ old('promo_ends_at', $promoEndsAt ? \Illuminate\Support\Carbon::parse($promoEndsAt)->format('Y-m-d\TH:i') : '') }}" class="input">
+                        </div>
                     </div>
                 </div>
 
@@ -182,14 +209,25 @@
                         Enabled
                     </label>
                 </div>
+
+                {{-- Live preview --}}
+                <div class="mt-4">
+                    <p class="mb-1.5 text-xs font-semibold uppercase tracking-wide text-slate-400">Live preview</p>
+                    <div class="flex flex-wrap items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-center text-sm font-medium text-white"
+                         :class="{ 'bg-gradient-to-r from-fuchsia-600 via-brand-600 to-indigo-600': annType==='offer', 'bg-gradient-to-r from-brand-600 to-indigo-600': annType==='info', 'bg-gradient-to-r from-emerald-600 to-teal-600': annType==='success', 'bg-gradient-to-r from-amber-500 to-orange-500': annType==='warning', 'bg-gradient-to-r from-rose-600 to-red-600': annType==='alert' }">
+                        <span x-text="annText || 'Your announcement message appears here…'"></span>
+                        <span x-show="annCoupon" x-cloak class="rounded border border-dashed border-white/60 bg-white/15 px-2 py-0.5 font-mono text-xs font-bold" x-text="annCoupon"></span>
+                    </div>
+                </div>
+
                 <div class="mt-4">
                     <label for="announcement_text" class="label">Message</label>
-                    <input id="announcement_text" name="announcement_text" type="text" value="{{ old('announcement_text', $announcementText) }}" class="input" placeholder="🎉 Summer sale — up to 40% off this week only!">
+                    <input id="announcement_text" name="announcement_text" type="text" x-model="annText" value="{{ old('announcement_text', $announcementText) }}" class="input" placeholder="🎉 Summer sale — up to 40% off this week only!">
                 </div>
                 <div class="mt-4 grid gap-5 sm:grid-cols-2">
                     <div>
                         <label for="announcement_type" class="label">Priority / style</label>
-                        <select id="announcement_type" name="announcement_type" class="input">
+                        <select id="announcement_type" name="announcement_type" x-model="annType" class="input">
                             @foreach (['offer' => 'Offer (promotional)', 'info' => 'Info', 'success' => 'Success', 'warning' => 'Warning', 'alert' => 'Alert (high priority)'] as $value => $label)
                                 <option value="{{ $value }}" {{ old('announcement_type', $announcementType) === $value ? 'selected' : '' }}>{{ $label }}</option>
                             @endforeach
@@ -201,6 +239,28 @@
                     </div>
                 </div>
                 <p class="mt-2 text-xs text-slate-400">If no link is set, the bar links to your products/marketplace page automatically.</p>
+
+                <datalist id="coupon-list">
+                    @foreach ($coupons as $c)<option value="{{ $c }}">@endforeach
+                </datalist>
+
+                <div class="mt-4 grid gap-5 sm:grid-cols-2">
+                    <div>
+                        <label for="announcement_coupon" class="label">Coupon code <span class="text-slate-400">(optional)</span></label>
+                        <input id="announcement_coupon" name="announcement_coupon" type="text" x-model="annCoupon" value="{{ old('announcement_coupon', $announcementCoupon) }}" class="input" placeholder="e.g. SUMMER30" list="coupon-list">
+                        <p class="mt-1 text-xs text-slate-400">Adds a tap-to-copy code chip to the bar.</p>
+                    </div>
+                </div>
+                <div class="mt-4 grid gap-5 sm:grid-cols-2">
+                    <div>
+                        <label for="announcement_starts_at" class="label">Show from <span class="text-slate-400">(optional)</span></label>
+                        <input id="announcement_starts_at" name="announcement_starts_at" type="datetime-local" value="{{ old('announcement_starts_at', $announcementStartsAt ? \Illuminate\Support\Carbon::parse($announcementStartsAt)->format('Y-m-d\TH:i') : '') }}" class="input">
+                    </div>
+                    <div>
+                        <label for="announcement_ends_at" class="label">Hide after <span class="text-slate-400">(optional)</span></label>
+                        <input id="announcement_ends_at" name="announcement_ends_at" type="datetime-local" value="{{ old('announcement_ends_at', $announcementEndsAt ? \Illuminate\Support\Carbon::parse($announcementEndsAt)->format('Y-m-d\TH:i') : '') }}" class="input">
+                    </div>
+                </div>
             </div>
 
             {{-- ============ POPUP TAB ============ --}}
@@ -214,6 +274,20 @@
                         <input type="checkbox" name="popup_enabled" value="1" {{ old('popup_enabled', $popupEnabled) ? 'checked' : '' }} class="rounded border-slate-300 text-brand-600 focus:ring-brand-500/30">
                         Enabled
                     </label>
+                </div>
+
+                {{-- Live preview --}}
+                <div class="mt-5">
+                    <p class="mb-1.5 text-xs font-semibold uppercase tracking-wide text-slate-400">Live preview</p>
+                    <div class="mx-auto max-w-xs overflow-hidden rounded-2xl border border-slate-200 bg-white text-center shadow-sm">
+                        <div class="h-1.5 bg-gradient-to-r from-brand-500 via-indigo-500 to-fuchsia-500"></div>
+                        <div class="p-5">
+                            <h3 class="text-lg font-bold text-ink-900" x-text="popHeading || 'Your heading'"></h3>
+                            <p class="mt-2 text-sm text-slate-500" x-text="popMessage || 'Your message text shows here…'"></p>
+                            <span x-show="popCoupon" x-cloak class="mt-3 inline-block rounded-lg border-2 border-dashed border-brand-300 bg-brand-50 px-3 py-1 font-mono text-sm font-bold text-brand-700" x-text="popCoupon"></span>
+                            <div class="mt-3"><span class="btn-primary btn-sm" x-text="popLinkText"></span></div>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="mt-5">
@@ -240,11 +314,11 @@
                     <p class="text-xs font-bold uppercase tracking-wide text-brand-600">Message fields</p>
                     <div>
                         <label for="popup_heading" class="label">Heading</label>
-                        <input id="popup_heading" :name="popupMode === 'message' ? 'popup_heading' : null" type="text" value="{{ old('popup_heading', $popupHeading) }}" class="input" placeholder="Welcome!">
+                        <input id="popup_heading" :name="popupMode === 'message' ? 'popup_heading' : null" type="text" x-model="popHeading" value="{{ old('popup_heading', $popupHeading) }}" class="input" placeholder="Welcome!">
                     </div>
                     <div>
                         <label for="popup_message_msg" class="label">Message</label>
-                        <textarea id="popup_message_msg" :name="popupMode === 'message' ? 'popup_message' : null" rows="3" class="input" placeholder="Check out our latest products...">{{ old('popup_message', $popupMessage) }}</textarea>
+                        <textarea id="popup_message_msg" :name="popupMode === 'message' ? 'popup_message' : null" rows="3" x-model="popMessage" class="input" placeholder="Check out our latest products...">{{ old('popup_message', $popupMessage) }}</textarea>
                     </div>
                     <div class="grid gap-4 sm:grid-cols-2">
                         <div>
@@ -253,7 +327,7 @@
                         </div>
                         <div>
                             <label for="popup_link_text" class="label">Button text</label>
-                            <input id="popup_link_text" name="popup_link_text" type="text" value="{{ old('popup_link_text', $popupLinkText) }}" class="input" placeholder="Browse Products">
+                            <input id="popup_link_text" name="popup_link_text" type="text" x-model="popLinkText" value="{{ old('popup_link_text', $popupLinkText) }}" class="input" placeholder="Browse Products">
                         </div>
                     </div>
                 </div>
@@ -318,6 +392,23 @@
                                 <span class="text-slate-700">Every page load</span>
                             </label>
                         </div>
+                    </div>
+                </div>
+
+                <div class="mt-5 grid gap-5 sm:grid-cols-2">
+                    <div>
+                        <label for="popup_coupon" class="label">Coupon code <span class="text-slate-400">(optional)</span></label>
+                        <input id="popup_coupon" name="popup_coupon" type="text" x-model="popCoupon" value="{{ old('popup_coupon', $popupCoupon) }}" class="input" placeholder="e.g. WELCOME10" list="coupon-list">
+                        <p class="mt-1 text-xs text-slate-400">Shows a tap-to-copy code inside the popup.</p>
+                    </div>
+                    <div>
+                        <label for="popup_audience" class="label">Show to</label>
+                        <select id="popup_audience" name="popup_audience" class="input">
+                            <option value="all" {{ old('popup_audience', $popupAudience) === 'all' ? 'selected' : '' }}>Everyone</option>
+                            <option value="new" {{ old('popup_audience', $popupAudience) === 'new' ? 'selected' : '' }}>New visitors only</option>
+                            <option value="guests" {{ old('popup_audience', $popupAudience) === 'guests' ? 'selected' : '' }}>Logged-out visitors only</option>
+                        </select>
+                        <p class="mt-1 text-xs text-slate-400">Target first-time or signed-out visitors.</p>
                     </div>
                 </div>
             </div>

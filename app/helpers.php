@@ -118,3 +118,26 @@ if (! function_exists('country_flag')) {
         return $flag;
     }
 }
+
+
+if (! function_exists('schedule_active')) {
+    /**
+     * Whether "now" falls within an optional start/end window.
+     * Empty bounds are treated as open-ended.
+     */
+    function schedule_active(?string $startsAt, ?string $endsAt): bool
+    {
+        try {
+            if (! empty($startsAt) && now()->lt(\Illuminate\Support\Carbon::parse($startsAt))) {
+                return false;
+            }
+            if (! empty($endsAt) && now()->gt(\Illuminate\Support\Carbon::parse($endsAt))) {
+                return false;
+            }
+        } catch (\Throwable $e) {
+            return true;
+        }
+
+        return true;
+    }
+}

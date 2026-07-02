@@ -17,10 +17,11 @@
     </button>
 
     {{-- Top announcement bar (managed in Admin → Promotions) --}}
-    @if (setting('announcement_enabled', '0') === '1' && setting('announcement_text'))
+    @if (setting('announcement_enabled', '0') === '1' && setting('announcement_text') && schedule_active(setting('announcement_starts_at'), setting('announcement_ends_at')))
         @php
             $annType = setting('announcement_type', 'offer');
             $annLink = setting('announcement_link') ?: route('products.index');
+            $annCoupon = setting('announcement_coupon', '');
             $annStyles = [
                 'info'    => ['bar' => 'bg-gradient-to-r from-brand-600 to-indigo-600', 'icon' => 'M11.25 11.25l.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z', 'label' => 'Info', 'cta' => 'Learn more'],
                 'offer'   => ['bar' => 'bg-gradient-to-r from-fuchsia-600 via-brand-600 to-indigo-600', 'icon' => 'M9.813 15.904 9 18.75l-.813-2.846a4.5 4.5 0 0 0-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 0 0 3.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 0 0 3.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 0 0-3.09 3.09Z', 'label' => 'Offer', 'cta' => 'Shop now'],
@@ -30,11 +31,19 @@
             ];
             $ann = $annStyles[$annType] ?? $annStyles['offer'];
         @endphp
-        <div x-data="{ show: false, key: 'akz_ann_{{ substr(md5(setting('announcement_text').$annType.($annLink)), 0, 10) }}', init(){ this.show = localStorage.getItem(this.key) !== '1' } }" x-show="show" x-cloak class="relative {{ $ann['bar'] }} text-white">
-            <div class="mx-auto flex max-w-7xl items-center justify-center gap-2.5 px-10 py-2 text-center text-xs font-medium sm:text-sm">
+        <div x-data="{ show: false, key: 'akz_ann_{{ substr(md5(setting('announcement_text').$annType.($annLink).$annCoupon), 0, 10) }}', copied: false, init(){ this.show = localStorage.getItem(this.key) !== '1' } }" x-show="show" x-cloak class="relative {{ $ann['bar'] }} text-white">
+            <div class="mx-auto flex max-w-7xl flex-wrap items-center justify-center gap-2.5 px-10 py-2 text-center text-xs font-medium sm:text-sm">
                 <svg class="hidden h-4 w-4 flex-shrink-0 sm:inline-flex" fill="none" viewBox="0 0 24 24" stroke-width="1.7" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="{{ $ann['icon'] }}" /></svg>
                 <span class="hidden rounded-full bg-white/20 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide sm:inline-flex">{{ $ann['label'] }}</span>
                 <span>{{ setting('announcement_text') }}</span>
+                @if ($annCoupon)
+                    <button type="button" @click="navigator.clipboard.writeText('{{ $annCoupon }}'); copied = true; setTimeout(() => copied = false, 1500)"
+                            class="inline-flex items-center gap-1 rounded-lg border border-dashed border-white/60 bg-white/15 px-2 py-0.5 font-mono text-xs font-bold transition hover:bg-white/25">
+                        <span x-show="!copied">{{ $annCoupon }}</span>
+                        <span x-show="copied" x-cloak>Copied!</span>
+                        <svg x-show="!copied" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 17.25v3.375c0 .621-.504 1.125-1.125 1.125h-9.75a1.125 1.125 0 0 1-1.125-1.125V7.875c0-.621.504-1.125 1.125-1.125H6.75a9.06 9.06 0 0 1 1.5.124m7.5 10.376h3.375c.621 0 1.125-.504 1.125-1.125V11.25c0-4.46-3.243-8.161-7.5-8.876a9.06 9.06 0 0 0-1.5-.124H9.375c-.621 0-1.125.504-1.125 1.125v3.5m7.5 10.375H9.375a1.125 1.125 0 0 1-1.125-1.125v-9.25m0 0H6.375" /></svg>
+                    </button>
+                @endif
                 <a href="{{ $annLink }}" class="ml-1 inline-flex items-center gap-1 font-bold text-white underline-offset-2 hover:underline">
                     {{ $ann['cta'] }}
                     <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke-width="2.2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" /></svg>
@@ -390,7 +399,7 @@
     @endif
 
     {{-- Promotional Popup --}}
-    @if (setting('popup_enabled', '0') === '1')
+    @if (setting('popup_enabled', '0') === '1' && (setting('popup_audience', 'all') !== 'guests' || auth()->guest()))
         @include('partials.popup')
     @endif
 </body>

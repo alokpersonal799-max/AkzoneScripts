@@ -13,6 +13,8 @@
     $popupTimerUntil = setting('popup_timer_until', '');
     $popupAutoClose = (int) setting('popup_auto_close_seconds', 8);
     $popupFrequency = setting('popup_frequency', 'once');
+    $popupCoupon = setting('popup_coupon', '');
+    $popupAudience = setting('popup_audience', 'all');
     $popupProductId = (int) setting('popup_product', 0);
     $popupProduct = null;
 
@@ -35,8 +37,15 @@
         timer: null,
         autoClose: {{ $popupAutoClose }},
         frequency: '{{ $popupFrequency }}',
+        audience: '{{ $popupAudience }}',
         storageKey: 'akz_popup_{{ $popupHash }}',
         init() {
+            // Track whether this browser has ever visited (for the "new visitors" audience).
+            const isNewVisitor = localStorage.getItem('akz_visited') !== '1';
+            localStorage.setItem('akz_visited', '1');
+
+            if (this.audience === 'new' && ! isNewVisitor) return;
+
             if (this.frequency === 'once') {
                 if (localStorage.getItem(this.storageKey) === '1') return;
             }
@@ -182,6 +191,18 @@
                     @endif
 
                     <a href="{{ route('products.show', $popupProduct) }}" class="btn-primary btn-md mt-4 inline-flex">Grab This Deal</a>
+                </div>
+            @endif
+
+            @if ($popupCoupon)
+                <div class="mt-5 text-center" x-data="{ copied: false }">
+                    <p class="text-xs font-semibold uppercase tracking-wide text-slate-400">Use coupon at checkout</p>
+                    <button type="button" @click="navigator.clipboard.writeText('{{ $popupCoupon }}'); copied = true; setTimeout(() => copied = false, 1500)"
+                            class="mt-1.5 inline-flex items-center gap-2 rounded-xl border-2 border-dashed border-brand-300 bg-brand-50 px-4 py-2 font-mono text-base font-bold text-brand-700 transition hover:bg-brand-100">
+                        <span x-show="!copied">{{ $popupCoupon }}</span>
+                        <span x-show="copied" x-cloak class="text-emerald-600">Copied!</span>
+                        <svg x-show="!copied" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 17.25v3.375c0 .621-.504 1.125-1.125 1.125h-9.75a1.125 1.125 0 0 1-1.125-1.125V7.875c0-.621.504-1.125 1.125-1.125H6.75a9.06 9.06 0 0 1 1.5.124m7.5 10.376h3.375c.621 0 1.125-.504 1.125-1.125V11.25c0-4.46-3.243-8.161-7.5-8.876a9.06 9.06 0 0 0-1.5-.124H9.375c-.621 0-1.125.504-1.125 1.125v3.5m7.5 10.375H9.375a1.125 1.125 0 0 1-1.125-1.125v-9.25m0 0H6.375" /></svg>
+                    </button>
                 </div>
             @endif
         </div>

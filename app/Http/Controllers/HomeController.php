@@ -95,6 +95,11 @@ class HomeController extends Controller
     {
         $mode = setting('promo_mode', 'off');
 
+        // Respect the optional schedule window (auto on/off).
+        if ($mode !== 'off' && ! schedule_active(setting('promo_starts_at'), setting('promo_ends_at'))) {
+            $mode = 'off';
+        }
+
         if ($mode === 'products') {
             $ids = json_decode((string) setting('promo_products', '[]'), true) ?: [];
             if (! empty($ids)) {
